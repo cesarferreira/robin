@@ -62,7 +62,39 @@ robin add "deploy" "fastlane deliver --submit-to-review" # Adds a deploy command
 ```
 
 -----------
-## Search
+## Ideas
+
+## Passing params
+
+This config:
+```json
+{
+    "scripts": [
+      { "clean": "flutter clean && rm-rf ./output/" },
+      { "release": "ruby deploy_tool --{{env}}'" },
+      { "release testflight": "fastlane ios release -e={{env}}'" },
+    ]
+}
+```  
+
+Would make this possible:
+```sh
+# clean your builds
+robin clean
+
+# deploy the app to the store
+robin release --env=staging
+robin release --env=production
+robin release --env=dev
+
+# release an alpha build
+robin release testflight --env=alpha
+```
+
+
+
+
+### Search
 
 Giving the `.robin.config.json`:
 
@@ -89,22 +121,6 @@ Will suggest:
 - `robin deploy production`
 
 Unless there's a `robin deploy` in your scripts list
-
-<!-- 
-```
-
-Usage
-
-   $ robin <command> <params>
-
-   $ robin sample <param>             # Uses the <PARAM>
-   
- Examples
-
-   $ robin sample TEST                # Uses the TEST
-   $ robin sample YOLO                # Uses the YOLO
-```  -->
---------------
 
 ## Install
 
