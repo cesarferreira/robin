@@ -2,23 +2,30 @@
 > Run scripts for any project
 
 
-## Reason
-> Every project has a different way of deploying/releasing/etc
-. By maintaining a simple json file with all the available tasks for this project everyone on the team can add / edit the available tasks for the project.
+<!-- Transform a .json file
+<p align="center">
+  <img src="media/json.png" width="100%" />
+</p>
 
-### Sharing is caring?
-> add it to `.gitignore` or share it with the team
-<!-- <p align="center">
-  <img src="https://raw.githubusercontent.com/cesarferreira/assets/master/images/screenshot_terminal_hello_world.png" width="100%" />
+Into a cli -->
+<p align="center">
+  <img src="media/terminal_ss.png" width="100%" />
 </p>
 
 [![Build Status](https://travis-ci.org/cesarferreira/robin.svg?branch=master)](https://travis-ci.org/cesarferreira/robin)
 [![npm](https://img.shields.io/npm/dt/robin.svg)](https://www.npmjs.com/package/robin)
-[![npm](https://img.shields.io/npm/v/robin.svg)](https://www.npmjs.com/package/robin) -->
+[![npm](https://img.shields.io/npm/v/robin.svg)](https://www.npmjs.com/package/robin) 
 
+## Reason
+> Every project has a different way of deploying/releasing/etc
+. By maintaining a simple json file with all the available tasks for this project everyone on the team can add / edit the available tasks for the project.
+
+
+
+### Sharing is caring?
+> add it to `.gitignore` or share it with the team
 
  ## Usage
-
 
 ```sh
 robin init # Creates an empty .robin.config.json

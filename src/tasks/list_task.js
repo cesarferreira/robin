@@ -10,10 +10,12 @@ const CONFIG_FILE_NAME = ".robin.config.json";
 // Main code //
 const self = (module.exports = {
 // MOVE ME TO UTILS?
-  readConfigFile: () => require(process.cwd() + "/" + CONFIG_FILE_NAME),
-  getCommandList: () => JSON.parse(self.readConfigFile()).scripts,
+  getConfigPath: () => process.cwd() + "/" + CONFIG_FILE_NAME,
+  readConfigFile: () => require(self.getConfigPath()),
+  getCommandList: () => JSON.parse(self.readConfigFile()),
   init: () => {
-    const path = self.getCommandList();
-    log(`${path}`);
+	  log(`path: ${self.getConfigPath()}`);
+	  log(`configfile: ${self.readConfigFile()}`);
+	  log(`commandList: ${self.getCommandList()}`);
   },
 });
