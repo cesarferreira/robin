@@ -21,11 +21,11 @@
 
 
 ```sh
-robin init # Creates an empty .robin.config
+robin init # Creates an empty .robin.config.json
 ```
 Generates this file:
 <!-- We can be smart and insert deploy prod if we detect it's flutter, has fastlane? we can pre-populate -->
-`.robin.json`
+`.robin.config.json`
 
 ```javascript
 {
@@ -63,7 +63,7 @@ robin add "deploy" "fastlane deliver --submit-to-review" # Adds a deploy command
 -----------
 ## Search
 
-Giving the `.robin.json`:
+Giving the `.robin.config.json`:
 
 ```javascript
 {
