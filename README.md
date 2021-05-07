@@ -42,6 +42,7 @@ Generates this file:
 Example: 
 ```sh
 robin release beta # Would run your script to release your app to beta
+robin deploy staging # Would deploy your server to staging environment
 ```
 --------------
 
