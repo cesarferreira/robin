@@ -59,6 +59,33 @@ Example:
 robin add "deploy" "fastlane deliver --submit-to-review" # Adds a deploy command to your current list of commands
 ```
 
+-----------
+## Search
+
+Giving the `.robin.json`:
+
+```json
+{
+  "scripts": [ 
+    "deploy staging": "echo 'ruby deploy tool --staging'",
+    "deploy production": "...",
+    "clean": "...",
+    "release beta": "...",
+    "release alpha": "...",
+  ]
+}
+```
+
+Writing: 
+```sh
+robin deploy 
+```
+
+Will suggest:
+- `robin deploy staging`
+- `robin deploy production`
+
+Unless there's a `robin deploy` in your scripts list
 
 <!-- 
 ```
