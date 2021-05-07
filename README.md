@@ -3,8 +3,8 @@
 
 
 ## Reason
-> every project has a different way of deploying/releasing/etc
-By maintaining a simple json file with all the available tasks for this project everyone on the team can add / edit the available tasks for the project.
+> Every project has a different way of deploying/releasing/etc
+. By maintaining a simple json file with all the available tasks for this project everyone on the team can add / edit the available tasks for the project.
 
 ### Sharing is caring?
 > add it to `.gitignore` or share it with the team
@@ -16,11 +16,6 @@ By maintaining a simple json file with all the available tasks for this project 
 [![npm](https://img.shields.io/npm/dt/robin.svg)](https://www.npmjs.com/package/robin)
 [![npm](https://img.shields.io/npm/v/robin.svg)](https://www.npmjs.com/package/robin) -->
 
-## Install
-
-```sh
-npm install -g robin
-```
 
  ## Usage
 
@@ -79,9 +74,16 @@ Usage
    $ robin sample TEST                # Uses the TEST
    $ robin sample YOLO                # Uses the YOLO
 ```  -->
+--------------
 
-<!-- ## Created by
+## Install
+
+```sh
+npm install -g robin
+```
+
+## Created by
 [Cesar Ferreira](https://cesarferreira.com)
 
 ## License
-MIT © [Cesar Ferreira](http://cesarferreira.com) -->
+MIT © [Cesar Ferreira](http://cesarferreira.com)
