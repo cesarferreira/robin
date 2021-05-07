@@ -27,7 +27,7 @@ Generates this file:
 <!-- We can be smart and insert deploy prod if we detect it's flutter, has fastlane? we can pre-populate -->
 `.robin.json`
 
-```json
+```javascript
 {
   "scripts": [ 
     "deploy staging": "echo 'ruby deploy tool --staging'",
@@ -64,7 +64,7 @@ robin add "deploy" "fastlane deliver --submit-to-review" # Adds a deploy command
 
 Giving the `.robin.json`:
 
-```json
+```javascript
 {
   "scripts": [ 
     "deploy staging": "echo 'ruby deploy tool --staging'",
