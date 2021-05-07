@@ -27,16 +27,17 @@ Generates this file:
 <!-- We can be smart and insert deploy prod if we detect it's flutter, has fastlane? we can pre-populate -->
 `.robin.config.json`
 
-```javascript
+```json
 {
-  "scripts": [ 
-    "deploy staging": "echo 'ruby deploy tool --staging'",
-    "deploy production": "...",
-    "clean": "...",
-    "release beta": "...",
-    "release alpha": "...",
-  ]
-}
+    "scripts": [
+      { "deploy staging": "echo 'ruby deploy tool --staging'" },
+      { "deploy production": "..." },
+      { "clean": "..." },
+      { "release beta": "..." },
+      { "release alpha": "..." }
+    ]
+  }
+  
 ```
 
 Example: 
@@ -65,16 +66,17 @@ robin add "deploy" "fastlane deliver --submit-to-review" # Adds a deploy command
 
 Giving the `.robin.config.json`:
 
-```javascript
+```json
 {
-  "scripts": [ 
-    "deploy staging": "echo 'ruby deploy tool --staging'",
-    "deploy production": "...",
-    "clean": "...",
-    "release beta": "...",
-    "release alpha": "...",
-  ]
-}
+    "scripts": [
+      { "deploy staging": "echo 'ruby deploy tool --staging'" },
+      { "deploy production": "..." },
+      { "clean": "..." },
+      { "release beta": "..." },
+      { "release alpha": "..." }
+    ]
+  }
+  
 ```
 
 Writing: 

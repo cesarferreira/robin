@@ -5,7 +5,8 @@ const Chalk = require("chalk");
 const Utils = require("./utils/utils");
 const log = console.log;
 
-const SampleTask = require("./tasks/sample_task");
+const InitTask = require("./tasks/init_task");
+const ListTask = require("./tasks/list_task");
 
 // Main code //
 const self = (module.exports = {
@@ -16,10 +17,10 @@ const self = (module.exports = {
     switch (command.toLowerCase()) {
       case "init":
 		  // TODO if file exists, REFUSE TO do it
-        SampleTask.init(params);
+        InitTask.init(params);
         break;
       case "list":
-        SampleTask.init(params);
+        ListTask.init(params);
         break;
 
       default:
