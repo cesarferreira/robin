@@ -1,6 +1,13 @@
 # robin
 > Run scripts for any project
 
+
+## Reason
+> every project has a different way of deploying/releasing/etc
+By maintaining a simple json file with all the available tasks for this project everyone on the team can add / edit the available tasks for the project.
+
+### Sharing is caring?
+> add it to `.gitignore` or share it with the team
 <!-- <p align="center">
   <img src="https://raw.githubusercontent.com/cesarferreira/assets/master/images/screenshot_terminal_hello_world.png" width="100%" />
 </p>
@@ -24,17 +31,40 @@ robin init # Creates an empty .robin.config
 Generates this file:
 <!-- We can be smart and insert deploy prod if we detect it's flutter, has fastlane? we can pre-populate -->
 `.robin.json`
+
 ```json
-[ 
-  "deploy prod": "/bin/ruby deploy tool --production",
-  "clean database": "/bin/mysql database --production --delete",
-]
+{
+  "scripts": [ 
+    "deploy staging": "echo 'ruby deploy tool --staging'",
+    "deploy production": "...",
+    "clean": "...",
+    "release beta": "...",
+    "release alpha": "...",
+  ]
+}
 ```
 
+Example: 
+```sh
+robin release beta # Would run your script to release your app to beta
+```
+--------------
 
 ```sh
 robin list # Lists all the available commands
 ```
+--------------
+
+```sh
+robin add # Adds a command
+```
+
+Example: 
+```sh
+robin add "deploy" "fastlane deliver --submit-to-review" # Adds a deploy command to your current list of commands
+```
+
+
 <!-- 
 ```
 
