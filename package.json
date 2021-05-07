@@ -1,0 +1,38 @@
+{
+  "name": "robin",
+  "version": "0.0.0",
+  "description": "Run scripts for any project",
+  "author": {
+    "name": "Cesar Ferreira",
+    "email": "cesar.manuel.ferreira@gmail.com",
+    "url": "http://cesarferreira.com"
+  },
+  "scripts": {
+    "start": "node example.js",
+    "lint": "eslint src/**/*",
+    "test": "xo"
+  },
+  "bin": {
+    "robin": "cli.js"
+  },
+  "main": "cli.js",
+  "keywords": [],
+  "dependencies": {
+    "chalk": "^4.1.1",
+    "meow": "^10.0.0",
+    "update-notifier": "^5.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.25.0",
+    "xo": "^0.39.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cesarferreira/robin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cesarferreira/robin/issues"
+  },
+  "homepage": "https://github.com/cesarferreira/robin#readme",
+  "license": "MIT"
+}
