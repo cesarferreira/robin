@@ -14,8 +14,8 @@ file at the root of the project:
 ```json
 {
     "scripts": {
-      "clean": "flutter clean && rm-rf ./output/",
-      "release": "ruby deploy_tool --{{env}}'",
+      "clean": "flutter clean && rm-rf ./src/gen/",
+      "release": "fastlane ios app_distribution release --{{env}} --rollout=0.2'",
       "release testflight": "fastlane ios release -e={{env}}'",
     }
 }
