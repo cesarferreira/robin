@@ -1,6 +1,5 @@
 # robin
-> Run scripts for any project
-
+> Run scripts on any project
 
 <!-- Transform a .json file
 <p align="center">
@@ -76,11 +75,11 @@ robin add "deploy" "fastlane deliver --submit-to-review" # Adds a deploy command
 This config:
 ```json
 {
-    "scripts": [
+    "scripts": {
       "clean": "flutter clean && rm-rf ./output/",
       "release": "ruby deploy_tool --{{env}}'",
       "release testflight": "fastlane ios release -e={{env}}'",
-    ]
+    }
 }
 ```  
 
