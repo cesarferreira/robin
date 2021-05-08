@@ -135,6 +135,20 @@ Will suggest:
 
 Unless there's a `robin deploy` in your scripts list
 
+
+## Interactive mode
+
+```sh
+robin -i # --interactive 
+```
+
+So we can fuzzy search the available tasks
+
+<p align="center"><img width="100%"src="https://github.com/cesarferreira/purrge/raw/master/extras/anim.gif"></p>
+
+
+
+
 ## Have init templates
 
 ```sh

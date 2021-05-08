@@ -12,6 +12,7 @@ const self = (module.exports = {
   find: (name, availableCommands) => lodash.filter(availableCommands, (x) => x.name === name),
   
   run: (command) => {
+    Utils.
     log(`gonna run: ${command.name} -> ${command.command}`)
   },
 });
