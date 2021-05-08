@@ -115,8 +115,8 @@ Giving the `.robin.config.json`:
       "clean": "...",
       "release beta": "...",
       "release alpha": "..."
-    ]
-  }
+    }
+}
   
 ```
 
