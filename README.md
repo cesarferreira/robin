@@ -1,28 +1,32 @@
 # robin
 > Run scripts on any project
 
-<!-- Transform a .json file
-<p align="center">
-  <img src="media/json.png" width="100%" />
-</p>
-
-Into a cli -->
-<p align="center">
-  <img src="media/terminal_ss.png" width="100%" />
-</p>
-
 [![Build Status](https://travis-ci.org/cesarferreira/robin.svg?branch=master)](https://travis-ci.org/cesarferreira/robin)
 [![npm](https://img.shields.io/npm/dt/robin.svg)](https://www.npmjs.com/package/robin)
 [![npm](https://img.shields.io/npm/v/robin.svg)](https://www.npmjs.com/package/robin) 
 
+<p align="center">
+  <img src="media/terminal_ss.png" width="100%" />
+</p>
+
+All of the above was generated based on this `.robin.config.json`
+file at the root of the project:
+```json
+{
+    "scripts": {
+      "clean": "flutter clean && rm-rf ./output/",
+      "release": "ruby deploy_tool --{{env}}'",
+      "release testflight": "fastlane ios release -e={{env}}'",
+    }
+}
+```  
+
+
+
+
 ## Reason
-> Every project has a different way of deploying/releasing/etc
-. By maintaining a simple json file with all the available tasks for this project everyone on the team can add / edit the available tasks for the project.
+> Every project has a different way of deploying/releasing/cleaning/etc. By maintaining a simple json file with all the available tasks for this project everyone on the team can run/add/ edit the available tasks for the project on their own machine.
 
-
-
-### Sharing is caring?
-> add it to `.gitignore` or share it with the team
 
  ## Usage
 
