@@ -21,14 +21,16 @@ file at the root of the project:
 }
 ```  
 
-
-
-
 ## Reason
 > Every project has a different way of deploying/releasing/cleaning/etc. By maintaining a simple json file with all the available tasks for this project everyone on the team can run/add/ edit the available tasks for the project on their own machine.
 
+## Install
 
- ## Usage
+```sh
+npm install -g robin
+```
+
+## Usage
 
 ```sh
 robin init # Creates an empty .robin.config.json
@@ -130,12 +132,6 @@ Will suggest:
 - `robin deploy production`
 
 Unless there's a `robin deploy` in your scripts list
-
-## Install
-
-```sh
-npm install -g robin
-```
 
 ## Created by
 [Cesar Ferreira](https://cesarferreira.com)
