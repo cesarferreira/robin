@@ -114,7 +114,7 @@ Giving the `.robin.config.json`:
       "deploy production": "...",
       "clean": "...",
       "release beta": "...",
-      { "release alpha": "..." }
+      "release alpha": "..."
     ]
   }
   
