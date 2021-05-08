@@ -15,11 +15,12 @@ file at the root of the project:
 {
     "scripts": {
       "clean": "flutter clean && rm-rf ./src/gen/",
-      "release": "fastlane ios app_distribution release --{{env}} --rollout=0.2'",
+      "release": "fastlane ios app_distribution release --{{env}} --rollout=1'",
       "release testflight": "fastlane ios release -e={{env}}'",
     }
 }
 ```  
+No need to re-generate / compile any code, it will read your `.robin.config.json` every time you run a command.
 
 ## Reason
 > Every project has a different way of deploying/releasing/cleaning/etc. By maintaining a simple json file with all the available tasks for this project everyone on the team can run/add/ edit the available tasks for the project on their own machine.
@@ -33,20 +34,21 @@ npm install -g robin
 ## Usage
 
 ```sh
-robin init # Creates an empty .robin.config.json
+robin init
 ```
-Generates this file:
+
+Creates a template `.robin.config.json` in your current folder.
 <!-- We can be smart and insert deploy prod if we detect it's flutter, has fastlane? we can pre-populate -->
-`.robin.config.json`
 
 ```json
 {
     "scripts": {
+      "clean": "...",
       "deploy staging": "echo 'ruby deploy tool --staging'",
       "deploy production": "...",
-      "clean": "...",
       "release beta": "...",
-      "release alpha": "..."
+      "release alpha": "...",
+      "release dev": "..."
     }
   }
   
@@ -105,7 +107,7 @@ robin release testflight --env=alpha
 
 
 
-### Search
+## IDEAS (not implemented yet)
 
 Giving the `.robin.config.json`:
 
@@ -132,6 +134,16 @@ Will suggest:
 - `robin deploy production`
 
 Unless there's a `robin deploy` in your scripts list
+
+## Have init templates
+
+```sh
+robin init --android
+robin init --ios
+robin init --flutter
+robin init --rails
+```
+
 
 ## Created by
 [Cesar Ferreira](https://cesarferreira.com)

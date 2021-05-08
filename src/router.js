@@ -7,6 +7,7 @@ const log = console.log;
 
 const InitTask = require("./tasks/init_task");
 const ListTask = require("./tasks/list_task");
+const RunTask = require("./tasks/run_task");
 
 // Main code //
 const self = (module.exports = {
@@ -14,7 +15,7 @@ const self = (module.exports = {
     const command = input[0];
     const params = input.subarray(1, input.length);
 
-	const availableComands = ListTask.readConfigFile();
+	const availableCommands = ListTask.getCommandList();
 
     switch (command.toLowerCase()) {
       case "init":
@@ -26,12 +27,14 @@ const self = (module.exports = {
         break;
 
       default:
-		let a = availableComands.find((a)=>{
-			a.tit
-		})
-
-		// if i can find it tell run it, other wise say the following
-        log(`Sorry, cant find ${command} with `);
+		const result = RunTask.find(command, availableCommands);
+		
+		if (result.length != 0 ) {
+			RunTask.run(result[0]);
+		} else {
+			log(`Sorry, cant find ${command} with `);
+		}
+			
     }
   },
 });

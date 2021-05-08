@@ -1,8 +1,8 @@
 {
     "scripts": {
+      "clean": "echo 'cleaning team here'",
       "deploy staging": "echo 'ruby deploy tool --staging'",
       "deploy production": "...",
-      "clean": "...",
       "release beta": "...",
       "release alpha": "..."
     }
