@@ -14,6 +14,8 @@ const self = (module.exports = {
     const command = input[0];
     const params = input.subarray(1, input.length);
 
+	const availableComands = ListTask.readConfigFile();
+
     switch (command.toLowerCase()) {
       case "init":
 		  // TODO if file exists, REFUSE TO do it
@@ -24,7 +26,12 @@ const self = (module.exports = {
         break;
 
       default:
-        log(`Sorry, cant find ${command}`);
+		let a = availableComands.find((a)=>{
+			a.tit
+		})
+
+		// if i can find it tell run it, other wise say the following
+        log(`Sorry, cant find ${command} with `);
     }
   },
 });

@@ -36,13 +36,13 @@ Generates this file:
 
 ```json
 {
-    "scripts": [
-      { "deploy staging": "echo 'ruby deploy tool --staging'" },
-      { "deploy production": "..." },
-      { "clean": "..." },
-      { "release beta": "..." },
-      { "release alpha": "..." }
-    ]
+    "scripts": {
+      "deploy staging": "echo 'ruby deploy tool --staging'",
+      "deploy production": "...",
+      "clean": "...",
+      "release beta": "...",
+      "release alpha": "..."
+    }
   }
   
 ```
@@ -77,9 +77,9 @@ This config:
 ```json
 {
     "scripts": [
-      { "clean": "flutter clean && rm-rf ./output/" },
-      { "release": "ruby deploy_tool --{{env}}'" },
-      { "release testflight": "fastlane ios release -e={{env}}'" },
+      "clean": "flutter clean && rm-rf ./output/",
+      "release": "ruby deploy_tool --{{env}}'",
+      "release testflight": "fastlane ios release -e={{env}}'",
     ]
 }
 ```  

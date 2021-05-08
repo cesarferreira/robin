@@ -12,20 +12,19 @@ const self = (module.exports = {
   // MOVE ME TO UTILS?
   getConfigPath: () => process.cwd() + "/" + CONFIG_FILE_NAME,
   readConfigFile: () => fs.readFileSync(self.getConfigPath()),
-  getCommandList: () => JSON.parse(self.readConfigFile()),
+  getCommandList: () => {
+    let config = JSON.parse(self.readConfigFile());
+    var commands = [];
+
+    for (const [key, value] of Object.entries(config.scripts)) {
+		let content = Object.entries(value);
+      commands.push({ name: content[0][0], command: content[0][1] });
+    }
+	return commands;
+  },
   init: () => {
+    let commands = self.getCommandList();
+    log(commands);
 
-	let rawdata = fs.readFileSync(self.getConfigPath());
-    // log(rawdata);
-    let config = JSON.parse(rawdata);
-    // log(config);
-
-	for (const [key, value] of Object.entries(config.scripts)) {
-		console.log(key, value);
-	  }
-
-    // log(`path: ${self.getConfigPath()}`);
-    // log(`configfile: ${self.readConfigFile()}`);
-    // log(`commandList: ${self.getCommandList()}`);
   },
 });
