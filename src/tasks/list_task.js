@@ -16,10 +16,16 @@ const self = (module.exports = {
     let config = JSON.parse(self.readConfigFile());
     var commands = [];
 
-    for (const [key, value] of Object.entries(config.scripts)) {
-		let content = Object.entries(value);
-      commands.push({ name: content[0][0], command: content[0][1] });
-    }
+	let entries = Object.entries(config.scripts);
+
+	for (const value in entries) {
+		let name = entries[value][0];
+		let command = entries[value][1];
+		if (name != undefined){
+			commands.push({ name: name, command: command });
+		}	
+	}
+
 	return commands;
   },
   init: () => {

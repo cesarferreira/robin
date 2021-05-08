@@ -100,18 +100,17 @@ robin release testflight --env=alpha
 
 
 
-
 ### Search
 
 Giving the `.robin.config.json`:
 
 ```json
 {
-    "scripts": [
-      { "deploy staging": "echo 'ruby deploy tool --staging'" },
-      { "deploy production": "..." },
-      { "clean": "..." },
-      { "release beta": "..." },
+    "scripts": {
+      "deploy staging": "echo 'ruby deploy tool --staging'",
+      "deploy production": "...",
+      "clean": "...",
+      "release beta": "...",
       { "release alpha": "..." }
     ]
   }
