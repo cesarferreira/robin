@@ -30,7 +30,10 @@ const self = (module.exports = {
   },
   init: () => {
     let commands = self.getCommandList();
-    log(commands);
+    // log(commands);
+    for (var c of commands) {
+      log("  "+c.name);
+    }
 
   },
 });

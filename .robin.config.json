@@ -1,6 +1,8 @@
 {
     "scripts": {
-      "clean": "echo 'cleaning team here'",
+      "clean": "echo 'cleaning team here' && echo 'cleaning team here' && echo 'cleaning team here'",
+      "clean2": "echo 'cleaning team here'",
+      "clean3": "ls -la",
       "deploy staging": "echo 'ruby deploy tool --staging'",
       "deploy production": "...",
       "release beta": "...",
