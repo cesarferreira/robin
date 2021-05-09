@@ -12,9 +12,10 @@ const RunTask = require("./tasks/run_task");
 // Main code //
 const self = (module.exports = {
   init: (input, flags) => {
-    const command = input[0];
+    const command = input.join(" ");
     const params = input.subarray(1, input.length);
 
+    // log(input.join(" "))
 	const availableCommands = ListTask.getCommandList();
 
     switch (command.toLowerCase()) {
@@ -30,9 +31,9 @@ const self = (module.exports = {
 		const result = RunTask.find(command, availableCommands);
 		
 		if (result.length != 0 ) {
-			RunTask.run(result[0]);
+			RunTask.run(result[0], flags);
 		} else {
-			log(`Sorry, cant find ${command} with `);
+			log(`Sorry, cant find "${command}" in your `);
 		}
 			
     }

@@ -7,16 +7,17 @@ const lodash = require("lodash");
 const fs = require("fs");
 const Utils = require("../utils/utils");
 const { spawn } = require("child_process");
-const execFile = require("child_process").execFile;
-const es = require("event-stream");
 const child_process = require("child_process");
 
 const { exec } = require("child_process");
 
-function runCommand(task) {
-  log("COMANDO: " + task.command);
+function replaceAll(str, find, replace) {
+  log(`${str}, ${find}, ${replace}`);
+  return str.replace(new RegExp(find, "g"), replace);
+}
 
-  exec(task.command, (err, stdout, stderr) => {
+function runCommand(command) {
+  exec(command, (err, stdout, stderr) => {
     if (err) {
       //some err occurred
       error(err);
@@ -35,17 +36,25 @@ const self = (module.exports = {
   find: (name, availableCommands) =>
     lodash.filter(availableCommands, (x) => x.name === name),
 
-  run: (task) => {
+  run: (task, flags) => {
     Utils.title(`Runing: ${task.name}...`);
+    log(`${task.command}...`);
 
-    const splitArray = task.command.split(" ");
-    const command = splitArray[0].trim();
-    const params = task.command
-      .substring(command.length, task.command.length)
-      .trim();
+    log(flags);
 
-    // log(command + " " + params);
+    var command = task.command;
 
-    runCommand(task);
+    let entries = Object.entries(flags);
+
+    for (const value in entries) {
+      let variable = entries[value][0];
+      let target = entries[value][1];
+      if (target) {
+        command = replaceAll(command, `{{${variable}}}`, target);
+      }
+    }
+
+    log(`command is: ${command}`);
+    // runCommand(command);
   },
 });

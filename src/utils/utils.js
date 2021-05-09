@@ -27,5 +27,8 @@ const self = module.exports = {
 	},
 	titleError: (text) => {
 		log(Chalk.red('==>') + Chalk.bold(` ${text}`));
-	}
+	},
+
+	CONFIG_FILE_NAME: ".robin.config.json"
+
 };

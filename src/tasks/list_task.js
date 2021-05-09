@@ -6,11 +6,10 @@ const log = console.log;
 const fs = require("fs");
 const Utils = require("../utils/utils");
 
-const CONFIG_FILE_NAME = ".robin.config.json";
 // Main code //
 const self = (module.exports = {
   // MOVE ME TO UTILS?
-  getConfigPath: () => process.cwd() + "/" + CONFIG_FILE_NAME,
+  getConfigPath: () => process.cwd() + "/" + Utils.CONFIG_FILE_NAME,
   readConfigFile: () => fs.readFileSync(self.getConfigPath()),
   getCommandList: () => {
     let config = JSON.parse(self.readConfigFile());
@@ -32,7 +31,7 @@ const self = (module.exports = {
     let commands = self.getCommandList();
     // log(commands);
     for (var c of commands) {
-      log("  "+c.name);
+      log(" -"+c.name);
     }
 
   },

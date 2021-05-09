@@ -1,13 +1,9 @@
 {
     "scripts": {
-      "wipe": "rm -rf node_modules/ package-lock.json",
-      "clean": "echo 'cleaning team here' && echo 'cleaning team here' && echo 'cleaning team here'",
-      "clean2": "echo 'cleaning team here'",
-      "clean3": "ls -la",
-      "deploy staging": "echo 'ruby deploy tool --staging'",
-      "deploy production": "...",
-      "release beta": "...",
-      "release alpha": "..."
+      "clean": "rm -rf node_modules/ package-lock.json",
+      "release": "np",
+      "sample params": "fastlane ios release --env={{env}}",
+      "github": "open https://github.com/cesarferreira/robin"
     }
   }
   
