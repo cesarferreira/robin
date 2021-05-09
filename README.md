@@ -2,8 +2,8 @@
 > Run scripts on any project
 
 [![Build Status](https://travis-ci.org/cesarferreira/robin.svg?branch=master)](https://travis-ci.org/cesarferreira/robin)
-[![npm](https://img.shields.io/npm/dt/robin.svg)](https://www.npmjs.com/package/robin)
-[![npm](https://img.shields.io/npm/v/robin.svg)](https://www.npmjs.com/package/robin) 
+[![npm](https://img.shields.io/npm/dt/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool)
+[![npm](https://img.shields.io/npm/v/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) 
 
 <p align="center">
   <img src="media/terminal_ss.png" width="100%" />
@@ -28,7 +28,7 @@ No need to re-generate / compile any code, it will read your `.robin.config.json
 ## Install
 
 ```sh
-npm install -g robin
+npm install -g robin-cli-tool
 ```
 
 ## Usage
@@ -139,7 +139,7 @@ Unless there's a `robin deploy` in your scripts list
 ## Interactive mode
 
 ```sh
-robin -i # --interactive 
+robin --interactive 
 ```
 
 So we can fuzzy search the available tasks
