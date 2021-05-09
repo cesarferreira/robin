@@ -40,8 +40,6 @@ const self = (module.exports = {
     Utils.title(`Runing: ${task.name}...`);
     log(`${task.command}...`);
 
-    log(flags);
-
     var command = task.command;
 
     let entries = Object.entries(flags);
@@ -54,7 +52,6 @@ const self = (module.exports = {
       }
     }
 
-    log(`command is: ${command}`);
-    // runCommand(command);
+    runCommand(command);
   },
 });
