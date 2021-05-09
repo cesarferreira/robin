@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "node example.js",
+    "test": "node test.js",
     "lint": "eslint src/**/*"
   },
   "bin": {
