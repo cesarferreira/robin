@@ -23,7 +23,8 @@
     "lodash": "^4.17.21",
     "meow": "^9.0.0",
     "np": "^7.5.0",
-    "update-notifier": "^5.1.0"
+    "update-notifier": "^5.1.0",
+    "user": "*"
   },
   "devDependencies": {
     "eslint": "^7.25.0",
