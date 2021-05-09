@@ -1,5 +1,6 @@
 {
     "scripts": {
+      "wipe": "rm -rf node_modules/ package-lock.json",
       "clean": "echo 'cleaning team here' && echo 'cleaning team here' && echo 'cleaning team here'",
       "clean2": "echo 'cleaning team here'",
       "clean3": "ls -la",
