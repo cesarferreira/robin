@@ -8,7 +8,7 @@ const lodash = require("lodash");
 const Utils = require("../utils/utils");
 
 function replaceAll(str, find, replace) {
-  log(`${str}, ${find}, ${replace}`);
+  // log(`${str}, ${find}, ${replace}`);
   return str.replace(new RegExp(find, "g"), replace);
 }
 

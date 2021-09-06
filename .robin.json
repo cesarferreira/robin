@@ -4,6 +4,7 @@
       "clean": "rm -rf node_modules/ package-lock.json",
       "release": "np",
       "sample params": "fastlane ios release --env={{env}}",
+      "sample": "echo 'fastlane ios release --env={{env}}'",
       "github": "open https://github.com/cesarferreira/robin"
     }
   }
