@@ -30,7 +30,8 @@ const self = (module.exports = {
   init: () => {
     let commands = self.getCommandList();
     for (var c of commands) {
-      log(" -"+c.name);
+      log(Chalk.blue('==>') + Chalk.bold(` ${c.name}  `) + Chalk.grey(`# ${c.command}`));
+
     }
 
   },
