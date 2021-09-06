@@ -13,16 +13,14 @@ Usage
 
    $ robin <command> <params>
 
-   $ robin sample <param>             # Uses the <PARAM>
-   $ robin other <param>              # Other the <PARAM>
-   $ robin another <param>            # Another the <PARAM>
+   $ robin init            # creates a new '.robin.json' config
+   $ robin list            # Lists the available commanbds
    
- Examples
-
-   $ robin sample TEST                # Uses the TEST
-   $ robin sample YOLO                # Uses the YOLO
-   $ robin other YOLO                 # Uses the YOLO
-   $ robin another YOLO               # Uses the YOLO
+   Examples
+   
+   $ robin clean           # Runs the clean script (eg: rm -rf node_modules)
+   $ robin release ios     # Runs the 'release ios' script (eg: fastlane run testflight)
+  
 `,
   {
     alias: {

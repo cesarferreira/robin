@@ -4,32 +4,14 @@
 const Chalk = require("chalk");
 const log = console.log;
 const lodash = require("lodash");
-const fs = require("fs");
+// const fs = require("fs");
 const Utils = require("../utils/utils");
-const { spawn } = require("child_process");
-const child_process = require("child_process");
-
-const { exec } = require("child_process");
 
 function replaceAll(str, find, replace) {
   log(`${str}, ${find}, ${replace}`);
   return str.replace(new RegExp(find, "g"), replace);
 }
 
-function runCommand(command) {
-  exec(command, (err, stdout, stderr) => {
-    if (err) {
-      //some err occurred
-      error(err);
-    } else {
-      if (!stderr) {
-        log(`${stdout}`);
-      } else {
-        log(`stderr: ${stderr}`);
-      }
-    }
-  });
-}
 
 // Main code //
 const self = (module.exports = {
@@ -38,7 +20,7 @@ const self = (module.exports = {
 
   run: (task, flags) => {
     Utils.title(`Runing: ${task.name}...`);
-    log(`${task.command}...`);
+    // log(`${task.command}...`);
 
     var command = task.command;
 
@@ -52,6 +34,6 @@ const self = (module.exports = {
       }
     }
 
-    runCommand(command);
+    Utils.runCommand(command);
   },
 });

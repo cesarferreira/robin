@@ -9,7 +9,7 @@
   <img src="media/terminal_ss.png" width="100%" />
 </p>
 
-All of the above was generated based on this `.robin.config.json`
+All of the above was generated based on this `.robin.json`
 file at the root of the project:
 ```json
 {
@@ -20,7 +20,7 @@ file at the root of the project:
     }
 }
 ```  
-No need to re-generate / compile any code, it will read your `.robin.config.json` every time you run a command.
+No need to re-generate / compile any code, it will read your `.robin.json` every time you run a command.
 
 ## Reason
 > Every project has a different way of deploying/releasing/cleaning/etc. By maintaining a simple json file with all the available tasks for this project everyone on the team can run/add/ edit the available tasks for the project on their own machine.
@@ -37,7 +37,7 @@ npm install -g robin-cli-tool
 robin init
 ```
 
-Creates a template `.robin.config.json` in your current folder.
+Creates a template `.robin.json` in your current folder.
 <!-- We can be smart and insert deploy prod if we detect it's flutter, has fastlane? we can pre-populate -->
 
 ```json
@@ -109,7 +109,7 @@ robin release testflight --env=alpha
 
 ## IDEAS (not implemented yet)
 
-Giving the `.robin.config.json`:
+Giving the `.robin.json`:
 
 ```json
 {
