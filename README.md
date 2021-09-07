@@ -1,29 +1,51 @@
 # robin
 > Run scripts on any project
 
+
+ <!-- , everyone on the team can run/add/edit the available tasks for the project on their own machine. -->
+
 [![Build Status](https://travis-ci.org/cesarferreira/robin.svg?branch=master)](https://travis-ci.org/cesarferreira/robin)
 [![npm](https://img.shields.io/npm/dt/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool)
 [![npm](https://img.shields.io/npm/v/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) 
+
+> Every project has a different way of deploying/releasing/cleaning/etc. By maintaining a simple json file with all the available tasks for a project
 
 <p align="center">
   <img src="media/terminal_ss.png" width="100%" />
 </p>
 
-All of the above was generated based on this `.robin.json`
+All of the above was generated based on this `robin.json`
 file at the root of the project:
 ```json
 {
     "scripts": {
       "clean": "flutter clean && rm-rf ./src/gen/",
       "release": "fastlane ios app_distribution release --{{env}} --rollout=1'",
-      "release testflight": "fastlane ios release -e={{env}}'",
+      "release testflight": "fastlane ios release -e={{env}}'"
     }
 }
 ```  
+
+Will result in the following list:
+
+```sh
+❯ robin list
+==> clean                 # flutter clean && rm-rf ./src/gen/                               
+==> release               # fastlane ios app_distribution release --{{env}} --rollout=1'    
+==> release testflight    # fastlane ios release -e={{env}}'             
+```
+
+<!-- which allows us to do:
+
+```sh
+robin release --env=staging
+robin release --env=production
+robin release --env=dev
+``` -->
+
 No need to re-generate / compile any code, it will read your `robin.json` every time you run a command.
 
-## Reason
-> Every project has a different way of deploying/releasing/cleaning/etc. By maintaining a simple json file with all the available tasks for this project everyone on the team can run/add/ edit the available tasks for the project on their own machine.
+
 
 ## Install
 
@@ -37,7 +59,7 @@ npm install -g robin-cli-tool
 robin init
 ```
 
-Creates a template `.robin.json` in your current folder.
+Creates a template `robin.json` in your current folder.
 <!-- We can be smart and insert deploy prod if we detect it's flutter, has fastlane? we can pre-populate -->
 
 ```json
@@ -56,8 +78,8 @@ Creates a template `.robin.json` in your current folder.
 
 Example: 
 ```sh
-robin release beta # Would run your script to release your app to beta
-robin deploy staging # Would deploy your server to staging environment
+robin release beta      # Would run your script to release your app to beta
+robin deploy staging    # Would deploy your server to staging environment
 ```
 --------------
 
@@ -116,8 +138,7 @@ Giving the `robin.json`:
 {
     "scripts": {
       "deploy staging": "echo 'ruby deploy tool --staging'",
-      "deploy production": "...",
-      "clean": "...",
+      "deploy production": "echo 'ruby deploy tool --production'",
       "release beta": "...",
       "release alpha": "..."
     }

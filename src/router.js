@@ -27,15 +27,15 @@ const self = (module.exports = {
     
     switch (command.toLowerCase()) {
       case "init":
-        // TODO if file exists, REFUSE TO do it
-        InitTask.init(params);
+        InitTask.init(params, flags);
         break;
         case "list":
         interruptIfConfigMissing();
-        // ListTask.init(params);
+        ListTask.init(params);
         break;
 
       default:
+
 		const result = RunTask.find(command, availableCommands);
 		
 		if (result.length != 0 ) {
