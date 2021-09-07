@@ -13,7 +13,7 @@ Usage
 
    $ robin <command> <params>
 
-   $ robin init            # creates a new '.robin.json' config
+   $ robin init            # creates a new 'robin.json' config
    $ robin list            # Lists the available commanbds
    
    Examples

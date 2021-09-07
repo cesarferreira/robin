@@ -17,6 +17,8 @@ const self = (module.exports = {
 
       let entries = Object.entries(config.scripts);
 
+      log(entries);
+
       for (const value in entries) {
         let name = entries[value][0];
         let command = entries[value][1];

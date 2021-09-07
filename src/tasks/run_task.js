@@ -19,7 +19,7 @@ const self = (module.exports = {
     lodash.filter(availableCommands, (x) => x.name === name),
 
   run: (task, flags) => {
-    Utils.title(`Runing: ${task.name}...`);
+    // Utils.title(`Running: ${task.name}...`);
     // log(`${task.command}...`);
 
     var command = task.command;

@@ -15,7 +15,9 @@ Array.prototype.subarray = function (start, end) {
 // Main code //
 const self = (module.exports = {
   getConfigPath: () => process.cwd() + "/" + self.CONFIG_FILE_NAME,
-  configFileExists: () => fs.existsSync(process.cwd() + "/" + self.CONFIG_FILE_NAME),
+  configFileExists: () => fs.existsSync(self.getConfigPath()),
+  copyFileHere: (sourceFile) => fs.copyFileSync(sourceFile, `./${self.CONFIG_FILE_NAME}`), 
+  copyConfigFileHere: (configName) => self.copyFileHere(`${__dirname}/../../template/${configName}-robin.config.json`), 
   isEmpty: (obj) => Object.keys(obj).length === 0,
   saveToFile: (content, filePath) => fs.writeFileSync(filePath, content, "utf-8"),
   readFile: (filePath) => fs.readFileSync(filePath, "utf-8"),
@@ -26,5 +28,5 @@ const self = (module.exports = {
     exec(command).stdout.pipe(process.stdout);
   },
 
-  CONFIG_FILE_NAME: ".robin.json",
+  CONFIG_FILE_NAME: "robin.json",
 });

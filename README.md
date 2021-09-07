@@ -20,7 +20,7 @@ file at the root of the project:
     }
 }
 ```  
-No need to re-generate / compile any code, it will read your `.robin.json` every time you run a command.
+No need to re-generate / compile any code, it will read your `robin.json` every time you run a command.
 
 ## Reason
 > Every project has a different way of deploying/releasing/cleaning/etc. By maintaining a simple json file with all the available tasks for this project everyone on the team can run/add/ edit the available tasks for the project on their own machine.
@@ -66,14 +66,14 @@ robin list # Lists all the available commands
 ```
 --------------
 
-```sh
+<!-- ```sh
 robin add # Adds a command
 ```
 
 Example: 
 ```sh
 robin add "deploy" "fastlane deliver --submit-to-review" # Adds a deploy command to your current list of commands
-```
+``` -->
 
 -----------
 
@@ -108,10 +108,9 @@ robin release testflight --env=alpha
 ```
 
 
-
 ## IDEAS (not implemented yet)
 
-Giving the `.robin.json`:
+Giving the `robin.json`:
 
 ```json
 {
@@ -157,6 +156,17 @@ robin init --ios
 robin init --flutter
 robin init --rails
 ```
+## Add 
+
+```sh
+robin add # Adds a command
+```
+
+Example: 
+```sh
+robin add "deploy" "fastlane deliver --submit-to-review" # Adds a deploy command to your current list of commands
+```
+
 
 
 ## Created by
