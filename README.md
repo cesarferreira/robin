@@ -1,12 +1,16 @@
-# robin
+# Robin 
 > Run scripts on any project
 
+<p align="center">
+
+
+[![Build Status](https://app.travis-ci.com/cesarferreira/robin.svg?branch=master)](https://app.travis-ci.com/cesarferreira/robin) [![npm](https://img.shields.io/npm/dt/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) [![npm](https://img.shields.io/npm/v/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) 
+
+</p>
 
  <!-- , everyone on the team can run/add/edit the available tasks for the project on their own machine. -->
 
-[![Build Status](https://travis-ci.org/cesarferreira/robin.svg?branch=master)](https://travis-ci.org/cesarferreira/robin)
-[![npm](https://img.shields.io/npm/dt/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool)
-[![npm](https://img.shields.io/npm/v/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) 
+
 
 > Every project has a different way of deploying/releasing/cleaning/etc. By maintaining a simple json file with all the available tasks for a project
 
