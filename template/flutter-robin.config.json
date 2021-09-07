@@ -1,0 +1,13 @@
+  {
+    "scripts": {
+      "run": "flutter run",
+      "refresh dependencies": "flutter pub get",
+      "clean": "flutter clean",
+      "generate images": "fluttergen -c pubspec.yaml",
+      "release ios beta": "cd ios; bundle exec fastlane ios beta; cd ..",
+      "test": "flutter test test/*",
+      "fix": "dart fix lib/ --apply",
+      "build release": "flutter build --release"
+    }
+  }
+  

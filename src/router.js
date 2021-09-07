@@ -9,6 +9,13 @@ const InitTask = require("./tasks/init_task");
 const ListTask = require("./tasks/list_task");
 const RunTask = require("./tasks/run_task");
 
+function interruptIfConfigMissing() {
+  if (!Utils.configFileExists()) {
+    Utils.titleError(`${Utils.CONFIG_FILE_NAME} file is missing, please use the 'init' command` );
+    process.exit();
+  }
+}
+
 // Main code //
 const self = (module.exports = {
   init: (input, flags) => {
@@ -16,15 +23,16 @@ const self = (module.exports = {
     const params = input.subarray(1, input.length);
 
     // log(input.join(" "))
-	const availableCommands = ListTask.getCommandList();
-
+    const availableCommands = ListTask.getCommandList();
+    
     switch (command.toLowerCase()) {
       case "init":
-		  // TODO if file exists, REFUSE TO do it
+        // TODO if file exists, REFUSE TO do it
         InitTask.init(params);
         break;
-      case "list":
-        ListTask.init(params);
+        case "list":
+        interruptIfConfigMissing();
+        // ListTask.init(params);
         break;
 
       default:

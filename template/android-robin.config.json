@@ -1,0 +1,10 @@
+{
+    "scripts": {
+      "clean": "...",
+      "release beta": "...",
+      "release alpha": "...",
+      "deploy staging": "echo 'ruby deploy tool --staging'",
+      "deploy production": "echo 'ruby deploy tool --prod'"
+    }
+  }
+  

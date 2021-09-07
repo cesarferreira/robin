@@ -76,9 +76,10 @@ robin add "deploy" "fastlane deliver --submit-to-review" # Adds a deploy command
 ```
 
 -----------
-## Ideas
 
 ## Passing params
+
+By using the following scheme: `{{variable}}` => `--variable=XXX`
 
 This config:
 ```json
@@ -91,7 +92,8 @@ This config:
 }
 ```  
 
-Would make this possible:
+Makes this possible:
+
 ```sh
 # clean your builds
 robin clean
@@ -145,8 +147,6 @@ robin --interactive
 So we can fuzzy search the available tasks
 
 <p align="center"><img width="100%"src="https://github.com/cesarferreira/purrge/raw/master/extras/anim.gif"></p>
-
-
 
 
 ## Have init templates

@@ -14,22 +14,13 @@ Array.prototype.subarray = function (start, end) {
 
 // Main code //
 const self = (module.exports = {
-  isEmpty: (obj) => {
-    return Object.keys(obj).length === 0;
-  },
-  saveToFile: (content, filePath) => {
-    fs.writeFileSync(filePath, content, "utf-8");
-  },
-  readFile: (filePath) => {
-    fs.readFileSync(filePath, "utf-8");
-  },
-
-  title: (text) => {
-    log(Chalk.blue("==>") + Chalk.bold(` ${text}`));
-  },
-  titleError: (text) => {
-    log(Chalk.red("==>") + Chalk.bold(` ${text}`));
-  },
+  getConfigPath: () => process.cwd() + "/" + self.CONFIG_FILE_NAME,
+  configFileExists: () => fs.existsSync(process.cwd() + "/" + self.CONFIG_FILE_NAME),
+  isEmpty: (obj) => Object.keys(obj).length === 0,
+  saveToFile: (content, filePath) => fs.writeFileSync(filePath, content, "utf-8"),
+  readFile: (filePath) => fs.readFileSync(filePath, "utf-8"),
+  title: (text) => log(Chalk.blue("==>") + Chalk.bold(` ${text}`)),
+  titleError: (text) => log(Chalk.red("==>") + Chalk.bold(` ${text}`)),
   runCommand: (command) => {
     const exec = require("child_process").exec;
     exec(command).stdout.pipe(process.stdout);

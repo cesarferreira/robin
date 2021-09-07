@@ -10,11 +10,15 @@ const Utils = require('../utils/utils');
 const self = module.exports = {
 	init: input => {
 
-		if (input.length == 0) {
-			log(Chalk.red(`You need to specify a params`));
-			return;
+		if (Utils.configFileExists()) {
+			Utils.titleError (`File already exists, please "rm -rf ${Utils.CONFIG_FILE_NAME}"`)
 		}
+
+		// if (input.length == 0) {
+		// 	log(Chalk.red(`You need to specify a params`));
+		// 	return;
+		// }
 	
-		log(`sample task with: ${input[0]}`);
+		// log(`sample task with: ${input[0]}`);
 	}
 };
