@@ -12,14 +12,15 @@
 
 
 
-> Every project has a different way of deploying/releasing/cleaning/etc. By maintaining a simple json file with all the available tasks for a project
+> Every project has a different way of deploying/releasing/cleaning/etc. By maintaining a simple json file with all the available tasks everyone can use/edit/add on a project level.
 
 <p align="center">
   <img src="media/terminal_ss.png" width="100%" />
 </p>
 
 All of the above was generated based on this `robin.json`
-file at the root of the project:
+file at the root of a flutter project:
+
 ```json
 {
     "scripts": {
@@ -85,12 +86,12 @@ Example:
 robin release beta      # Would run your script to release your app to beta
 robin deploy staging    # Would deploy your server to staging environment
 ```
---------------
+
 
 ```sh
-robin list # Lists all the available commands
+robin list              # Lists all the available commands
 ```
---------------
+
 
 <!-- ```sh
 robin add # Adds a command
