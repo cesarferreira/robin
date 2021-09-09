@@ -5,7 +5,7 @@ const Chalk = require("chalk");
 const log = console.log;
 const fs = require("fs");
 // const table = require("table");
-const { table, getBorderCharacters } = require( 'table');
+const { table, getBorderCharacters } = require("table");
 
 const Utils = require("../utils/utils");
 
@@ -34,19 +34,12 @@ const self = (module.exports = {
   },
   init: () => {
     let commands = self.getCommandList();
-    const data = [
-      // ["0A", "0B"],
-      // ["1A", "1B"],
-      // ["2A", "2B"],
-    ];
+    const data = [];
     for (var c of commands) {
-      // log(
-      //   Chalk.blue("==>") +
-      //     Chalk.bold(` ${c.name}  `) +
-      //     Chalk.grey(`# ${c.command}`)
-      // );
-
-      data.push([Chalk.blue("==>") + Chalk.bold(` ${c.name}`), Chalk.grey(`# ${c.command}`)]);
+      data.push([
+        Chalk.blue("==>") + Chalk.bold(` ${c.name}`),
+        Chalk.grey(`# ${c.command}`),
+      ]);
     }
 
     const output = table(data, {

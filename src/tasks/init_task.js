@@ -9,7 +9,7 @@ const Utils = require("../utils/utils");
 // Main code //
 const self = (module.exports = {
   init: (input, flags) => {
-	  log(`sample task with: ${input[0]}`);
+    
     if (Utils.configFileExists()) {
       Utils.titleError(`File already exists, please "rm -rf ${Utils.CONFIG_FILE_NAME}"`);
       process.exit();
