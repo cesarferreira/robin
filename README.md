@@ -1,19 +1,25 @@
-# Robin 
+# Robin  
 > Run scripts on any project
-
-<p align="center">
 
 
 [![Node.js CI](https://github.com/cesarferreira/robin/actions/workflows/node.js.yml/badge.svg)](https://github.com/cesarferreira/robin/actions/workflows/node.js.yml) [![npm](https://img.shields.io/npm/dt/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) [![npm](https://img.shields.io/npm/v/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) 
 </p>
 
+<p align="center">
 
-> Maintaining a simple JSON file with all the available tasks allows for easy customization of deployment, release, cleaning, and other project-specific actions. This ensures that everyone on the team can use, edit, and add tasks on a project level.
+
+
+
+
 
 <p align="center">
   <img src="media/terminal_ss4.png" width="100%" />
 </p>
 
+### Reason
+> Maintaining a simple JSON file with all the available tasks allows for easy customization of deployment, release, cleaning, and other project-specific actions. This ensures that everyone on the team can use, edit, and add tasks on a project level.
+
+## Usage
 All of the above was generated based on this `robin.json`
 file at the root of a flutter project:
 
@@ -36,13 +42,6 @@ Will result in the following list:
 ==> release testflight    # fastlane ios release -e={{env}}'             
 ```
 
-<!-- which allows us to do:
-
-```sh
-robin release --env=staging
-robin release --env=production
-robin release --env=dev
-``` -->
 
 No need to re-generate / compile any code, it will read your `robin.json` every time you run a command.
 
@@ -165,7 +164,7 @@ Unless there's a `robin deploy` in your scripts list
 robin --interactive 
 ```
 
-So we can fuzzy search the available tasks
+So we can fuzzy search the available tasks (like I did with [purrge](https://github.com/cesarferreira/purrge))
 
 <p align="center"><img width="100%"src="https://github.com/cesarferreira/purrge/raw/master/extras/anim.gif"></p>
 
