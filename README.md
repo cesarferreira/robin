@@ -4,7 +4,7 @@
 <p align="center">
 
 
-[![npm](https://img.shields.io/npm/dt/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) [![npm](https://img.shields.io/npm/v/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) 
+[![Node.js CI](https://github.com/cesarferreira/robin/actions/workflows/node.js.yml/badge.svg)](https://github.com/cesarferreira/robin/actions/workflows/node.js.yml) [![npm](https://img.shields.io/npm/dt/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) [![npm](https://img.shields.io/npm/v/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) 
 </p>
 
 
