@@ -11,7 +11,9 @@ const RunTask = require("./tasks/run_task");
 
 function interruptIfConfigMissing() {
   if (!Utils.configFileExists()) {
-    Utils.titleError(`${Utils.CONFIG_FILE_NAME} file is missing, please use the 'init' command` );
+    Utils.titleError(
+      `${Utils.CONFIG_FILE_NAME} file is missing, please use the 'init' command`
+    );
     process.exit();
   }
 }
@@ -24,26 +26,24 @@ const self = (module.exports = {
 
     // log(input.join(" "))
     const availableCommands = ListTask.getCommandList();
-    
+
     switch (command.toLowerCase()) {
       case "init":
         InitTask.init(params, flags);
         break;
-        case "list":
+      case "list":
         interruptIfConfigMissing();
         ListTask.init(params);
         break;
 
       default:
+        const result = RunTask.find(command, availableCommands);
 
-		const result = RunTask.find(command, availableCommands);
-		
-		if (result.length != 0 ) {
-			RunTask.run(result[0], flags);
-		} else {
-			log(`Sorry, cant find "${command}" in your `);
-		}
-			
+        if (result.length != 0) {
+          RunTask.run(result[0], flags);
+        } else {
+          log(`Sorry, cant find "${command}" in your robin.json`);
+        }
     }
   },
 });

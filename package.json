@@ -9,11 +9,11 @@
   },
   "scripts": {
     "start": "node example.js",
-    "test": "node test.js",
-    "lint": "eslint src/**/*"
+    "test": "node test.js"
   },
   "bin": {
-    "robin": "cli.js"
+    "robin": "cli.js",
+    "rob": "cli.js"
   },
   "main": "cli.js",
   "keywords": [],

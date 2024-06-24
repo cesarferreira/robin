@@ -11,7 +11,7 @@
 > Maintaining a simple JSON file with all the available tasks allows for easy customization of deployment, release, cleaning, and other project-specific actions. This ensures that everyone on the team can use, edit, and add tasks on a project level.
 
 <p align="center">
-  <img src="media/terminal_ss.png" width="100%" />
+  <img src="media/terminal_ss4.png" width="100%" />
 </p>
 
 All of the above was generated based on this `robin.json`
