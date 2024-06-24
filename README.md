@@ -1,26 +1,24 @@
-# Robin  
-> Run scripts on any project
-
-
-[![Node.js CI](https://github.com/cesarferreira/robin/actions/workflows/node.js.yml/badge.svg)](https://github.com/cesarferreira/robin/actions/workflows/node.js.yml) [![npm](https://img.shields.io/npm/dt/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) [![npm](https://img.shields.io/npm/v/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) 
-</p>
-
-<p align="center">
-
-
-
-
-
 
 <p align="center">
   <img src="media/terminal_ss4.png" width="100%" />
 </p>
+<h1 align="center">robin</h1>
+<p align="center">Run scripts on <i>any</i> project</p>
+<p align="center">
+  <a href="https://github.com/cesarferreira/robin/actions/workflows/node.js.yml"><img src="https://github.com/cesarferreira/robin/actions/workflows/node.js.yml/badge.svg" alt="Node.js CI"></a>
+  <a href="https://www.npmjs.com/package/robin"><img src="https://img.shields.io/npm/dt/robin.svg" alt="npm"></a>
+  <a href="https://www.npmjs.com/package/robin"><img src="https://img.shields.io/npm/v/robin.svg" alt="npm"></a>
+  <a href="https://github.com/cesarferreira/robin/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+</p>
 
-### Reason
+
+---
+
+## Reason
 > Maintaining a simple JSON file with all the available tasks allows for easy customization of deployment, release, cleaning, and other project-specific actions. This ensures that everyone on the team can use, edit, and add tasks on a project level.
 
-## Usage
-All of the above was generated based on this `robin.json`
+## Using robin
+The screenshot above was generated based on this `robin.json`
 file at the root of a flutter project:
 
 ```json
@@ -87,15 +85,6 @@ robin deploy staging    # Would deploy your server to staging environment
 robin list              # Lists all the available commands
 ```
 
-
-<!-- ```sh
-robin add # Adds a command
-```
-
-Example: 
-```sh
-robin add "deploy" "fastlane deliver --submit-to-review" # Adds a deploy command to your current list of commands
-``` -->
 
 -----------
 
