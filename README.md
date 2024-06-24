@@ -4,15 +4,11 @@
 <p align="center">
 
 
-[![Build Status](https://app.travis-ci.com/cesarferreira/robin.svg?branch=master)](https://app.travis-ci.com/cesarferreira/robin) [![npm](https://img.shields.io/npm/dt/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) [![npm](https://img.shields.io/npm/v/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) 
-
+[![npm](https://img.shields.io/npm/dt/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) [![npm](https://img.shields.io/npm/v/robin-cli-tool.svg)](https://www.npmjs.com/package/robin-cli-tool) 
 </p>
 
- <!-- , everyone on the team can run/add/edit the available tasks for the project on their own machine. -->
 
-
-
-> Every project has a different way of deploying/releasing/cleaning/etc. By maintaining a simple json file with all the available tasks everyone can use/edit/add on a project level.
+> Maintaining a simple JSON file with all the available tasks allows for easy customization of deployment, release, cleaning, and other project-specific actions. This ensures that everyone on the team can use, edit, and add tasks on a project level.
 
 <p align="center">
   <img src="media/terminal_ss.png" width="100%" />

@@ -2,10 +2,11 @@
 {
     "scripts": {
       "clean": "rm -rf node_modules/ package-lock.json",
+      "build": "npm install meow && npm install",
+      "rebuild": "rm -rf node_modules/ package-lock.json && echo \"deleted folders\" && npm install",
       "release": "np",
-      "sample params": "fastlane ios release --env={{env}}",
-      "sample": "echo 'fastlane ios release --env={{env}}'",
-      "github": "open https://github.com/cesarferreira/robin"
+      "github": "open https://github.com/cesarferreira/robin",
+      "sample": "echo 'fastlane ios release --env={{env}}'"
     }
   }
   
