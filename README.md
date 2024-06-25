@@ -1,6 +1,6 @@
 
 <h1 align="center">robin</h1>
-<p align="center">Run scripts on <i>any</i> project</p>
+<p align="center">Your own customizable <b>CLI</b> tool</p>
 <p align="center">
   <a href="https://github.com/cesarferreira/robin/actions/workflows/node.js.yml"><img src="https://github.com/cesarferreira/robin/actions/workflows/node.js.yml/badge.svg" alt="node build"></a>
   <a href="https://www.npmjs.com/package/robin-cli-tool"><img src="https://img.shields.io/npm/dt/robin-cli-tool.svg" alt="npm"></a>
