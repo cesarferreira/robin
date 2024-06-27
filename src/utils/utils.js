@@ -49,5 +49,5 @@ const self = (module.exports = {
   titleError: (text) => log(Chalk.red("==>") + Chalk.bold(` ${text}`)),
   runCommand: (command) => executeCommand(command),
 
-  CONFIG_FILE_NAME: "robin.json",
+  CONFIG_FILE_NAME: ".robin.json",
 });

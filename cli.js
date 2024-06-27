@@ -1,20 +1,23 @@
 #!/usr/bin/env node
-'use strict';
+"use strict";
 
-const meow = require('meow');
-const router = require('./src/router');
-const updateNotifier = require('update-notifier');
-const pkg = require('./package.json');
+const meow = require("meow");
+const router = require("./src/router");
+const updateNotifier = require("update-notifier");
+const pkg = require("./package.json");
+const log = console.log;
 
 updateNotifier({ pkg }).notify();
 
-const cli = meow(`
+const cli = meow(
+  `
 Usage
 
    $ robin <command> <params>
 
-   $ robin init            # creates a new 'robin.json' config
-   $ robin list            # Lists the available commanbds
+   $ robin init              # creates a new '.robin.json' config
+   $ robin --list            # Lists the available commanbds
+   $ robin --interactive     # Starts a fuzzy search for available commands
    
    Examples
    
@@ -24,14 +27,18 @@ Usage
 `,
   {
     alias: {
-      v: 'version'
+      v: "version",
+      i: "interactive",
+      l: "list",
     },
-    boolean: ['version']
+    boolean: ["version"],
+    boolean: ["interactive"],
+    boolean: ["list"],
   }
 );
 
-if (cli.input.length > 0) {
-	router.init(cli.input, cli.flags);
+if (cli.input.length > 0 || Object.keys(cli.flags).length > 0) {
+  router.init(cli.input, cli.flags);
 } else {
-	cli.showHelp(2);
+  cli.showHelp(2);
 }
