@@ -32,7 +32,7 @@ file at the root of a flutter project:
 Will result in the following list:
 
 ```sh
-❯ robin list
+❯ robin --list
 ==> clean                 # flutter clean && rm-rf ./src/gen/                               
 ==> release               # fastlane ios app_distribution release --{{env}} --rollout=1'    
 ==> release testflight    # fastlane ios release -e={{env}}'             
@@ -41,6 +41,16 @@ Will result in the following list:
 
 No need to re-generate / compile any code, it will read your `robin.json` every time you run a command.
 
+
+## Interactive mode
+
+```sh
+robin --interactive # or "-i"
+```
+
+We can fuzzy search the available tasks (TODO: replace gif)
+
+<p align="center"><img width="100%"src="https://github.com/cesarferreira/purrge/raw/master/extras/anim.gif"></p>
 
 
 ## Install
@@ -80,7 +90,8 @@ robin deploy staging    # Would deploy your server to staging environment
 
 
 ```sh
-robin list              # Lists all the available commands
+robin --list              # Lists all the available commands
+robin --interactive       # Interactive search for your available commands
 ```
 
 
@@ -119,7 +130,7 @@ robin release testflight --env=alpha
 
 ## IDEAS (not implemented yet)
 
-Giving the `robin.json`:
+<!-- Giving the `robin.json`:
 
 ```json
 {
@@ -142,18 +153,7 @@ Will suggest:
 - `robin deploy staging`
 - `robin deploy production`
 
-Unless there's a `robin deploy` in your scripts list
-
-
-## Interactive mode
-
-```sh
-robin --interactive 
-```
-
-So we can fuzzy search the available tasks (like I did with [purrge](https://github.com/cesarferreira/purrge))
-
-<p align="center"><img width="100%"src="https://github.com/cesarferreira/purrge/raw/master/extras/anim.gif"></p>
+Unless there's a `robin deploy` in your scripts list -->
 
 
 ## Have init templates
