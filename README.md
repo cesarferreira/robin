@@ -16,7 +16,7 @@
 > Maintaining a simple JSON file with all the available tasks allows for easy customization of deployment, release, cleaning, and other project-specific actions. This ensures that everyone on the team can use, edit, and add tasks on a project level.
 
 ## Using robin
-The screenshot above was generated based on this `robin.json`
+The screenshot above was generated based on this `.robin.json`
 file at the root of a flutter project:
 
 ```json
@@ -39,7 +39,7 @@ Will result in the following list:
 ```
 
 
-No need to re-generate / compile any code, it will read your `robin.json` every time you run a command.
+No need to re-generate / compile any code, it will read your `.robin.json` every time you run a command.
 
 
 ## Interactive mode
@@ -65,7 +65,7 @@ npm install -g robin-cli-tool
 robin init
 ```
 
-Creates a template `robin.json` in your current folder.
+Creates a template `.robin.json` in your current folder.
 <!-- We can be smart and insert deploy prod if we detect it's flutter, has fastlane? we can pre-populate -->
 
 ```json
