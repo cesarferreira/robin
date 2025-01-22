@@ -17,8 +17,12 @@
     "install": "cargo install --path .",
     "build": "cargo build --release",
     "print all": "echo \"HELLO: {{env=prod}}\"",
-    "deploy": "echo \"Deploying to {{env=staging}} with version {{version=latest}}\"",
+    "deploy": "echo \"Deploying to {{env=[staging, prod]}} with version {{version=latest}}\"",
     "test": "cargo test",
-    "fmt": "cargo fmt --all -- --check"
+    "fmt": "cargo fmt --all -- --check",
+    "deploy:env": "echo \"Deploying to {{[staging, prod]}}\"",
+    "build:mode": "cargo build --{{mode=[debug, release]}}",
+    "test:type": "cargo test --{{type=[lib, doc, all]}}",
+    "deploy:app": "fastlane {{platform=[ios, android]}} {{env=[dev, staging, prod]}} --track={{track=[alpha, beta, production]}}"
   }
 }

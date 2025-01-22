@@ -15,22 +15,47 @@ use config::RobinConfig;
 const CONFIG_FILE: &str = ".robin.json";
 
 fn replace_variables(script: &str, args: &[String]) -> Result<String> {
-    let var_regex = Regex::new(r"\{\{(\w+)(?:=([^}]+))?\}\}").unwrap();
+    // Updated regex to support both patterns:
+    // 1. {{variable=default}}
+    // 2. {{variable=[value1, value2, ...]}}
+    let var_regex = Regex::new(r"\{\{(\w+)(?:=([^}\]]+|\[[^\]]+\]))\}\}").unwrap();
     let mut result = script.to_string();
     
     for capture in var_regex.captures_iter(script) {
+        let full_match = &capture[0];
         let var_name = &capture[1];
-        let default_value = capture.get(2).map(|m| m.as_str());
+        let default_or_enum = capture.get(2).map(|m| m.as_str()).unwrap_or("");
         let var_pattern = format!("--{}=", var_name);
-        
-        // Find the matching argument or use default value
-        let value = args.iter()
-            .find(|arg| arg.starts_with(&var_pattern))
-            .map(|arg| arg.trim_start_matches(&var_pattern))
-            .or(default_value)
-            .ok_or_else(|| anyhow!("Missing required variable: {}", var_name))?;
 
-        result = result.replace(&capture[0], value);
+        // Check if this is an enum validation pattern
+        if default_or_enum.starts_with('[') && default_or_enum.ends_with(']') {
+            let allowed_values: Vec<&str> = default_or_enum[1..default_or_enum.len()-1]
+                .split(',')
+                .map(|s| s.trim())
+                .collect();
+            
+            // Find the matching argument and validate against allowed values
+            let value = args.iter()
+                .find(|arg| arg.starts_with(&var_pattern))
+                .map(|arg| arg.trim_start_matches(&var_pattern))
+                .ok_or_else(|| anyhow!("Missing required variable: {}", var_name))?;
+
+            if !allowed_values.contains(&value) {
+                return Err(anyhow!("Value '{}' for {} must be one of: {}", 
+                    value, var_name, allowed_values.join(", ")));
+            }
+            
+            result = result.replace(full_match, value);
+        } else {
+            // Handle regular variable substitution with optional default
+            let value = args.iter()
+                .find(|arg| arg.starts_with(&var_pattern))
+                .map(|arg| arg.trim_start_matches(&var_pattern))
+                .or(Some(default_or_enum))
+                .ok_or_else(|| anyhow!("Missing required variable: {}", var_name))?;
+
+            result = result.replace(full_match, value);
+        }
     }
     
     Ok(result)

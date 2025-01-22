@@ -11,6 +11,7 @@ A Rust implementation of the Robin CLI tool - your own customizable CLI tool for
 - Cross-platform support
 - Template initialization for different project types
 - Variable substitution with default values
+- Enum validation for variables
 
 ## Installation
 
@@ -121,6 +122,43 @@ robin deploy            # Will use defaults: staging and latest
 # Override defaults:
 robin print --env=dev   # Will use: dev
 robin deploy --env=prod --version=1.0.0  # Will use: prod and 1.0.0
+```
+
+### Enum Validation
+You can restrict variable values to a specific set using `{{variable=[value1, value2, ...]}}` syntax:
+
+```json
+{
+    "scripts": {
+        "deploy": "echo \"Deploying to {{env=[staging, prod]}}\"",
+        "build": "cargo build --{{mode=[debug, release]}}",
+        "deploy:app": "fastlane {{platform=[ios, android]}} {{env=[dev, staging, prod]}} --track={{track=[alpha, beta, production]}}"
+    }
+}
+```
+
+Using enum validation:
+```bash
+# Simple validation
+robin deploy --env=staging    # Works: 'staging' is allowed
+robin deploy --env=prod      # Works: 'prod' is allowed
+robin deploy --env=dev       # Fails: only 'staging' or 'prod' are allowed
+
+# Build modes
+robin build --mode=debug     # Works: 'debug' is allowed
+robin build --mode=release   # Works: 'release' is allowed
+robin build --mode=test      # Fails: only 'debug' or 'release' are allowed
+
+# Multiple validations
+robin deploy:app \
+    --platform=ios \
+    --env=staging \
+    --track=beta            # Works: all values are allowed
+
+robin deploy:app \
+    --platform=web \        # Fails: 'web' is not in [ios, android]
+    --env=staging \
+    --track=beta
 ```
 
 ## License
