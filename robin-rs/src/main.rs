@@ -34,6 +34,29 @@ fn replace_variables(script: &str, args: &[String]) -> Result<String> {
     Ok(result)
 }
 
+fn split_command_and_args(args: &[String]) -> (String, Vec<String>) {
+    if args.is_empty() {
+        return (String::new(), vec![]);
+    }
+
+    let mut command_parts = Vec::new();
+    let mut var_args = Vec::new();
+    let mut found_args = false;
+
+    for arg in args {
+        if arg.starts_with("--") {
+            found_args = true;
+            var_args.push(arg.clone());
+        } else if !found_args {
+            command_parts.push(arg.clone());
+        } else {
+            var_args.push(arg.clone());
+        }
+    }
+
+    (command_parts.join(" "), var_args)
+}
+
 fn main() -> Result<()> {
     let cli = Cli::parse();
     let config_path = PathBuf::from(CONFIG_FILE);
@@ -66,13 +89,7 @@ fn main() -> Result<()> {
             let config = RobinConfig::load(&config_path)
                 .with_context(|| "No .robin.json found. Run 'robin init' first")?;
 
-            let (script_name, var_args) = if args.is_empty() {
-                (String::new(), vec![])
-            } else {
-                let mut parts: Vec<String> = args.clone();
-                let name = parts.remove(0);
-                (name, parts)
-            };
+            let (script_name, var_args) = split_command_and_args(args);
 
             if let Some(script) = config.scripts.get(&script_name) {
                 let script_with_vars = replace_variables(script, &var_args)?;
