@@ -68,20 +68,19 @@ fn main() -> Result<()> {
 }
 
 fn run_script(script: &str) -> Result<()> {
-    let output = if cfg!(target_os = "windows") {
+    let status = if cfg!(target_os = "windows") {
         Command::new("cmd")
             .args(["/C", script])
-            .output()
+            .status()
     } else {
         Command::new("sh")
             .arg("-c")
             .arg(script)
-            .output()
+            .status()
     }.with_context(|| format!("Failed to execute script: {}", script))?;
 
-    if !output.status.success() {
+    if !status.success() {
         println!("{}", "Script failed!".red());
-        return Ok(());
     }
 
     Ok(())

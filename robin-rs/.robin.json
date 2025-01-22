@@ -1,0 +1,20 @@
+{
+    "scripts": {
+        "build": "cargo build --release",
+        "check": "cargo check",
+        "test": "cargo test",
+        "lint": "cargo clippy -- -D warnings",
+        "fmt": "cargo fmt --all -- --check",
+        "fmt:fix": "cargo fmt --all",
+        "clean": "cargo clean",
+        "doc": "cargo doc --no-deps --open",
+        "update": "cargo update",
+        "bench": "cargo bench",
+        "release": "cargo build --release && cargo test && cargo clippy -- -D warnings",
+        "install": "cargo install --path .",
+        "publish": "cargo publish",
+        "run:dev": "cargo run -- --help",
+        "run:interactive": "cargo run -- --interactive",
+        "run:list": "cargo run -- --list"
+    }
+} 
