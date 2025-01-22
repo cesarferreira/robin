@@ -1,23 +1,24 @@
 {
-    "scripts": {
-        "build": "cargo build --release",
-        "check": "cargo check",
-        "test": "cargo test",
-        "lint": "cargo clippy -- -D warnings",
-        "fmt": "cargo fmt --all -- --check",
-        "fmt:fix": "cargo fmt --all",
-        "clean": "cargo clean",
-        "doc": "cargo doc --no-deps --open",
-        "update": "cargo update",
-        "bench": "cargo bench",
-        "release": "cargo build --release && cargo test && cargo clippy -- -D warnings",
-        "install": "cargo install --path .",
-        "publish": "cargo publish",
-        "run:dev": "cargo run -- --help",
-        "run:interactive": "cargo run -- --interactive",
-        "run:list": "cargo run -- --list",
-        "print": "echo {{env=prod}}",
-        "print all": "echo \"HELLO: {{env=prod}}\"",
-        "deploy": "echo \"Deploying to {{env=staging}} with version {{version=latest}}\""
-    }
-} 
+  "scripts": {
+    "run:list": "cargo run -- --list",
+    "run:dev": "cargo run -- --help",
+    "doc": "cargo doc --no-deps --open",
+    "bench": "cargo bench",
+    "publish": "cargo publish",
+    "print": "echo {{env=prod}}",
+    "run:interactive": "cargo run -- --interactive",
+    "deploy2": "fastlane deliver --submit-to-review",
+    "update": "cargo update",
+    "lint": "cargo clippy -- -D warnings",
+    "fmt:fix": "cargo fmt --all",
+    "clean": "cargo clean",
+    "release": "cargo build --release && cargo test && cargo clippy -- -D warnings",
+    "check": "cargo check",
+    "install": "cargo install --path .",
+    "build": "cargo build --release",
+    "print all": "echo \"HELLO: {{env=prod}}\"",
+    "deploy": "echo \"Deploying to {{env=staging}} with version {{version=latest}}\"",
+    "test": "cargo test",
+    "fmt": "cargo fmt --all -- --check"
+  }
+}

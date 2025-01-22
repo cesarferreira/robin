@@ -10,6 +10,7 @@ A Rust implementation of the Robin CLI tool - your own customizable CLI tool for
 - Add new commands easily
 - Cross-platform support
 - Template initialization for different project types
+- Variable substitution with default values
 
 ## Installation
 
@@ -82,23 +83,44 @@ The `.robin.json` file structure:
 }
 ```
 
-## Parameter Passing
+## Variable Substitution
 
+### Basic Variables
 Use `{{variable}}` in your scripts and pass them as `--variable=XXX` when running the command:
 
 ```json
 {
     "scripts": {
-        "release": "ruby deploy_tool --{{env}}"
+        "deploy": "fastlane {{platform}} {{env}}"
     }
 }
 ```
 
 Then run:
-
 ```bash
-robin release --env=staging
-robin release --env=production
+robin deploy --platform=ios --env=staging
+```
+
+### Default Values
+You can specify default values for variables using `{{variable=default}}` syntax:
+
+```json
+{
+    "scripts": {
+        "print": "echo {{env=prod}}",
+        "deploy": "echo \"Deploying to {{env=staging}} with version {{version=latest}}\""
+    }
+}
+```
+
+Using default values:
+```bash
+robin print              # Will use default: prod
+robin deploy            # Will use defaults: staging and latest
+
+# Override defaults:
+robin print --env=dev   # Will use: dev
+robin deploy --env=prod --version=1.0.0  # Will use: prod and 1.0.0
 ```
 
 ## License
