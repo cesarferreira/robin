@@ -15,6 +15,7 @@
         "publish": "cargo publish",
         "run:dev": "cargo run -- --help",
         "run:interactive": "cargo run -- --interactive",
-        "run:list": "cargo run -- --list"
+        "run:list": "cargo run -- --list",
+        "print": "echo {{env}}"
     }
 } 
