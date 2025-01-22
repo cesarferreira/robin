@@ -16,7 +16,8 @@
         "run:dev": "cargo run -- --help",
         "run:interactive": "cargo run -- --interactive",
         "run:list": "cargo run -- --list",
-        "print": "echo {{env}}",
-        "print all": "echo \"HELLO: {{env}}\""
+        "print": "echo {{env=prod}}",
+        "print all": "echo \"HELLO: {{env=prod}}\"",
+        "deploy": "echo \"Deploying to {{env=staging}} with version {{version=latest}}\""
     }
 } 

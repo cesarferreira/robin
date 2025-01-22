@@ -15,20 +15,22 @@ use config::RobinConfig;
 const CONFIG_FILE: &str = ".robin.json";
 
 fn replace_variables(script: &str, args: &[String]) -> Result<String> {
-    let var_regex = Regex::new(r"\{\{(\w+)\}\}").unwrap();
+    let var_regex = Regex::new(r"\{\{(\w+)(?:=([^}]+))?\}\}").unwrap();
     let mut result = script.to_string();
     
     for capture in var_regex.captures_iter(script) {
         let var_name = &capture[1];
+        let default_value = capture.get(2).map(|m| m.as_str());
         let var_pattern = format!("--{}=", var_name);
         
-        // Find the matching argument
-        if let Some(arg) = args.iter().find(|arg| arg.starts_with(&var_pattern)) {
-            let value = arg.trim_start_matches(&var_pattern);
-            result = result.replace(&format!("{{{{{}}}}}", var_name), value);
-        } else {
-            return Err(anyhow!("Missing required variable: {}", var_name));
-        }
+        // Find the matching argument or use default value
+        let value = args.iter()
+            .find(|arg| arg.starts_with(&var_pattern))
+            .map(|arg| arg.trim_start_matches(&var_pattern))
+            .or(default_value)
+            .ok_or_else(|| anyhow!("Missing required variable: {}", var_name))?;
+
+        result = result.replace(&capture[0], value);
     }
     
     Ok(result)
