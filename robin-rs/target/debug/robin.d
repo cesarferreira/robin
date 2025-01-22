@@ -1,1 +1,0 @@
-/Users/cesarferreira/code/github/robin/robin-rs/target/debug/robin: /Users/cesarferreira/code/github/robin/robin-rs/src/cli.rs /Users/cesarferreira/code/github/robin/robin-rs/src/config.rs /Users/cesarferreira/code/github/robin/robin-rs/src/main.rs
