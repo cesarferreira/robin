@@ -1,184 +1,263 @@
+# Robin (Rust Version)
 
-<h1 align="center">robin</h1>
-<p align="center">Your own customizable <b>CLI</b> tool</p>
-<p align="center">
-  <a href="https://github.com/cesarferreira/robin/actions/workflows/node.js.yml"><img src="https://github.com/cesarferreira/robin/actions/workflows/node.js.yml/badge.svg" alt="node build"></a>
-  <a href="https://www.npmjs.com/package/robin-cli-tool"><img src="https://img.shields.io/npm/dt/robin-cli-tool.svg" alt="npm"></a>
-  <a href="https://www.npmjs.com/package/robin-cli-tool"><img src="https://img.shields.io/npm/v/robin-cli-tool.svg" alt="npm"></a>
-  <a href="https://github.com/cesarferreira/robin/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
-</p>
-<p align="center">
-  <img src="media/terminal_ss4.png" width="100%" />
-</p>
+A Rust implementation of the Robin CLI tool - your own customizable CLI tool for running project-specific scripts.
 
+## Features
 
-## Reason
-> Maintaining a simple JSON file with all the available tasks allows for easy customization of deployment, release, cleaning, and other project-specific actions. This ensures that everyone on the team can use, edit, and add tasks on a project level.
+- Define and run project-specific scripts via `.robin.json`
+- Support for both single commands and command sequences
+- Interactive mode with fuzzy search
+- List all available commands
+- Add new commands easily
+- Cross-platform support
+- Template initialization for different project types
+- Variable substitution with default values
+- Enum validation for variables
 
-## Using robin
-The screenshot above was generated based on this `.robin.json`
-file at the root of a flutter project:
+## Installation
 
-```json
-{
-    "scripts": {
-      "clean": "flutter clean && rm-rf ./src/gen/",
-      "release": "fastlane ios app_distribution release --{{env}} --rollout=1'",
-      "release testflight": "fastlane ios release -e={{env}}'"
-    }
-}
-```  
+```bash
+# From source
+cargo install --path .
 
-Will result in the following list:
-
-```sh
-❯ robin --list
-==> clean                 # flutter clean && rm-rf ./src/gen/                               
-==> release               # fastlane ios app_distribution release --{{env}} --rollout=1'    
-==> release testflight    # fastlane ios release -e={{env}}'             
-```
-
-
-No need to re-generate / compile any code, it will read your `.robin.json` every time you run a command.
-
-
-## Interactive mode
-
-```sh
-robin --interactive # or "-i"
-```
-
-We can fuzzy search the available tasks (TODO: replace gif)
-
-<p align="center"><img width="100%"src="https://github.com/cesarferreira/purrge/raw/master/extras/anim.gif"></p>
-
-
-## Install
-
-```sh
-npm install -g robin-cli-tool
+# Once published to crates.io (coming soon)
+cargo install robin
 ```
 
 ## Usage
 
-```sh
+### Initialize a new project
+
+```bash
 robin init
 ```
 
-Creates a template `.robin.json` in your current folder.
-<!-- We can be smart and insert deploy prod if we detect it's flutter, has fastlane? we can pre-populate -->
+This creates a `.robin.json` file in your current directory with some template scripts.
+
+### Using templates
+
+```bash
+robin init --template android
+robin init --template ios
+robin init --template flutter
+robin init --template rails
+```
+
+### List all commands
+
+```bash
+robin --list
+```
+
+### Interactive mode
+
+```bash
+robin --interactive  # or -i
+```
+
+### Add a new command
+
+```bash
+robin add "deploy" "fastlane deliver --submit-to-review"
+```
+
+### Run a command
+
+```bash
+robin deploy staging
+robin release beta
+```
+
+## Configuration
+
+The `.robin.json` file supports both single commands and command sequences:
 
 ```json
 {
     "scripts": {
-      "clean": "...",
-      "deploy staging": "echo 'ruby deploy tool --staging'",
-      "deploy production": "...",
-      "release beta": "...",
-      "release alpha": "...",
-      "release dev": "..."
-    }
-  }
-  
-```
-
-Example: 
-```sh
-robin release beta      # Would run your script to release your app to beta
-robin deploy staging    # Would deploy your server to staging environment
-```
-
-
-```sh
-robin --list              # Lists all the available commands
-robin --interactive       # Interactive search for your available commands
-```
-
-
------------
-
-## Passing params
-
-By using the following scheme: `{{variable}}` => `--variable=XXX`
-
-This config:
-```json
-{
-    "scripts": {
-      "clean": "flutter clean && rm-rf ./output/",
-      "release": "ruby deploy_tool --{{env}}'",
-      "release testflight": "fastlane ios release -e={{env}}'",
-    }
-}
-```  
-
-Makes this possible:
-
-```sh
-# clean your builds
-robin clean
-
-# deploy the app to the store
-robin release --env=staging
-robin release --env=production
-robin release --env=dev
-
-# release an alpha build
-robin release testflight --env=alpha
-```
-
-
-## IDEAS (not implemented yet)
-
-<!-- Giving the `robin.json`:
-
-```json
-{
-    "scripts": {
-      "deploy staging": "echo 'ruby deploy tool --staging'",
-      "deploy production": "echo 'ruby deploy tool --production'",
-      "release beta": "...",
-      "release alpha": "..."
+        "clean": "rm -rf build/",
+        "deploy staging": "echo 'ruby deploy tool --staging'",
+        "deploy production": "echo 'ruby deploy tool --prod'",
+        "prep-and-deploy": [
+            "robin clean",
+            "robin build",
+            "robin deploy --env=production"
+        ],
+        "full-release": [
+            "flutter clean",
+            "flutter pub get",
+            "flutter build ios",
+            "cd ios && fastlane beta"
+        ]
     }
 }
-  
 ```
 
-Writing: 
-```sh
-robin deploy 
+When using command sequences (arrays):
+- Commands are executed in order
+- If any command fails, the sequence stops
+- Environment variables and working directory are preserved between commands
+- Notifications show total execution time for the sequence
+
+## Variable Substitution
+
+### Basic Variables
+Use `{{variable}}` in your scripts and pass them as `--variable=XXX` when running the command:
+
+```json
+{
+    "scripts": {
+        "deploy": "fastlane {{platform}} {{env}}"
+    }
+}
 ```
 
-Will suggest:
-- `robin deploy staging`
-- `robin deploy production`
-
-Unless there's a `robin deploy` in your scripts list -->
-
-
-## Have init templates
-
-```sh
-robin init --android
-robin init --ios
-robin init --flutter
-robin init --rails
-```
-## Add 
-
-```sh
-robin add # Adds a command
+Then run:
+```bash
+robin deploy --platform=ios --env=staging
 ```
 
-Example: 
-```sh
-robin add "deploy" "fastlane deliver --submit-to-review" # Adds a deploy command to your current list of commands
+### Default Values
+You can specify default values for variables using `{{variable=default}}` syntax:
+
+```json
+{
+    "scripts": {
+        "print": "echo {{env=prod}}",
+        "deploy": "echo \"Deploying to {{env=staging}} with version {{version=latest}}\""
+    }
+}
 ```
 
+Using default values:
+```bash
+robin print              # Will use default: prod
+robin deploy            # Will use defaults: staging and latest
 
+# Override defaults:
+robin print --env=dev   # Will use: dev
+robin deploy --env=prod --version=1.0.0  # Will use: prod and 1.0.0
+```
 
-## Created by
-[Cesar Ferreira](https://cesarferreira.com)
+### Enum Validation
+You can restrict variable values to a specific set using `{{variable=[value1, value2, ...]}}` syntax:
+
+```json
+{
+    "scripts": {
+        "deploy": "echo \"Deploying to {{env=[staging, prod]}}\"",
+        "build": "cargo build --{{mode=[debug, release]}}",
+        "deploy:app": "fastlane {{platform=[ios, android]}} {{env=[dev, staging, prod]}} --track={{track=[alpha, beta, production]}}"
+    }
+}
+```
+
+Using enum validation:
+```bash
+# Simple validation
+robin deploy --env=staging    # Works: 'staging' is allowed
+robin deploy --env=prod      # Works: 'prod' is allowed
+robin deploy --env=dev       # Fails: only 'staging' or 'prod' are allowed
+
+# Build modes
+robin build --mode=debug     # Works: 'debug' is allowed
+robin build --mode=release   # Works: 'release' is allowed
+robin build --mode=test      # Fails: only 'debug' or 'release' are allowed
+
+# Multiple validations
+robin deploy:app \
+    --platform=ios \
+    --env=staging \
+    --track=beta            # Works: all values are allowed
+
+robin deploy:app \
+    --platform=web \        # Fails: 'web' is not in [ios, android]
+    --env=staging \
+    --track=beta
+```
+
+Variables work in both single commands and command sequences:
+```json
+{
+    "scripts": {
+        "deploy-sequence": [
+            "flutter clean",
+            "flutter build {{platform=[ios,android]}}",
+            "fastlane {{platform}} beta"
+        ]
+    }
+}
+```
+
+## Development Environment
+
+### Doctor Command
+The `doctor` command helps verify your development environment is properly set up:
+
+```bash
+robin doctor
+```
+
+This will check:
+- 📦 Required Tools
+  - Cargo and Rust
+  - Ruby and Fastlane
+  - Flutter
+  - Node.js and npm
+- 🔧 Environment Variables
+  - ANDROID_HOME
+  - JAVA_HOME
+  - FLUTTER_ROOT
+- 📱 Platform Tools
+  - Android Debug Bridge (adb)
+  - Xcode Command Line Tools
+  - CocoaPods
+- 🔐 Git Configuration
+  - user.name
+  - user.email
+
+Example output:
+```bash
+🔍 Checking development environment...
+
+📦 Required Tools:
+✅ Cargo: cargo 1.75.0
+✅ Rust: rustc 1.75.0
+✅ Ruby: ruby 3.2.2
+✅ Fastlane: fastlane 2.217.0
+❌ Flutter not found
+✅ Node.js: v20.10.0
+✅ npm: 10.2.3
+
+🔧 Environment Variables:
+✅ ANDROID_HOME is set
+✅ JAVA_HOME is set
+❌ FLUTTER_ROOT is not set
+
+📱 Platform Tools:
+✅ Android Debug Bridge (adb): Android Debug Bridge version 1.0.41
+✅ Xcode Command Line Tools: installed
+✅ CocoaPods: 1.14.3
+
+🔐 Git Configuration:
+✅ Git user.name is set
+✅ Git user.email is set
+```
+
+### Update Development Tools
+To update all development tools to their latest versions:
+
+```bash
+robin doctor:update
+```
+
+This will update:
+- Rust (via rustup)
+- Flutter
+- Fastlane (via gem)
+- Global npm packages
+- CocoaPods repositories
 
 ## License
+
 MIT © [Cesar Ferreira](http://cesarferreira.com)
