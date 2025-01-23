@@ -157,7 +157,7 @@ fn replace_variables(script: &serde_json::Value, args: &[String]) -> Result<serd
 }
 
 fn replace_variables_in_string(script: &str, args: &[String]) -> Result<String> {
-    let var_regex = Regex::new(r"\{\{(\w+)(?:=([^}\]]+|\[[^\]]+\]))\}\}").unwrap();
+    let var_regex = Regex::new(r"\{\{(\w+)(?:=([^}]+|\[[^\]]+\]))\}\}").unwrap();
     let mut result = script.to_string();
     
     for capture in var_regex.captures_iter(script) {
