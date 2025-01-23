@@ -9,9 +9,7 @@ use std::process::Command;
 use anyhow::{Context, Result, anyhow};
 use clap::Parser;
 use colored::*;
-use inquire::Select;
 use regex::Regex;
-use notify_rust::Notification;
 use serde_json;
 
 use cli::{Cli, Commands};
