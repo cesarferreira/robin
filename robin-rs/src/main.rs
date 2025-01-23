@@ -14,6 +14,70 @@ use config::RobinConfig;
 
 const CONFIG_FILE: &str = ".robin.json";
 
+#[derive(Debug, PartialEq)]
+struct RequiredTool {
+    name: &'static str,
+    command: &'static str,
+    version_arg: &'static str,
+    patterns: &'static [&'static str],
+}
+
+const KNOWN_TOOLS: &[RequiredTool] = &[
+    RequiredTool {
+        name: "Node.js",
+        command: "node",
+        version_arg: "--version",
+        patterns: &["node ", "npm ", "npx "],
+    },
+    RequiredTool {
+        name: "Python",
+        command: "python",
+        version_arg: "--version",
+        patterns: &["python ", "pip ", "python3 "],
+    },
+    RequiredTool {
+        name: "Ruby",
+        command: "ruby",
+        version_arg: "--version",
+        patterns: &["ruby ", "gem ", "bundle "],
+    },
+    RequiredTool {
+        name: "Fastlane",
+        command: "fastlane",
+        version_arg: "--version",
+        patterns: &["fastlane "],
+    },
+    RequiredTool {
+        name: "Flutter",
+        command: "flutter",
+        version_arg: "--version",
+        patterns: &["flutter "],
+    },
+    RequiredTool {
+        name: "Cargo",
+        command: "cargo",
+        version_arg: "--version",
+        patterns: &["cargo "],
+    },
+    RequiredTool {
+        name: "Go",
+        command: "go",
+        version_arg: "version",
+        patterns: &["go "],
+    },
+];
+
+fn detect_required_tools(config: &RobinConfig) -> Vec<&'static RequiredTool> {
+    KNOWN_TOOLS
+        .iter()
+        .filter(|tool| {
+            config.scripts.values().any(|script| {
+                tool.patterns.iter().any(|&pattern| script.contains(pattern))
+            })
+        })
+        .collect()
+}
+
 fn replace_variables(script: &str, args: &[String]) -> Result<String> {
     // Updated regex to support both patterns:
     // 1. {{variable=default}}
@@ -84,6 +148,135 @@ fn split_command_and_args(args: &[String]) -> (String, Vec<String>) {
     (command_parts.join(" "), var_args)
 }
 
+fn check_environment() -> Result<()> {
+    let config_path = PathBuf::from(CONFIG_FILE);
+    let config = RobinConfig::load(&config_path)
+        .with_context(|| "No .robin.json found. Run 'robin init' first")?;
+
+    println!("🔍 Checking development environment...\n");
+
+    // Check Required Tools
+    let required_tools = detect_required_tools(&config);
+    if !required_tools.is_empty() {
+        println!("📦 Required Tools:");
+        for tool in &required_tools {
+            check_tool(tool.name, tool.command, tool.version_arg)?;
+        }
+    }
+
+    // Check Environment Variables if needed tools are detected
+    let needs_android = required_tools.iter().any(|t| t.name == "Flutter");
+    let needs_java = needs_android || config.scripts.values().any(|s| s.contains("java ") || s.contains("gradle "));
+    
+    if needs_android || needs_java {
+        println!("\n🔧 Environment Variables:");
+        if needs_android {
+            check_env_var("ANDROID_HOME")?;
+        }
+        if needs_java {
+            check_env_var("JAVA_HOME")?;
+        }
+    }
+
+    // Check Git Configuration if git commands are used
+    if config.scripts.values().any(|s| s.contains("git ")) {
+        println!("\n🔐 Git Configuration:");
+        check_git_config("user.name")?;
+        check_git_config("user.email")?;
+    }
+
+    Ok(())
+}
+
+fn update_tools() -> Result<()> {
+    println!("🔄 Updating development tools...\n");
+
+    // Update Rust
+    let has_rustup = Command::new("rustup").arg("--version").output().is_ok();
+    if has_rustup {
+        println!("Updating Rust toolchain...");
+        run_update_command("rustup", &["update"])?;
+    }
+
+    // Update Flutter
+    let has_flutter = Command::new("flutter").arg("--version").output().is_ok();
+    if has_flutter {
+        println!("\nUpdating Flutter...");
+        run_update_command("flutter", &["upgrade"])?;
+    }
+
+    // Update Fastlane
+    let has_gem = Command::new("gem").arg("--version").output().is_ok();
+    if has_gem {
+        println!("\nUpdating Fastlane...");
+        run_update_command("gem", &["update", "fastlane"])?;
+    }
+
+    // Update npm packages
+    let has_npm = Command::new("npm").arg("--version").output().is_ok();
+    if has_npm {
+        println!("\nUpdating global npm packages...");
+        run_update_command("npm", &["update", "-g"])?;
+    }
+
+    // Update CocoaPods
+    if cfg!(target_os = "macos") {
+        let has_pod = Command::new("pod").arg("--version").output().is_ok();
+        if has_pod {
+            println!("\nUpdating CocoaPods repos...");
+            run_update_command("pod", &["repo", "update"])?;
+        }
+    }
+
+    println!("\n✅ Update complete!");
+    Ok(())
+}
+
+fn check_tool(name: &str, cmd: &str, arg: &str) -> Result<()> {
+    match Command::new(cmd).arg(arg).output() {
+        Ok(output) if output.status.success() => {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            let version = stdout.lines()
+                .next()
+                .unwrap_or("")
+                .trim();
+            println!("✅ {}: {}", name, version);
+        }
+        _ => println!("❌ {} not found", name),
+    }
+    Ok(())
+}
+
+fn check_env_var(name: &str) -> Result<()> {
+    match std::env::var(name) {
+        Ok(_) => println!("✅ {} is set", name),
+        Err(_) => println!("❌ {} is not set", name),
+    }
+    Ok(())
+}
+
+fn check_git_config(key: &str) -> Result<()> {
+    match Command::new("git").args(["config", key]).output() {
+        Ok(output) if output.status.success() => {
+            println!("✅ Git {} is set", key);
+        }
+        _ => println!("❌ Git {} is not set", key),
+    }
+    Ok(())
+}
+
+fn run_update_command(cmd: &str, args: &[&str]) -> Result<()> {
+    let status = Command::new(cmd)
+        .args(args)
+        .status()
+        .with_context(|| format!("Failed to run {} update", cmd))?;
+
+    if !status.success() {
+        println!("❌ {} update failed", cmd);
+    }
+    Ok(())
+}
+
 fn main() -> Result<()> {
     let cli = Cli::parse();
     let config_path = PathBuf::from(CONFIG_FILE);
@@ -110,6 +303,14 @@ fn main() -> Result<()> {
             config.scripts.insert(name.clone(), script.clone());
             config.save(&config_path)?;
             println!("{} {}", "Added command:".green(), name);
+        }
+
+        Some(Commands::Doctor) => {
+            check_environment()?;
+        }
+
+        Some(Commands::DoctorUpdate) => {
+            update_tools()?;
         }
 
         Some(Commands::Run(args)) => {

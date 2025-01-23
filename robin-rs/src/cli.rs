@@ -32,6 +32,12 @@ pub enum Commands {
         script: String,
     },
 
+    /// Check development environment setup
+    Doctor,
+
+    /// Update development tools to their latest versions
+    DoctorUpdate,
+
     /// Run a script
     #[command(external_subcommand)]
     Run(Vec<String>),

@@ -161,6 +161,75 @@ robin deploy:app \
     --track=beta
 ```
 
+## Development Environment
+
+### Doctor Command
+The `doctor` command helps verify your development environment is properly set up:
+
+```bash
+robin doctor
+```
+
+This will check:
+- 📦 Required Tools
+  - Cargo and Rust
+  - Ruby and Fastlane
+  - Flutter
+  - Node.js and npm
+- 🔧 Environment Variables
+  - ANDROID_HOME
+  - JAVA_HOME
+  - FLUTTER_ROOT
+- 📱 Platform Tools
+  - Android Debug Bridge (adb)
+  - Xcode Command Line Tools
+  - CocoaPods
+- 🔐 Git Configuration
+  - user.name
+  - user.email
+
+Example output:
+```bash
+🔍 Checking development environment...
+
+📦 Required Tools:
+✅ Cargo: cargo 1.75.0
+✅ Rust: rustc 1.75.0
+✅ Ruby: ruby 3.2.2
+✅ Fastlane: fastlane 2.217.0
+❌ Flutter not found
+✅ Node.js: v20.10.0
+✅ npm: 10.2.3
+
+🔧 Environment Variables:
+✅ ANDROID_HOME is set
+✅ JAVA_HOME is set
+❌ FLUTTER_ROOT is not set
+
+📱 Platform Tools:
+✅ Android Debug Bridge (adb): Android Debug Bridge version 1.0.41
+✅ Xcode Command Line Tools: installed
+✅ CocoaPods: 1.14.3
+
+🔐 Git Configuration:
+✅ Git user.name is set
+✅ Git user.email is set
+```
+
+### Update Development Tools
+To update all development tools to their latest versions:
+
+```bash
+robin doctor:update
+```
+
+This will update:
+- Rust (via rustup)
+- Flutter
+- Fastlane (via gem)
+- Global npm packages
+- CocoaPods repositories
+
 ## License
 
 MIT © [Cesar Ferreira](http://cesarferreira.com) 
