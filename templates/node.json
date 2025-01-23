@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "install deps": "npm install",
+    "update deps": "npm update",
+    "audit": "npm audit fix",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write ."
+  }
+} 

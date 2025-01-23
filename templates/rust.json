@@ -1,0 +1,21 @@
+{
+  "scripts": {
+    "build": "cargo build",
+    "build release": "cargo build --release",
+    "run": "cargo run",
+    "run release": "cargo run --release",
+    "test": "cargo test",
+    "test watch": "cargo watch -x test",
+    "check": "cargo check",
+    "lint": "cargo clippy",
+    "lint fix": "cargo clippy --fix",
+    "format": "cargo fmt",
+    "format check": "cargo fmt --check",
+    "update deps": "cargo update",
+    "clean": "cargo clean",
+    "doc": "cargo doc --no-deps",
+    "doc open": "cargo doc --no-deps --open",
+    "audit": "cargo audit",
+    "bench": "cargo bench"
+  }
+} 

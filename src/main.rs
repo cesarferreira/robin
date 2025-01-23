@@ -11,6 +11,8 @@ use clap::Parser;
 use colored::*;
 use regex::Regex;
 use serde_json;
+use std::fs;
+use dialoguer::Confirm;
 
 use cli::{Cli, Commands};
 use config::RobinConfig;
@@ -19,7 +21,13 @@ use utils::{send_notification, split_command_and_args, replace_variables};
 use scripts::{run_script, list_commands, interactive_mode};
 
 const CONFIG_FILE: &str = ".robin.json";
+const TEMPLATES_DIR: &str = "templates";
 
+fn load_template(template_name: &str) -> Result<RobinConfig> {
+    let template_path = PathBuf::from(TEMPLATES_DIR).join(format!("{}.json", template_name));
+    RobinConfig::load(&template_path)
+        .with_context(|| format!("Failed to load template: {}", template_name))
+}
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -28,13 +36,25 @@ fn main() -> Result<()> {
     match &cli.command {
         Some(Commands::Init { template }) => {
             if config_path.exists() {
-                println!("{}", "Config file already exists!".red());
-                return Ok(());
+                let should_override = Confirm::new()
+                    .with_prompt("Config file already exists. Do you want to override it?")
+                    .default(false)
+                    .interact()?;
+                
+                if !should_override {
+                    println!("{}", "Operation cancelled.".yellow());
+                    return Ok(());
+                }
             }
 
-            let config = RobinConfig::create_template();
+            let config = if let Some(template_name) = template {
+                load_template(template_name)?
+            } else {
+                RobinConfig::create_template()
+            };
+
             config.save(&config_path)?;
-            println!("{}", "Created .robin.json template".green());
+            println!("{} {}", "Created".green(), config_path.display());
         }
 
         Some(Commands::Add { name, script }) => {

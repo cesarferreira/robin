@@ -1,0 +1,19 @@
+{
+  "scripts": {
+    "server": "rails server",
+    "console": "rails console",
+    "test": "rails test",
+    "routes": "rails routes",
+    "migrate": "rails db:migrate",
+    "rollback": "rails db:rollback",
+    "seed": "rails db:seed",
+    "reset db": "rails db:drop db:create db:migrate db:seed",
+    "bundle": "bundle install",
+    "assets": "rails assets:precompile",
+    "lint": "rubocop",
+    "lint fix": "rubocop -a",
+    "generate migration": "rails generate migration {{name}}",
+    "generate model": "rails generate model {{name}}",
+    "generate controller": "rails generate controller {{name}}"
+  }
+} 

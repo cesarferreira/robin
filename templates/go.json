@@ -1,0 +1,20 @@
+{
+  "scripts": {
+    "build": "go build",
+    "run": "go run .",
+    "test": "go test ./...",
+    "test verbose": "go test -v ./...",
+    "test coverage": "go test -cover ./...",
+    "test race": "go test -race ./...",
+    "lint": "golangci-lint run",
+    "lint fix": "golangci-lint run --fix",
+    "format": "go fmt ./...",
+    "vet": "go vet ./...",
+    "tidy": "go mod tidy",
+    "download": "go mod download",
+    "update deps": "go get -u ./...",
+    "clean": "go clean",
+    "generate": "go generate ./...",
+    "doc": "godoc -http=:6060"
+  }
+} 

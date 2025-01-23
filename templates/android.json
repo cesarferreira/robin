@@ -1,0 +1,23 @@
+{
+    "scripts": {
+      "build": "./gradlew build",
+      "clean": "./gradlew clean",
+      "test": "./gradlew test",
+      "lint": "./gradlew lint",
+      "install": "./gradlew installDebug",
+      "uninstall": "./gradlew uninstallDebug",
+      "bundle": "./gradlew bundleRelease",
+      "apk": "./gradlew assembleRelease",
+      "debug": "./gradlew assembleDebug",
+      "dependencies": "./gradlew androidDependencies",
+      "ktlint": "./gradlew ktlintCheck",
+      "ktlint fix": "./gradlew ktlintFormat",
+      "unit test": "./gradlew testDebugUnitTest",
+      "instrumented test": "./gradlew connectedAndroidTest",
+      "release beta": "...",
+      "release alpha": "...",
+      "deploy staging": "echo 'ruby deploy tool --staging'",
+      "deploy production": "echo 'ruby deploy tool --prod'"
+    }
+  }
+  

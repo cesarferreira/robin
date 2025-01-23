@@ -50,11 +50,29 @@ This creates a `.robin.json` file in your current directory with some template s
 ### Using templates
 
 ```bash
-robin init --template android
-robin init --template ios
-robin init --template flutter
-robin init --template rails
+# Initialize with a specific template
+robin init --template android    # Android project template
+robin init --template ios       # iOS project template
+robin init --template flutter  # Flutter project template
+robin init --template rails    # Ruby on Rails project template
+robin init --template node     # Node.js/TypeScript project template
+robin init --template python   # Python project template
+robin init --template rust     # Rust project template
+robin init --template go       # Go project template
 ```
+
+Each template comes with a curated set of useful commands for that specific platform or framework. For example:
+
+- **Android**: Gradle commands, testing, linting (ktlint), and deployment
+- **iOS**: Xcode build, CocoaPods, testing, SwiftLint, and Fastlane commands
+- **Flutter**: Build, test, dependency management, and platform-specific commands
+- **Rails**: Server, console, database tasks, testing, and code generation
+- **Node.js**: Development, testing (Jest), TypeScript, linting (ESLint), and formatting (Prettier)
+- **Python**: Virtual env, testing (pytest), linting (flake8), formatting (black), and type checking (mypy)
+- **Rust**: Cargo commands for building, testing, linting (clippy), formatting, and documentation
+- **Go**: Build, test, linting (golangci-lint), formatting, and dependency management
+
+If a `.robin.json` file already exists, you'll be prompted to confirm before overriding it.
 
 ### List all commands
 

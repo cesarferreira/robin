@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "start": "python main.py",
+    "test": "pytest",
+    "test:watch": "pytest-watch",
+    "lint": "flake8",
+    "format": "black .",
+    "type check": "mypy .",
+    "install": "pip install -r requirements.txt",
+    "freeze": "pip freeze > requirements.txt",
+    "venv": "python -m venv venv",
+    "activate": "source venv/bin/activate",
+    "clean": "find . -type d -name __pycache__ -exec rm -r {} +",
+    "coverage": "pytest --cov=.",
+    "docs": "pdoc --html --output-dir docs ."
+  }
+} 
