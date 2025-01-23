@@ -1,6 +1,19 @@
-# Robin (Rust Version)
 
-A Rust implementation of the Robin CLI tool - your own customizable CLI tool for running project-specific scripts.
+<h1 align="center">robin</h1>
+<p align="center">Your own customizable <b>CLI</b> tool</p>
+<!-- <p align="center">
+  <a href="https://github.com/cesarferreira/robin/actions/workflows/node.js.yml"><img src="https://github.com/cesarferreira/robin/actions/workflows/node.js.yml/badge.svg" alt="node build"></a>
+  <a href="https://www.npmjs.com/package/robin-cli-tool"><img src="https://img.shields.io/npm/dt/robin-cli-tool.svg" alt="npm"></a>
+  <a href="https://www.npmjs.com/package/robin-cli-tool"><img src="https://img.shields.io/npm/v/robin-cli-tool.svg" alt="npm"></a>
+  <a href="https://github.com/cesarferreira/robin/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+</p>
+<p align="center"> -->
+  <img src="media/terminal_ss4.png" width="100%" />
+</p>
+
+
+## Reason
+> Maintaining a simple JSON file with all the available tasks allows for easy customization of deployment, release, cleaning, and other project-specific actions. This ensures that everyone on the team can use, edit, and add tasks on a project level.
 
 ## Features
 
