@@ -1,12 +1,14 @@
 use std::collections::HashMap;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use serde::{Deserialize, Serialize};
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, anyhow};
 use serde_json::Value;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RobinConfig {
+    #[serde(default)]
+    pub include: Vec<String>,
     pub scripts: HashMap<String, Value>,
 }
 
@@ -15,8 +17,38 @@ impl RobinConfig {
         let content = fs::read_to_string(path)
             .with_context(|| format!("Failed to read config file: {}", path.display()))?;
         
-        serde_json::from_str(&content)
-            .with_context(|| "Failed to parse .robin.json")
+        let mut config: Self = serde_json::from_str(&content)
+            .with_context(|| "Failed to parse .robin.json")?;
+
+        // Load and merge included configs
+        if !config.include.is_empty() {
+            let base_dir = path.parent().unwrap_or_else(|| Path::new("."));
+            config = config.merge_includes(base_dir)?;
+        }
+
+        Ok(config)
+    }
+
+    fn merge_includes(&self, base_dir: &Path) -> Result<Self> {
+        let mut merged_scripts = self.scripts.clone();
+
+        for include_path in &self.include {
+            let full_path = base_dir.join(include_path);
+            let included_config = Self::load(&full_path)
+                .with_context(|| format!("Failed to load included config: {}", include_path))?;
+            
+            // Merge scripts from included config
+            for (key, value) in included_config.scripts {
+                if !merged_scripts.contains_key(&key) {
+                    merged_scripts.insert(key, value);
+                }
+            }
+        }
+
+        Ok(Self {
+            include: self.include.clone(),
+            scripts: merged_scripts,
+        })
     }
 
     pub fn save(&self, path: &Path) -> Result<()> {
@@ -38,6 +70,9 @@ impl RobinConfig {
         scripts.insert("release alpha".to_string(), Value::String("...".to_string()));
         scripts.insert("release dev".to_string(), Value::String("...".to_string()));
 
-        Self { scripts }
+        Self { 
+            include: Vec::new(),
+            scripts 
+        }
     }
 } 

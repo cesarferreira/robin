@@ -33,5 +33,6 @@
         "echo \"456\"", 
         "echo \"789\""
     ]
-  }
+  },
+  "include": ["./otherrobin.json"]
 }

@@ -99,6 +99,97 @@ When using command sequences (arrays):
 - Environment variables and working directory are preserved between commands
 - Notifications show total execution time for the sequence
 
+## External Configuration
+
+Robin supports including external configuration files, which is particularly useful for monorepos or sharing common scripts across projects:
+
+```json
+{
+    "include": [
+        "../common/robin.base.json",
+        "./team-specific.json"
+    ],
+    "scripts": {
+        "local-dev": "npm run dev",
+        "test": "npm run test"
+    }
+}
+```
+
+### Monorepo Example
+
+Here's a typical monorepo structure using shared scripts:
+
+```
+monorepo/
+├── common/
+│   └── robin.base.json         # Shared scripts for all projects
+├── frontend/
+│   ├── .robin.json            # Frontend-specific scripts
+│   └── package.json
+├── backend/
+│   ├── .robin.json            # Backend-specific scripts
+│   └── package.json
+└── mobile/
+    ├── .robin.json            # Mobile-specific scripts
+    └── pubspec.yaml
+```
+
+`common/robin.base.json`:
+```json
+{
+    "scripts": {
+        "lint": "eslint .",
+        "format": "prettier --write .",
+        "docker:up": "docker-compose up -d",
+        "docker:down": "docker-compose down",
+        "ci:test": [
+            "npm ci",
+            "npm run test"
+        ]
+    }
+}
+```
+
+`frontend/.robin.json`:
+```json
+{
+    "include": ["../common/robin.base.json"],
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "deploy:staging": [
+            "robin docker:down",
+            "robin build",
+            "robin docker:up"
+        ]
+    }
+}
+```
+
+`mobile/.robin.json`:
+```json
+{
+    "include": ["../common/robin.base.json"],
+    "scripts": {
+        "dev": "flutter run",
+        "build:android": "flutter build apk",
+        "build:ios": "flutter build ios",
+        "deploy:beta": [
+            "robin build:{{platform=[ios,android]}}",
+            "fastlane {{platform}} beta"
+        ]
+    }
+}
+```
+
+Scripts from included files are merged with local scripts, where local scripts take precedence. This allows you to:
+- Share common development workflows across projects
+- Maintain consistent CI/CD scripts
+- Override shared scripts when needed
+- Keep project-specific scripts separate from shared ones
+
 ## Variable Substitution
 
 ### Basic Variables
