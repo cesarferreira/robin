@@ -1,4 +1,5 @@
 {
+  "include": ["./otherrobin.json"],
   "scripts": {
     "run:list": "cargo run -- --list",
     "run:dev": "cargo run -- --help",
@@ -28,12 +29,7 @@
     "build:mode": "cargo build --{{mode=[debug, release]}}",
     "test:type": "cargo test --{{type=[lib, doc, all]}}",
     "deploy:app": "fastlane {{platform=[ios, android]}} {{env=[dev, staging, prod]}} --track={{track=[alpha, beta, production]}}",
-    "123": [
-        "echo \"123\"",
-        "echo \"456\"", 
-        "echo \"789\""
-    ],
+    "123": ["echo \"123\"", "echo \"456\"", "echo \"789\""],
     "release notes": "./generate_release_notes.sh -o `pwd` \"{{githash=HEAD}}\""
-  },
-  "include": ["./otherrobin.json"]
+  }
 }
