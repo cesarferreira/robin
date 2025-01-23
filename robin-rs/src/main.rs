@@ -65,6 +65,48 @@ const KNOWN_TOOLS: &[RequiredTool] = &[
         version_arg: "version",
         patterns: &["go "],
     },
+    RequiredTool {
+        name: "ADB",
+        command: "adb",
+        version_arg: "version",
+        patterns: &["adb "],
+    },
+    RequiredTool {
+        name: "Gradle",
+        command: "gradle",
+        version_arg: "--version",
+        patterns: &["gradle ", "./gradlew "],
+    },
+    RequiredTool {
+        name: "CocoaPods",
+        command: "pod",
+        version_arg: "--version",
+        patterns: &["pod ", "cocoapods "],
+    },
+    RequiredTool {
+        name: "Xcode CLI",
+        command: "xcrun",
+        version_arg: "--version",
+        patterns: &["xcrun ", "xcodebuild "],
+    },
+    RequiredTool {
+        name: "Docker",
+        command: "docker",
+        version_arg: "--version",
+        patterns: &["docker "],
+    },
+    RequiredTool {
+        name: "Git",
+        command: "git",
+        version_arg: "--version",
+        patterns: &["git "],
+    },
+    RequiredTool {
+        name: "Maven",
+        command: "mvn",
+        version_arg: "--version",
+        patterns: &["mvn ", "maven "],
+    },
 ];
 
 fn detect_required_tools(config: &RobinConfig) -> Vec<&'static RequiredTool> {
