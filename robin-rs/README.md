@@ -5,6 +5,7 @@ A Rust implementation of the Robin CLI tool - your own customizable CLI tool for
 ## Features
 
 - Define and run project-specific scripts via `.robin.json`
+- Support for both single commands and command sequences
 - Interactive mode with fuzzy search
 - List all available commands
 - Add new commands easily
@@ -69,20 +70,34 @@ robin release beta
 
 ## Configuration
 
-The `.robin.json` file structure:
+The `.robin.json` file supports both single commands and command sequences:
 
 ```json
 {
     "scripts": {
-        "clean": "...",
+        "clean": "rm -rf build/",
         "deploy staging": "echo 'ruby deploy tool --staging'",
-        "deploy production": "...",
-        "release beta": "...",
-        "release alpha": "...",
-        "release dev": "..."
+        "deploy production": "echo 'ruby deploy tool --prod'",
+        "prep-and-deploy": [
+            "robin clean",
+            "robin build",
+            "robin deploy --env=production"
+        ],
+        "full-release": [
+            "flutter clean",
+            "flutter pub get",
+            "flutter build ios",
+            "cd ios && fastlane beta"
+        ]
     }
 }
 ```
+
+When using command sequences (arrays):
+- Commands are executed in order
+- If any command fails, the sequence stops
+- Environment variables and working directory are preserved between commands
+- Notifications show total execution time for the sequence
 
 ## Variable Substitution
 
@@ -161,6 +176,19 @@ robin deploy:app \
     --track=beta
 ```
 
+Variables work in both single commands and command sequences:
+```json
+{
+    "scripts": {
+        "deploy-sequence": [
+            "flutter clean",
+            "flutter build {{platform=[ios,android]}}",
+            "fastlane {{platform}} beta"
+        ]
+    }
+}
+```
+
 ## Development Environment
 
 ### Doctor Command
@@ -232,4 +260,4 @@ This will update:
 
 ## License
 
-MIT © [Cesar Ferreira](http://cesarferreira.com) 
+MIT © [Cesar Ferreira](http://cesarferreira.com)
