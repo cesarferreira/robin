@@ -3,10 +3,11 @@ use std::fs;
 use std::path::Path;
 use serde::{Deserialize, Serialize};
 use anyhow::{Context, Result};
+use serde_json::Value;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RobinConfig {
-    pub scripts: HashMap<String, String>,
+    pub scripts: HashMap<String, Value>,
 }
 
 impl RobinConfig {
@@ -30,12 +31,12 @@ impl RobinConfig {
 
     pub fn create_template() -> Self {
         let mut scripts = HashMap::new();
-        scripts.insert("clean".to_string(), "...".to_string());
-        scripts.insert("deploy staging".to_string(), "echo 'ruby deploy tool --staging'".to_string());
-        scripts.insert("deploy production".to_string(), "...".to_string());
-        scripts.insert("release beta".to_string(), "...".to_string());
-        scripts.insert("release alpha".to_string(), "...".to_string());
-        scripts.insert("release dev".to_string(), "...".to_string());
+        scripts.insert("clean".to_string(), Value::String("...".to_string()));
+        scripts.insert("deploy staging".to_string(), Value::String("echo 'ruby deploy tool --staging'".to_string()));
+        scripts.insert("deploy production".to_string(), Value::String("...".to_string()));
+        scripts.insert("release beta".to_string(), Value::String("...".to_string()));
+        scripts.insert("release alpha".to_string(), Value::String("...".to_string()));
+        scripts.insert("release dev".to_string(), Value::String("...".to_string()));
 
         Self { scripts }
     }

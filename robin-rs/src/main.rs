@@ -9,6 +9,7 @@ use colored::*;
 use inquire::Select;
 use regex::Regex;
 use notify_rust::Notification;
+use serde_json;
 
 use cli::{Cli, Commands};
 use config::RobinConfig;
@@ -110,21 +111,52 @@ const KNOWN_TOOLS: &[RequiredTool] = &[
     },
 ];
 
+fn check_script_contains(script: &serde_json::Value, pattern: &str) -> bool {
+    match script {
+        serde_json::Value::String(cmd) => cmd.contains(pattern),
+        serde_json::Value::Array(commands) => {
+            commands.iter().any(|cmd| {
+                cmd.as_str().map_or(false, |s| s.contains(pattern))
+            })
+        },
+        _ => false,
+    }
+}
+
 fn detect_required_tools(config: &RobinConfig) -> Vec<&'static RequiredTool> {
     KNOWN_TOOLS
         .iter()
         .filter(|tool| {
             config.scripts.values().any(|script| {
-                tool.patterns.iter().any(|&pattern| script.contains(pattern))
+                tool.patterns.iter().any(|&pattern| check_script_contains(script, pattern))
             })
         })
         .collect()
 }
 
-fn replace_variables(script: &str, args: &[String]) -> Result<String> {
-    // Updated regex to support both patterns:
-    // 1. {{variable=default}}
-    // 2. {{variable=[value1, value2, ...]}}
+fn replace_variables(script: &serde_json::Value, args: &[String]) -> Result<serde_json::Value> {
+    match script {
+        serde_json::Value::String(cmd) => {
+            let replaced = replace_variables_in_string(cmd, args)?;
+            Ok(serde_json::Value::String(replaced))
+        },
+        serde_json::Value::Array(commands) => {
+            let mut replaced_commands = Vec::new();
+            for cmd in commands {
+                if let Some(cmd_str) = cmd.as_str() {
+                    let replaced = replace_variables_in_string(cmd_str, args)?;
+                    replaced_commands.push(serde_json::Value::String(replaced));
+                } else {
+                    replaced_commands.push(cmd.clone());
+                }
+            }
+            Ok(serde_json::Value::Array(replaced_commands))
+        },
+        _ => Ok(script.clone()),
+    }
+}
+
+fn replace_variables_in_string(script: &str, args: &[String]) -> Result<String> {
     let var_regex = Regex::new(r"\{\{(\w+)(?:=([^}\]]+|\[[^\]]+\]))\}\}").unwrap();
     let mut result = script.to_string();
     
@@ -134,14 +166,12 @@ fn replace_variables(script: &str, args: &[String]) -> Result<String> {
         let default_or_enum = capture.get(2).map(|m| m.as_str()).unwrap_or("");
         let var_pattern = format!("--{}=", var_name);
 
-        // Check if this is an enum validation pattern
         if default_or_enum.starts_with('[') && default_or_enum.ends_with(']') {
             let allowed_values: Vec<&str> = default_or_enum[1..default_or_enum.len()-1]
                 .split(',')
                 .map(|s| s.trim())
                 .collect();
             
-            // Find the matching argument and validate against allowed values
             let value = args.iter()
                 .find(|arg| arg.starts_with(&var_pattern))
                 .map(|arg| arg.trim_start_matches(&var_pattern))
@@ -154,7 +184,6 @@ fn replace_variables(script: &str, args: &[String]) -> Result<String> {
             
             result = result.replace(full_match, value);
         } else {
-            // Handle regular variable substitution with optional default
             let value = args.iter()
                 .find(|arg| arg.starts_with(&var_pattern))
                 .map(|arg| arg.trim_start_matches(&var_pattern))
@@ -226,7 +255,9 @@ fn check_environment() -> Result<(bool, usize, usize, std::time::Duration)> {
 
     // Check Environment Variables if needed tools are detected
     let needs_android = required_tools.iter().any(|t| t.name == "Flutter");
-    let needs_java = needs_android || config.scripts.values().any(|s| s.contains("java ") || s.contains("gradle "));
+    let needs_java = needs_android || config.scripts.values().any(|s| 
+        check_script_contains(s, "java ") || check_script_contains(s, "gradle ")
+    );
     
     if needs_android || needs_java {
         println!("\n🔧 Environment Variables:");
@@ -253,7 +284,7 @@ fn check_environment() -> Result<(bool, usize, usize, std::time::Duration)> {
     }
 
     // Check Git Configuration if git commands are used
-    if config.scripts.values().any(|s| s.contains("git ")) {
+    if config.scripts.values().any(|s| check_script_contains(s, "git ")) {
         println!("\n🔐 Git Configuration:");
         for key in ["user.name", "user.email"].iter() {
             match Command::new("git").args(["config", key]).output() {
@@ -427,38 +458,73 @@ fn send_notification(title: &str, message: &str, success: bool) -> Result<()> {
     Ok(())
 }
 
-fn run_script(script: &str, notify: bool) -> Result<()> {
+fn run_script(script: &serde_json::Value, notify: bool) -> Result<()> {
     let start_time = std::time::Instant::now();
     
-    let status = if cfg!(target_os = "windows") {
-        Command::new("cmd")
-            .args(["/C", script])
-            .status()
-    } else {
-        Command::new("sh")
-            .arg("-c")
-            .arg(script)
-            .status()
-    }.with_context(|| format!("Failed to execute script: {}", script))?;
+    match script {
+        serde_json::Value::String(cmd) => {
+            let status = if cfg!(target_os = "windows") {
+                Command::new("cmd")
+                    .args(["/C", cmd])
+                    .status()
+            } else {
+                Command::new("sh")
+                    .arg("-c")
+                    .arg(cmd)
+                    .status()
+            }.with_context(|| format!("Failed to execute script: {}", cmd))?;
 
-    if notify {
-        let duration = start_time.elapsed();
-        let success = status.success();
-        let message = if success {
-            format!("Completed in {:.1}s", duration.as_secs_f32())
-        } else {
-            "Failed".to_string()
-        };
-        
-        send_notification(
-            "Robin",
-            &format!("Command '{}' {}", script.split_whitespace().next().unwrap_or(script), message),
-            success,
-        )?;
-    }
+            if notify {
+                let duration = start_time.elapsed();
+                let success = status.success();
+                let message = if success {
+                    format!("Completed in {:.1}s", duration.as_secs_f32())
+                } else {
+                    "Failed".to_string()
+                };
+                
+                send_notification(
+                    "Robin",
+                    &format!("Command '{}' {}", cmd.split_whitespace().next().unwrap_or(cmd), message),
+                    success,
+                )?;
+            }
 
-    if !status.success() {
-        println!("{}", "Script failed!".red());
+            if !status.success() {
+                println!("{}", "Script failed!".red());
+            }
+        },
+        serde_json::Value::Array(commands) => {
+            for cmd in commands {
+                if let Some(cmd_str) = cmd.as_str() {
+                    let status = if cfg!(target_os = "windows") {
+                        Command::new("cmd")
+                            .args(["/C", cmd_str])
+                            .status()
+                    } else {
+                        Command::new("sh")
+                            .arg("-c")
+                            .arg(cmd_str)
+                            .status()
+                    }.with_context(|| format!("Failed to execute script: {}", cmd_str))?;
+
+                    if !status.success() {
+                        println!("{}", format!("Script failed: {}", cmd_str).red());
+                        return Ok(());  // Stop execution if any command fails
+                    }
+                }
+            }
+
+            if notify {
+                let duration = start_time.elapsed();
+                send_notification(
+                    "Robin",
+                    &format!("Command sequence completed in {:.1}s", duration.as_secs_f32()),
+                    true,
+                )?;
+            }
+        },
+        _ => return Err(anyhow!("Invalid script type: must be string or array of strings")),
     }
 
     Ok(())
@@ -487,7 +553,7 @@ fn main() -> Result<()> {
                 RobinConfig::create_template()
             };
 
-            config.scripts.insert(name.clone(), script.clone());
+            config.scripts.insert(name.clone(), serde_json::Value::String(script.clone()));
             config.save(&config_path)?;
             println!("{} {}", "Added command:".green(), name);
         }
@@ -554,7 +620,21 @@ fn list_commands(config_path: &PathBuf) -> Result<()> {
         .with_context(|| "No .robin.json found. Run 'robin init' first")?;
 
     for (name, script) in &config.scripts {
-        println!("==> {} # {}", name.blue(), script);
+        match script {
+            serde_json::Value::String(cmd) => {
+                println!("==> {} # {}", name.blue(), cmd);
+            },
+            serde_json::Value::Array(commands) => {
+                println!("==> {} # [", name.blue());
+                for cmd in commands {
+                    if let Some(cmd_str) = cmd.as_str() {
+                        println!("       {}", cmd_str);
+                    }
+                }
+                println!("     ]");
+            },
+            _ => println!("==> {} # <invalid script type>", name.blue()),
+        }
     }
 
     Ok(())
