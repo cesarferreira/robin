@@ -6,9 +6,7 @@
     "doc": "cargo doc --no-deps --open",
     "bench": "cargo bench",
     "publish": "cargo publish",
-    "print": "echo {{env=prod}}",
     "run:interactive": "cargo run -- --interactive",
-    "deploy2": "fastlane deliver --submit-to-review",
     "update": "cargo update",
     "lint": "cargo clippy -- -D warnings",
     "fmt:fix": "cargo fmt --all",
@@ -21,15 +19,13 @@
     "check": "cargo check",
     "install": "cargo install --path .",
     "build": "cargo build --release",
-    "print all": "echo \"HELLO: {{env=prod}}\"",
     "deploy": "echo \"Deploying to {{env=[staging, prod]}} with version {{version=latest}}\"",
     "test": "cargo test",
     "fmt": "cargo fmt --all -- --check",
-    "deploy:env": "echo \"Deploying to {{[staging, prod]}}\"",
+    "deploy:env": "echo \"Deploying to {{env=[staging, prod]}}\"",
     "build:mode": "cargo build --{{mode=[debug, release]}}",
     "test:type": "cargo test --{{type=[lib, doc, all]}}",
     "deploy:app": "fastlane {{platform=[ios, android]}} {{env=[dev, staging, prod]}} --track={{track=[alpha, beta, production]}}",
-    "123": ["echo \"123\"", "echo \"456\"", "echo \"789\""],
-    "release notes": "./generate_release_notes.sh -o `pwd` \"{{githash=HEAD}}\""
+    "multi": ["echo \"123\"", "echo \"456\"", "echo \"789\""]
   }
 }
