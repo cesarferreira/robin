@@ -13,6 +13,10 @@ pub struct Cli {
     /// Interactive mode
     #[arg(short, long)]
     pub interactive: bool,
+
+    /// Send system notification when command completes
+    #[arg(long)]
+    pub notify: bool,
 }
 
 #[derive(Subcommand)]

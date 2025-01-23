@@ -8,6 +8,7 @@ use clap::Parser;
 use colored::*;
 use inquire::Select;
 use regex::Regex;
+use notify_rust::Notification;
 
 use cli::{Cli, Commands};
 use config::RobinConfig;
@@ -190,7 +191,12 @@ fn split_command_and_args(args: &[String]) -> (String, Vec<String>) {
     (command_parts.join(" "), var_args)
 }
 
-fn check_environment() -> Result<()> {
+fn check_environment() -> Result<(bool, usize, usize, std::time::Duration)> {
+    let start_time = std::time::Instant::now();
+    let mut all_checks_passed = true;
+    let mut found_tools = 0;
+    let mut missing_tools = 0;
+
     let config_path = PathBuf::from(CONFIG_FILE);
     let config = RobinConfig::load(&config_path)
         .with_context(|| "No .robin.json found. Run 'robin init' first")?;
@@ -202,7 +208,19 @@ fn check_environment() -> Result<()> {
     if !required_tools.is_empty() {
         println!("📦 Required Tools:");
         for tool in &required_tools {
-            check_tool(tool.name, tool.command, tool.version_arg)?;
+            match Command::new(tool.command).arg(tool.version_arg).output() {
+                Ok(output) if output.status.success() => {
+                    found_tools += 1;
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    let version = stdout.lines().next().unwrap_or("").trim();
+                    println!("✅ {}: {}", tool.name, version);
+                }
+                _ => {
+                    missing_tools += 1;
+                    all_checks_passed = false;
+                    println!("❌ {} not found", tool.name);
+                }
+            }
         }
     }
 
@@ -213,65 +231,123 @@ fn check_environment() -> Result<()> {
     if needs_android || needs_java {
         println!("\n🔧 Environment Variables:");
         if needs_android {
-            check_env_var("ANDROID_HOME")?;
+            if std::env::var("ANDROID_HOME").is_ok() {
+                found_tools += 1;
+                println!("✅ ANDROID_HOME is set");
+            } else {
+                missing_tools += 1;
+                all_checks_passed = false;
+                println!("❌ ANDROID_HOME is not set");
+            }
         }
         if needs_java {
-            check_env_var("JAVA_HOME")?;
+            if std::env::var("JAVA_HOME").is_ok() {
+                found_tools += 1;
+                println!("✅ JAVA_HOME is set");
+            } else {
+                missing_tools += 1;
+                all_checks_passed = false;
+                println!("❌ JAVA_HOME is not set");
+            }
         }
     }
 
     // Check Git Configuration if git commands are used
     if config.scripts.values().any(|s| s.contains("git ")) {
         println!("\n🔐 Git Configuration:");
-        check_git_config("user.name")?;
-        check_git_config("user.email")?;
-    }
-
-    Ok(())
-}
-
-fn update_tools() -> Result<()> {
-    println!("🔄 Updating development tools...\n");
-
-    // Update Rust
-    let has_rustup = Command::new("rustup").arg("--version").output().is_ok();
-    if has_rustup {
-        println!("Updating Rust toolchain...");
-        run_update_command("rustup", &["update"])?;
-    }
-
-    // Update Flutter
-    let has_flutter = Command::new("flutter").arg("--version").output().is_ok();
-    if has_flutter {
-        println!("\nUpdating Flutter...");
-        run_update_command("flutter", &["upgrade"])?;
-    }
-
-    // Update Fastlane
-    let has_gem = Command::new("gem").arg("--version").output().is_ok();
-    if has_gem {
-        println!("\nUpdating Fastlane...");
-        run_update_command("gem", &["update", "fastlane"])?;
-    }
-
-    // Update npm packages
-    let has_npm = Command::new("npm").arg("--version").output().is_ok();
-    if has_npm {
-        println!("\nUpdating global npm packages...");
-        run_update_command("npm", &["update", "-g"])?;
-    }
-
-    // Update CocoaPods
-    if cfg!(target_os = "macos") {
-        let has_pod = Command::new("pod").arg("--version").output().is_ok();
-        if has_pod {
-            println!("\nUpdating CocoaPods repos...");
-            run_update_command("pod", &["repo", "update"])?;
+        for key in ["user.name", "user.email"].iter() {
+            match Command::new("git").args(["config", key]).output() {
+                Ok(output) if output.status.success() => {
+                    found_tools += 1;
+                    println!("✅ Git {} is set", key);
+                }
+                _ => {
+                    missing_tools += 1;
+                    all_checks_passed = false;
+                    println!("❌ Git {} is not set", key);
+                }
+            }
         }
     }
 
-    println!("\n✅ Update complete!");
-    Ok(())
+    let duration = start_time.elapsed();
+    Ok((all_checks_passed, found_tools, missing_tools, duration))
+}
+
+fn update_tools() -> Result<(bool, Vec<String>)> {
+    let config_path = PathBuf::from(CONFIG_FILE);
+    let config = RobinConfig::load(&config_path)
+        .with_context(|| "No .robin.json found. Run 'robin init' first")?;
+
+    let required_tools = detect_required_tools(&config);
+    let mut updated_tools = Vec::new();
+    let mut all_success = true;
+
+    println!("🔄 Updating development tools...\n");
+
+    for tool in required_tools {
+        match tool.name {
+            "Node.js" => {
+                if Command::new("npm").arg("--version").output().is_ok() {
+                    println!("Updating npm packages...");
+                    if !run_update_command("npm", &["update", "-g"])? {
+                        all_success = false;
+                    } else {
+                        updated_tools.push("npm packages".to_string());
+                    }
+                }
+            },
+            "Ruby" | "Fastlane" => {
+                if Command::new("gem").arg("--version").output().is_ok() {
+                    println!("Updating Fastlane...");
+                    if !run_update_command("gem", &["update", "fastlane"])? {
+                        all_success = false;
+                    } else {
+                        updated_tools.push("Fastlane".to_string());
+                    }
+                }
+            },
+            "Flutter" => {
+                if Command::new("flutter").arg("--version").output().is_ok() {
+                    println!("Updating Flutter...");
+                    if !run_update_command("flutter", &["upgrade"])? {
+                        all_success = false;
+                    } else {
+                        updated_tools.push("Flutter".to_string());
+                    }
+                }
+            },
+            "Cargo" => {
+                if Command::new("rustup").arg("--version").output().is_ok() {
+                    println!("Updating Rust toolchain...");
+                    if !run_update_command("rustup", &["update"])? {
+                        all_success = false;
+                    } else {
+                        updated_tools.push("Rust".to_string());
+                    }
+                }
+            },
+            "CocoaPods" => {
+                if cfg!(target_os = "macos") && Command::new("pod").arg("--version").output().is_ok() {
+                    println!("Updating CocoaPods repos...");
+                    if !run_update_command("pod", &["repo", "update"])? {
+                        all_success = false;
+                    } else {
+                        updated_tools.push("CocoaPods".to_string());
+                    }
+                }
+            },
+            _ => {}
+        }
+    }
+
+    if updated_tools.is_empty() {
+        println!("No tools to update!");
+    } else {
+        println!("\n✅ Update complete!");
+    }
+
+    Ok((all_success, updated_tools))
 }
 
 fn check_tool(name: &str, cmd: &str, arg: &str) -> Result<()> {
@@ -307,7 +383,7 @@ fn check_git_config(key: &str) -> Result<()> {
     Ok(())
 }
 
-fn run_update_command(cmd: &str, args: &[&str]) -> Result<()> {
+fn run_update_command(cmd: &str, args: &[&str]) -> Result<bool> {
     let status = Command::new(cmd)
         .args(args)
         .status()
@@ -316,6 +392,75 @@ fn run_update_command(cmd: &str, args: &[&str]) -> Result<()> {
     if !status.success() {
         println!("❌ {} update failed", cmd);
     }
+    Ok(status.success())
+}
+
+fn send_notification(title: &str, message: &str, success: bool) -> Result<()> {
+    if cfg!(target_os = "windows") {
+        let icon = if success { "✅" } else { "❌" };
+        let script = format!(
+            "New-BurntToastNotification -Text '{}', '{} {}' -Silent",
+            title, icon, message
+        );
+        Command::new("powershell")
+            .arg("-Command")
+            .arg(script)
+            .output()?;
+    } else {
+        // Use notify-rust for Unix-like systems (Linux and macOS)
+        let mut notification = Notification::new();
+        
+        notification
+            .summary(title)
+            .body(&format!("{} {}", if success { "✅" } else { "❌" }, message))
+            .timeout(5000); // 5 seconds
+
+        // Set appropriate icon based on the platform
+        if cfg!(target_os = "macos") {
+            notification.sound_name("default");
+        } else {
+            notification.icon(if success { "dialog-ok" } else { "dialog-error" });
+        }
+
+        notification.show()?;
+    }
+    Ok(())
+}
+
+fn run_script(script: &str, notify: bool) -> Result<()> {
+    let start_time = std::time::Instant::now();
+    
+    let status = if cfg!(target_os = "windows") {
+        Command::new("cmd")
+            .args(["/C", script])
+            .status()
+    } else {
+        Command::new("sh")
+            .arg("-c")
+            .arg(script)
+            .status()
+    }.with_context(|| format!("Failed to execute script: {}", script))?;
+
+    if notify {
+        let duration = start_time.elapsed();
+        let success = status.success();
+        let message = if success {
+            format!("Completed in {:.1}s", duration.as_secs_f32())
+        } else {
+            "Failed".to_string()
+        };
+        
+        send_notification(
+            "Robin",
+            &format!("Command '{}' {}", script.split_whitespace().next().unwrap_or(script), message),
+            success,
+        )?;
+    }
+
+    if !status.success() {
+        println!("{}", "Script failed!".red());
+    }
+
     Ok(())
 }
 
@@ -348,11 +493,32 @@ fn main() -> Result<()> {
         }
 
         Some(Commands::Doctor) => {
-            check_environment()?;
+            let start_time = std::time::Instant::now();
+            let (success, found, missing, duration) = check_environment()?;
+            
+            if cli.notify {
+                let message = if success {
+                    format!("All {} tools found ({:.1}s)", found, duration.as_secs_f32())
+                } else {
+                    format!("{} tools found, {} missing ({:.1}s)", found, missing, duration.as_secs_f32())
+                };
+                send_notification("Robin Doctor", &message, success)?;
+            }
         }
 
         Some(Commands::DoctorUpdate) => {
-            update_tools()?;
+            let start_time = std::time::Instant::now();
+            let (success, updated_tools) = update_tools()?;
+            
+            if cli.notify {
+                let duration = start_time.elapsed();
+                let message = if success {
+                    format!("Tools updated in {:.1}s", duration.as_secs_f32())
+                } else {
+                    "Update failed".to_string()
+                };
+                send_notification("Robin Doctor Update", &message, success)?;
+            }
         }
 
         Some(Commands::Run(args)) => {
@@ -363,7 +529,7 @@ fn main() -> Result<()> {
 
             if let Some(script) = config.scripts.get(&script_name) {
                 let script_with_vars = replace_variables(script, &var_args)?;
-                run_script(&script_with_vars)?;
+                run_script(&script_with_vars, cli.notify)?;
             } else {
                 println!("{} {}", "Unknown command:".red(), script_name);
             }
@@ -378,25 +544,6 @@ fn main() -> Result<()> {
                 println!("Use --help to see available commands");
             }
         }
-    }
-
-    Ok(())
-}
-
-fn run_script(script: &str) -> Result<()> {
-    let status = if cfg!(target_os = "windows") {
-        Command::new("cmd")
-            .args(["/C", script])
-            .status()
-    } else {
-        Command::new("sh")
-            .arg("-c")
-            .arg(script)
-            .status()
-    }.with_context(|| format!("Failed to execute script: {}", script))?;
-
-    if !status.success() {
-        println!("{}", "Script failed!".red());
     }
 
     Ok(())
@@ -425,7 +572,7 @@ fn interactive_mode(config_path: &PathBuf) -> Result<()> {
 
     let selection = Select::new("Select a command to run:", commands).prompt()?;
     if let Some(script) = config.scripts.get(&selection) {
-        run_script(script)?;
+        run_script(script, false)?;
     }
 
     Ok(())
