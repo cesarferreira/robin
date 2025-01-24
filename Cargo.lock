@@ -1724,7 +1724,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "robin"
+name = "robin_cli_tool"
 version = "0.1.0"
 dependencies = [
  "anyhow",
