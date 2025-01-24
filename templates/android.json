@@ -1,23 +1,21 @@
 {
     "scripts": {
       "build": "./gradlew build",
+      "build variant": "./gradlew assemble{{variant=[Debug,Release]}}",
       "clean": "./gradlew clean",
       "test": "./gradlew test",
+      "test variant": "./gradlew test{{variant=[Debug,Release]}}UnitTest",
       "lint": "./gradlew lint",
-      "install": "./gradlew installDebug",
-      "uninstall": "./gradlew uninstallDebug",
-      "bundle": "./gradlew bundleRelease",
-      "apk": "./gradlew assembleRelease",
-      "debug": "./gradlew assembleDebug",
+      "install": "./gradlew install{{variant=Debug}}",
+      "uninstall": "./gradlew uninstall{{variant=Debug}}",
+      "bundle": "./gradlew bundle{{variant=Release}}",
+      "apk": "./gradlew assemble{{variant=Release}}",
       "dependencies": "./gradlew androidDependencies",
       "ktlint": "./gradlew ktlintCheck",
       "ktlint fix": "./gradlew ktlintFormat",
-      "unit test": "./gradlew testDebugUnitTest",
-      "instrumented test": "./gradlew connectedAndroidTest",
-      "release beta": "...",
-      "release alpha": "...",
-      "deploy staging": "echo 'ruby deploy tool --staging'",
-      "deploy production": "echo 'ruby deploy tool --prod'"
+      "instrumented test": "./gradlew connected{{variant=[Debug,Release]}}AndroidTest",
+      "deploy": "fastlane {{lane=[beta,production]}} --env={{env=[staging,prod]}}",
+      "release": "fastlane {{lane=[alpha,beta,production]}} --track={{track=[internal,alpha,beta,production]}}"
     }
   }
   

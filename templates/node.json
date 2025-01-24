@@ -1,17 +1,20 @@
 {
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "build": "tsc",
-    "clean": "rm -rf dist",
-    "install deps": "npm install",
-    "update deps": "npm update",
-    "audit": "npm audit fix",
-    "typecheck": "tsc --noEmit",
-    "format": "prettier --write ."
+    "start": "node {{file=index.js}}",
+    "dev": "nodemon {{file=index.js}} --watch {{path=src}}",
+    "test": "jest {{path=tests}} --verbose",
+    "test watch": "jest --watch {{path=tests}}",
+    "test coverage": "jest --coverage --coverageDirectory={{dir=coverage}}",
+    "lint": "eslint {{path=.}} --ext {{ext=[.js,.ts,.jsx,.tsx]}}",
+    "lint fix": "eslint {{path=.}} --ext {{ext=[.js,.ts,.jsx,.tsx]}} --fix",
+    "build": "tsc --project {{file=tsconfig.json}} --outDir {{dir=dist}}",
+    "clean": "rm -rf {{dir=[dist,coverage,node_modules]}}",
+    "install deps": "npm install --production",
+    "update deps": "npm update {{scope=@types}}",
+    "audit": "npm audit fix {{level=[low,moderate,high,critical]}}",
+    "typecheck": "tsc --noEmit --strict",
+    "format": "prettier --write {{path=.}} --ignore-path {{file=.prettierignore}}",
+    "deploy": "npm publish --tag {{tag=[latest,beta,alpha]}} --access {{access=[public,restricted]}}",
+    "serve": "node {{file=dist/index.js}} --port={{port=3000}} --env={{env=[development,staging,production]}}"
   }
 } 

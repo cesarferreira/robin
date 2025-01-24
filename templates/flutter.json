@@ -1,13 +1,19 @@
-  {
-    "scripts": {
-      "run": "flutter run",
-      "refresh dependencies": "flutter pub get",
-      "clean": "flutter clean",
-      "generate images": "fluttergen -c pubspec.yaml",
-      "release ios beta": "cd ios; bundle exec fastlane ios beta; cd ..",
-      "test": "flutter test test/*",
-      "fix": "dart fix lib/ --apply",
-      "build release": "flutter build --release"
-    }
+{
+  "scripts": {
+    "run": "flutter run",
+    "run release": "flutter run --release",
+    "build": "flutter build {{platform=[ios,android,web,macos,linux,windows]}} {{mode=[debug,release,profile]}}",
+    "test": "flutter test {{path=test/*}}",
+    "test watch": "flutter test --watch {{path=test/*}}",
+    "clean": "flutter clean",
+    "pub get": "flutter pub get",
+    "pub upgrade": "flutter pub upgrade",
+    "analyze": "flutter analyze",
+    "format": "flutter format lib/ test/",
+    "generate": "dart run build_runner build --delete-conflicting-outputs",
+    "watch": "dart run build_runner watch --delete-conflicting-outputs",
+    "deploy": "fastlane {{platform=[ios,android]}} {{lane=[beta,production]}} --env={{env=[staging,prod]}}",
+    "release": "fastlane {{platform=[ios,android]}} {{lane=[internal,alpha,beta,production]}} --track={{track=[internal,alpha,beta,production]}}"
   }
+}
   
