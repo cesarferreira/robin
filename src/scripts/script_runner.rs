@@ -42,7 +42,9 @@ pub fn run_script(script: &serde_json::Value, notify: bool) -> Result<()> {
 
             if !status.success() {
                 println!("{}", "Script failed!".red());
+                return Err(anyhow!("Script failed: {}", cmd));
             }
+            Ok(())
         },
         serde_json::Value::Array(commands) => {
             for cmd in commands {
@@ -60,7 +62,7 @@ pub fn run_script(script: &serde_json::Value, notify: bool) -> Result<()> {
 
                     if !status.success() {
                         println!("{}", format!("Script failed: {}", cmd_str).red());
-                        return Ok(());  // Stop execution if any command fails
+                        return Err(anyhow!("Script failed: {}", cmd_str));
                     }
                 }
             }
@@ -73,11 +75,10 @@ pub fn run_script(script: &serde_json::Value, notify: bool) -> Result<()> {
                     true,
                 )?;
             }
+            Ok(())
         },
-        _ => return Err(anyhow!("Invalid script type: must be string or array of strings")),
+        _ => Err(anyhow!("Invalid script type: must be string or array of strings")),
     }
-
-    Ok(())
 }
 
 pub fn list_commands(config_path: &PathBuf) -> Result<()> {

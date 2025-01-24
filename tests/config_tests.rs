@@ -1,7 +1,8 @@
+#![cfg(feature = "test-utils")]
 mod common;
 
 use robin::config::RobinConfig;
-use mockito::Server;
+use robin::fetch_template;
 
 #[tokio::test]
 async fn test_init_without_template() {
@@ -19,20 +20,13 @@ async fn test_init_without_template() {
 #[tokio::test]
 async fn test_init_with_template() {
     let (_temp_dir, config_path) = common::setup().await;
-    let mut server = Server::new();
     
-    // Mock the template response
-    let _mock = server.mock("GET", "/templates/node.json")
-        .with_status(200)
-        .with_body(r#"{"scripts": {"start": "npm start"}}"#)
-        .create();
-
-    let config = RobinConfig::create_template();
+    let config = fetch_template("node").await.unwrap();
     config.save(&config_path).unwrap();
     
     assert!(config_path.exists());
     let loaded_config = RobinConfig::load(&config_path).unwrap();
-    assert!(loaded_config.scripts.contains_key("clean"));
+    assert!(loaded_config.scripts.contains_key("start"));
 }
 
 #[tokio::test]
