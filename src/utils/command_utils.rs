@@ -48,7 +48,7 @@ pub fn replace_variables(script: &serde_json::Value, args: &[String]) -> Result<
 }
 
 fn replace_variables_in_string(script: &str, args: &[String]) -> Result<String> {
-    let var_regex = Regex::new(r"\{\{(\w+)(?:=([^}]+|\[[^\]]+\]))\}\}").unwrap();
+    let var_regex = Regex::new(r"\{\{(\w+)(?:=([^}]+|\[[^\]]+\]))?\}\}").unwrap();
     let mut result = script.to_string();
     
     for capture in var_regex.captures_iter(script) {
@@ -78,7 +78,7 @@ fn replace_variables_in_string(script: &str, args: &[String]) -> Result<String> 
             let value = args.iter()
                 .find(|arg| arg.starts_with(&var_pattern))
                 .map(|arg| arg.trim_start_matches(&var_pattern))
-                .or(Some(default_or_enum))
+                .or(if default_or_enum.is_empty() { None } else { Some(default_or_enum) })
                 .ok_or_else(|| anyhow!("Missing required variable: {}", var_name))?;
 
             result = result.replace(full_match, value);

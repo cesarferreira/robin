@@ -1,27 +1,20 @@
-mod cli;
-mod config;
-mod tools;
-mod utils;
-mod scripts;
-
 use std::path::PathBuf;
-use std::process::Command;
 use anyhow::{Context, Result, anyhow};
 use clap::Parser;
 use colored::*;
-use regex::Regex;
 use serde_json;
-use std::fs;
 use dialoguer::Confirm;
 use reqwest;
 
-use cli::{Cli, Commands};
-use config::RobinConfig;
-use tools::{check_environment, update_tools};
-use utils::{send_notification, split_command_and_args, replace_variables};
-use scripts::{run_script, list_commands, interactive_mode};
+use robin::{
+    Cli, Commands,
+    RobinConfig,
+    check_environment, update_tools,
+    send_notification, split_command_and_args, replace_variables,
+    run_script, list_commands, interactive_mode,
+    CONFIG_FILE
+};
 
-const CONFIG_FILE: &str = ".robin.json";
 const GITHUB_TEMPLATE_BASE: &str = "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/master/templates";
 // const GITHUB_TEMPLATE_BASE: &str = "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/cesar/migrate-to-RUST/templates";
 

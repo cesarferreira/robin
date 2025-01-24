@@ -6,6 +6,14 @@ authors = ["Cesar Ferreira <cesar.manuel.ferreira@gmail.com>"]
 description = "A CLI tool to run scripts for any project (Rust version)"
 license = "MIT"
 
+[[bin]]
+name = "robin"
+path = "src/main.rs"
+
+[lib]
+name = "robin"
+path = "src/lib.rs"
+
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
@@ -21,3 +29,8 @@ notify-rust = "4.10"
 dialoguer = "0.11"
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1.0", features = ["full"] }
+
+[dev-dependencies]
+tempfile = "3.8"
+mockito = "1.2"
+tokio-test = "0.4"
