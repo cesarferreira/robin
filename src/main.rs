@@ -13,6 +13,7 @@ use regex::Regex;
 use serde_json;
 use std::fs;
 use dialoguer::Confirm;
+use reqwest;
 
 use cli::{Cli, Commands};
 use config::RobinConfig;
@@ -21,15 +22,30 @@ use utils::{send_notification, split_command_and_args, replace_variables};
 use scripts::{run_script, list_commands, interactive_mode};
 
 const CONFIG_FILE: &str = ".robin.json";
-const TEMPLATES_DIR: &str = "templates";
+const GITHUB_TEMPLATE_BASE: &str = "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/master/template";
 
-fn load_template(template_name: &str) -> Result<RobinConfig> {
-    let template_path = PathBuf::from(TEMPLATES_DIR).join(format!("{}.json", template_name));
-    RobinConfig::load(&template_path)
-        .with_context(|| format!("Failed to load template: {}", template_name))
+async fn fetch_template(template_name: &str) -> Result<RobinConfig> {
+    let url = format!("{}/{}.json", GITHUB_TEMPLATE_BASE, template_name);
+    let response = reqwest::get(&url)
+        .await
+        .with_context(|| format!("Failed to fetch template from: {}", url))?;
+    
+    if !response.status().is_success() {
+        return Err(anyhow!("Template '{}' not found", template_name));
+    }
+
+    let content = response.text()
+        .await
+        .with_context(|| "Failed to read template content")?;
+    
+    let config: RobinConfig = serde_json::from_str(&content)
+        .with_context(|| "Failed to parse template JSON")?;
+    
+    Ok(config)
 }
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     let cli = Cli::parse();
     let config_path = PathBuf::from(CONFIG_FILE);
 
@@ -48,7 +64,15 @@ fn main() -> Result<()> {
             }
 
             let config = if let Some(template_name) = template {
-                load_template(template_name)?
+                println!("Fetching template '{}'...", template_name);
+                match fetch_template(template_name).await {
+                    Ok(config) => config,
+                    Err(e) => {
+                        println!("{} {}", "Error:".red(), e);
+                        println!("Available templates: android, ios, flutter, rails, node, python, rust, go");
+                        return Err(e);
+                    }
+                }
             } else {
                 RobinConfig::create_template()
             };
