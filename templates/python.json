@@ -1,0 +1,21 @@
+{
+  "scripts": {
+    "start": "python {{file=main.py}}",
+    "test": "pytest {{path=tests/}} --verbose",
+    "test watch": "pytest-watch {{path=tests/}}",
+    "test coverage": "pytest --cov={{path=.}} --cov-report={{format=[term,html,xml]}}",
+    "lint": "flake8 {{path=.}}",
+    "format": "black {{path=.}} --line-length={{length=88}}",
+    "type check": "mypy {{path=.}} --strict",
+    "install": "pip install -r {{file=requirements.txt}}",
+    "install dev": "pip install -r {{file=requirements-dev.txt}}",
+    "freeze": "pip freeze > {{file=requirements.txt}}",
+    "venv": "python -m venv {{name=venv}}",
+    "activate": "source {{name=venv}}/bin/activate",
+    "clean": "find . -type d -name {{pattern=__pycache__}} -exec rm -r {} +",
+    "docs": "pdoc --html --output-dir {{dir=docs}} {{path=.}}",
+    "serve docs": "python -m http.server {{port=8000}} --directory {{dir=docs}}",
+    "build": "python setup.py {{target=[sdist,bdist_wheel]}}",
+    "deploy": "twine upload {{target=[dist/*,wheels/*]}} --repository {{repo=[testpypi,pypi]}}"
+  }
+} 

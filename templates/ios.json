@@ -1,0 +1,19 @@
+{
+    "scripts": {
+      "build": "xcodebuild -workspace {{workspace}}.xcworkspace -scheme {{scheme}} -configuration {{config=[Debug,Release]}} build",
+      "clean": "xcodebuild clean -workspace {{workspace}}.xcworkspace -scheme {{scheme}}",
+      "test": "xcodebuild test -workspace {{workspace}}.xcworkspace -scheme {{scheme}} -destination '{{device=platform=iOS Simulator,name=iPhone 14}}'",
+      "archive": "xcodebuild archive -workspace {{workspace}}.xcworkspace -scheme {{scheme}} -configuration {{config=[Debug,Release]}} -archivePath build/{{scheme}}.xcarchive",
+      "pods": "pod install",
+      "pods update": "pod update {{pod}}",
+      "pods outdated": "pod outdated",
+      "lint": "swiftlint",
+      "lint fix": "swiftlint --fix",
+      "format": "swift-format format -i -r .",
+      "simulator": "xcrun simctl boot '{{device=iPhone 14}}'",
+      "devices": "xcrun xctrace list devices",
+      "deploy": "fastlane {{lane=[beta,production]}} --env={{env=[staging,prod]}}",
+      "release": "fastlane {{lane=[testflight,appstore]}} --track={{track=[internal,external,appstore]}}"
+    }
+  }
+  

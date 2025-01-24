@@ -1,0 +1,23 @@
+{
+  "scripts": {
+    "build": "cargo build --release --target={{target}}",
+    "run": "cargo run --release --bin={{bin}}",
+    "test": "cargo test {{test}} --verbose",
+    "test watch": "cargo watch -x 'test {{test}} --verbose'",
+    "check": "cargo check --target={{target}}",
+    "lint": "cargo clippy --all-targets",
+    "lint fix": "cargo clippy --fix --allow-dirty",
+    "format": "cargo fmt --all",
+    "format check": "cargo fmt --check --all",
+    "update deps": "cargo update {{package}}",
+    "clean": "cargo clean --target={{target}}",
+    "doc": "cargo doc --no-deps --open",
+    "audit": "cargo audit --ignore {{rustsec}}",
+    "bench": "cargo bench {{bench}} --verbose",
+    "publish": "cargo publish --allow-dirty --registry {{registry=[crates-io,github]}}",
+    "install": "cargo install {{path}} --force",
+    "coverage": "cargo tarpaulin --out={{format=[Html,Xml,Json]}}",
+    "profile": "cargo flamegraph --bin={{bin}}",
+    "expand": "cargo expand {{module}} --theme={{theme=[dark,light]}}"
+  }
+} 

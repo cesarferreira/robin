@@ -1,0 +1,21 @@
+{
+    "scripts": {
+      "build": "./gradlew build",
+      "build variant": "./gradlew assemble{{variant=[Debug,Release]}}",
+      "clean": "./gradlew clean",
+      "test": "./gradlew test",
+      "test variant": "./gradlew test{{variant=[Debug,Release]}}UnitTest",
+      "lint": "./gradlew lint",
+      "install": "./gradlew install{{variant=Debug}}",
+      "uninstall": "./gradlew uninstall{{variant=Debug}}",
+      "bundle": "./gradlew bundle{{variant=Release}}",
+      "apk": "./gradlew assemble{{variant=Release}}",
+      "dependencies": "./gradlew androidDependencies",
+      "ktlint": "./gradlew ktlintCheck",
+      "ktlint fix": "./gradlew ktlintFormat",
+      "instrumented test": "./gradlew connected{{variant=[Debug,Release]}}AndroidTest",
+      "deploy": "fastlane {{lane=[beta,production]}} --env={{env=[staging,prod]}}",
+      "release": "fastlane {{lane=[alpha,beta,production]}} --track={{track=[internal,alpha,beta,production]}}"
+    }
+  }
+  
