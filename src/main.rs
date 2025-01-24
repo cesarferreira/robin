@@ -22,7 +22,8 @@ use utils::{send_notification, split_command_and_args, replace_variables};
 use scripts::{run_script, list_commands, interactive_mode};
 
 const CONFIG_FILE: &str = ".robin.json";
-const GITHUB_TEMPLATE_BASE: &str = "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/master/template";
+const GITHUB_TEMPLATE_BASE: &str = "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/master/templates";
+// const GITHUB_TEMPLATE_BASE: &str = "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/cesar/migrate-to-RUST/templates";
 
 async fn fetch_template(template_name: &str) -> Result<RobinConfig> {
     let url = format!("{}/{}.json", GITHUB_TEMPLATE_BASE, template_name);
