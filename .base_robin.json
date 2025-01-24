@@ -1,0 +1,24 @@
+{
+  "scripts": {
+    "me": "echo \"`whoami`\"",
+    "update": "cargo update",
+    "lint": "cargo clippy -- -D warnings",
+    "fmt:fix": "cargo fmt --all",
+    "clean": "cargo clean",
+    "release": [
+      "cargo build --release",
+      "cargo test",
+      "cargo clippy -- -D warnings"
+    ],
+    "check": "cargo check",
+    "install": "cargo install --path .",
+    "build": "cargo build --release",
+    "doc": "cargo doc --no-deps --open",
+    "bench": "cargo bench",
+    "publish": "cargo publish",
+    "test": "cargo test",
+    "fmt": "cargo fmt --all -- --check",
+    "build:mode": "cargo build --{{mode=[debug, release]}}",
+    "test:type": "cargo test --{{type=[lib, doc, all]}}"
+  }
+}

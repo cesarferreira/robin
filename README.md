@@ -30,11 +30,11 @@
 ## Installation
 
 ```bash
-# From source
-cargo install --path .
-
 # From crates.io
 cargo install robin_cli_tool
+
+# From source
+cargo install --path .
 ```
 
 ## Usage
@@ -52,13 +52,13 @@ This creates a `.robin.json` file in your current directory with some template s
 ```bash
 # Initialize with a specific template
 robin init --template android    # Android project template
-robin init --template ios       # iOS project template
-robin init --template flutter  # Flutter project template
-robin init --template rails    # Ruby on Rails project template
-robin init --template node     # Node.js/TypeScript project template
-robin init --template python   # Python project template
-robin init --template rust     # Rust project template
-robin init --template go       # Go project template
+robin init --template ios        # iOS project template
+robin init --template flutter    # Flutter project template
+robin init --template rails      # Ruby on Rails project template
+robin init --template node       # Node.js/TypeScript project template
+robin init --template python     # Python project template
+robin init --template rust       # Rust project template
+robin init --template go         # Go project template
 ```
 
 Each template comes with a curated set of useful commands for that specific platform or framework. For example:
@@ -107,8 +107,7 @@ The `.robin.json` file supports both single commands and command sequences:
 {
     "scripts": {
         "clean": "rm -rf build/",
-        "deploy staging": "echo 'ruby deploy tool --staging'",
-        "deploy production": "echo 'ruby deploy tool --prod'",
+        "deploy": "echo 'ruby deploy tool --{{env=[staging,production]}}'",
         "prep-and-deploy": [
             "robin clean",
             "robin build",
@@ -154,7 +153,7 @@ Here's a typical monorepo structure using shared scripts:
 ```
 monorepo/
 ├── common/
-│   └── robin.base.json         # Shared scripts for all projects
+│   └── robin.base.json        # Shared scripts for all projects
 ├── frontend/
 │   ├── .robin.json            # Frontend-specific scripts
 │   └── package.json
@@ -245,7 +244,7 @@ You can specify default values for variables using `{{variable=default}}` syntax
 ```json
 {
     "scripts": {
-        "print": "echo {{env=prod}}",
+        "build": "echo \"Building {{mode=debug}}\"",
         "deploy": "echo \"Deploying to {{env=staging}} with version {{version=latest}}\""
     }
 }
@@ -253,12 +252,12 @@ You can specify default values for variables using `{{variable=default}}` syntax
 
 Using default values:
 ```bash
-robin print              # Will use default: prod
+robin build             # Will use default: debug
 robin deploy            # Will use defaults: staging and latest
 
 # Override defaults:
-robin print --env=dev   # Will use: dev
-robin deploy --env=prod --version=1.0.0  # Will use: prod and 1.0.0
+robin build --mode=release                  # Will use: release
+robin deploy --env=prod --version=1.0.0     # Will use: prod and 1.0.0
 ```
 
 ### Enum Validation
@@ -277,7 +276,7 @@ You can restrict variable values to a specific set using `{{variable=[value1, va
 Using enum validation:
 ```bash
 # Simple validation
-robin deploy --env=staging    # Works: 'staging' is allowed
+robin deploy --env=staging   # Works: 'staging' is allowed
 robin deploy --env=prod      # Works: 'prod' is allowed
 robin deploy --env=dev       # Fails: only 'staging' or 'prod' are allowed
 

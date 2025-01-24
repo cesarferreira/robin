@@ -16,7 +16,6 @@ use robin::{
 };
 
 const GITHUB_TEMPLATE_BASE: &str = "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/master/templates";
-// const GITHUB_TEMPLATE_BASE: &str = "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/cesar/migrate-to-RUST/templates";
 
 async fn fetch_template(template_name: &str) -> Result<RobinConfig> {
     let url = format!("{}/{}.json", GITHUB_TEMPLATE_BASE, template_name);

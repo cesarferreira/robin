@@ -1,31 +1,10 @@
 {
-  "include": ["./otherrobin.json"],
+  "include": ["./.base_robin.json", "./.app_robin.json"],
   "scripts": {
     "run:list": "cargo run -- --list",
     "run:dev": "cargo run -- --help",
-    "doc": "cargo doc --no-deps --open",
-    "bench": "cargo bench",
-    "publish": "cargo publish",
+    "run:doctor": "cargo run -- --doctor",
     "run:interactive": "cargo run -- --interactive",
-    "update": "cargo update",
-    "lint": "cargo clippy -- -D warnings",
-    "fmt:fix": "cargo fmt --all",
-    "clean": "cargo clean",
-    "release": [
-      "cargo build --release",
-      "cargo test",
-      "cargo clippy -- -D warnings"
-    ],
-    "check": "cargo check",
-    "install": "cargo install --path .",
-    "build": "cargo build --release",
-    "deploy": "echo \"Deploying to {{env=[staging, prod]}} with version {{version=latest}}\"",
-    "test": "cargo test",
-    "fmt": "cargo fmt --all -- --check",
-    "deploy:env": "echo \"Deploying to {{env=[staging, prod]}}\"",
-    "build:mode": "cargo build --{{mode=[debug, release]}}",
-    "test:type": "cargo test --{{type=[lib, doc, all]}}",
-    "deploy:app": "fastlane {{platform=[ios, android]}} {{env=[dev, staging, prod]}} --track={{track=[alpha, beta, production]}}",
-    "multi": ["echo \"123\"", "echo \"456\"", "echo \"789\""]
+    "run:version": "cargo run -- --version"
   }
 }

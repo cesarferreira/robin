@@ -1,0 +1,8 @@
+{
+    "scripts": {
+      "deploy:env": "echo \"Deploying to {{env=[staging, prod]}}\"",
+      "deploy:app": "fastlane {{platform=[ios, android]}} {{env=[dev, staging, prod]}} --track={{track=[alpha, beta, production]}}",
+      "multiple": ["echo \"1\"", "echo \"2\"", "echo \"3\""]
+    }
+  }
+  
