@@ -33,8 +33,8 @@
 # From source
 cargo install --path .
 
-# Once published to crates.io (coming soon)
-cargo install robin
+# From crates.io
+cargo install robin_cli_tool
 ```
 
 ## Usage
