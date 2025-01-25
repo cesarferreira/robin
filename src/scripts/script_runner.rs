@@ -85,13 +85,19 @@ pub fn list_commands(config_path: &PathBuf) -> Result<()> {
     let config = RobinConfig::load(config_path)
         .with_context(|| "No .robin.json found. Run 'robin init' first")?;
 
+    // Find the longest command name for padding
+    let max_len = config.scripts.keys()
+        .map(|name| name.len())
+        .max()
+        .unwrap_or(0);
+
     for (name, script) in &config.scripts {
         match script {
             serde_json::Value::String(cmd) => {
-                println!("==> {} # {}", name.blue(), cmd);
+                println!("==> {:<width$} # {}", name.blue(), cmd, width = max_len);
             },
             serde_json::Value::Array(commands) => {
-                println!("==> {} # [", name.blue());
+                println!("==> {:<width$} # [", name.blue(), width = max_len);
                 for cmd in commands {
                     if let Some(cmd_str) = cmd.as_str() {
                         println!("       {}", cmd_str);
@@ -99,7 +105,7 @@ pub fn list_commands(config_path: &PathBuf) -> Result<()> {
                 }
                 println!("     ]");
             },
-            _ => println!("==> {} # <invalid script type>", name.blue()),
+            _ => println!("==> {:<width$} # <invalid script type>", name.blue(), width = max_len),
         }
     }
 
