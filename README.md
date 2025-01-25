@@ -9,7 +9,7 @@
   
 </p>
 <p align="center">
-  <img src="media/terminal_ss4.png" width="100%" />
+  <img src="media/terminal_ss3.png" width="100%" />
 </p>
 
 
