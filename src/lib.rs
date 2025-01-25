@@ -1,5 +1,5 @@
 pub const CONFIG_FILE: &str = ".robin.json";
-const GITHUB_TEMPLATE_BASE: &str = "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/master/templates";
+const GITHUB_TEMPLATE_BASE: &str = "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/main/templates";
 
 pub mod cli;
 pub mod config;

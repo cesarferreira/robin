@@ -3,7 +3,7 @@
 <p align="center">Your own customizable <b>CLI</b> tool</p>
 <p align="center">
 <a href="https://crates.io/crates/robin_cli_tool"><img alt="Crates.io Version" src="https://img.shields.io/crates/v/robin_cli_tool"></a>
-<a href="https://github.com/cesarferreira/robin/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+<a href="https://github.com/cesarferreira/robin/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
 <img alt="Crates.io Total Downloads" src="https://img.shields.io/crates/d/robin_cli_tool">
 
   

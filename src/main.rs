@@ -15,7 +15,7 @@ use robin::{
     CONFIG_FILE
 };
 
-const GITHUB_TEMPLATE_BASE: &str = "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/master/templates";
+const GITHUB_TEMPLATE_BASE: &str = "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/main/templates";
 
 async fn fetch_template(template_name: &str) -> Result<RobinConfig> {
     let url = format!("{}/{}.json", GITHUB_TEMPLATE_BASE, template_name);
@@ -62,7 +62,6 @@ async fn main() -> Result<()> {
                     Ok(config) => config,
                     Err(e) => {
                         println!("{} {}", "Error:".red(), e);
-                        println!("Available templates: android, ios, flutter, rails, node, python, rust, go");
                         return Err(e);
                     }
                 }
