@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "dev": "npx next dev --turbopack",
+    "build": "npx next build",
+    "start": "npx next start",
+    "lint": "npx next lint",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .next"
+  }
+} 
