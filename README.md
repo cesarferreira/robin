@@ -57,6 +57,7 @@ robin init --template ios        # iOS project template
 robin init --template flutter    # Flutter project template
 robin init --template rails      # Ruby on Rails project template
 robin init --template node       # Node.js/TypeScript project template
+robin init --template nextjs     # Next.js project template
 robin init --template python     # Python project template
 robin init --template rust       # Rust project template
 robin init --template go         # Go project template
