@@ -1,13 +1,14 @@
 
 <h1 align="center">robin</h1>
 <p align="center">Your own customizable <b>CLI</b> tool</p>
-<!-- <p align="center">
-  <a href="https://github.com/cesarferreira/robin/actions/workflows/node.js.yml"><img src="https://github.com/cesarferreira/robin/actions/workflows/node.js.yml/badge.svg" alt="node build"></a>
-  <a href="https://www.npmjs.com/package/robin-cli-tool"><img src="https://img.shields.io/npm/dt/robin-cli-tool.svg" alt="npm"></a>
-  <a href="https://www.npmjs.com/package/robin-cli-tool"><img src="https://img.shields.io/npm/v/robin-cli-tool.svg" alt="npm"></a>
-  <a href="https://github.com/cesarferreira/robin/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+<p align="center">
+<a href="https://crates.io/crates/robin_cli_tool"><img alt="Crates.io Version" src="https://img.shields.io/crates/v/robin_cli_tool"></a>
+<a href="https://github.com/cesarferreira/robin/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+<img alt="Crates.io Total Downloads" src="https://img.shields.io/crates/d/robin_cli_tool">
+
+  
 </p>
-<p align="center"> -->
+<p align="center">
   <img src="media/terminal_ss4.png" width="100%" />
 </p>
 
