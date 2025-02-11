@@ -2,7 +2,8 @@
     "scripts": {
       "deploy:env": "echo \"Deploying to {{env=[staging, prod]}}\"",
       "deploy:app": "fastlane {{platform=[ios, android]}} {{env=[dev, staging, prod]}} --track={{track=[alpha, beta, production]}}",
-      "multiple": ["echo \"1\"", "echo \"2\"", "echo \"3\""]
+      "multiple": ["echo \"1\"", "echo \"2\"", "echo \"3\""],
+      "download_apk2": "echo 'bundle exec fastlane android download_universal_apk is_canary:{{is_canary=[true,false]}} version_code:{{version_code}} destination:build/{{version_code}}.apk'"
     }
   }
   

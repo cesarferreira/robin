@@ -6,5 +6,6 @@
     "run:doctor": "cargo run -- --doctor",
     "run:interactive": "cargo run -- --interactive",
     "run:version": "cargo run -- --version"
+
   }
 }

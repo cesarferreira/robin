@@ -14,11 +14,15 @@ pub struct RobinConfig {
 
 impl RobinConfig {
     pub fn load(path: &Path) -> Result<Self> {
+        if !path.exists() {
+            return Err(anyhow::anyhow!("No .robin.json found. Run 'robin init' first"));
+        }
+
         let content = fs::read_to_string(path)
             .with_context(|| format!("Failed to read config file: {}", path.display()))?;
         
         let mut config: Self = serde_json::from_str(&content)
-            .with_context(|| "Failed to parse .robin.json")?;
+            .with_context(|| "The .robin.json file exists but contains malformed JSON. Please check the file format.")?;
 
         // Load and merge included configs
         if !config.include.is_empty() {

@@ -91,7 +91,11 @@ pub fn list_commands(config_path: &PathBuf) -> Result<()> {
         .max()
         .unwrap_or(0);
 
-    for (name, script) in &config.scripts {
+    // Convert to sorted vec for alphabetical ordering
+    let mut commands: Vec<_> = config.scripts.iter().collect();
+    commands.sort_by(|a, b| a.0.cmp(b.0));
+
+    for (name, script) in commands {
         match script {
             serde_json::Value::String(cmd) => {
                 println!("==> {:<width$} # {}", name.blue(), cmd, width = max_len);

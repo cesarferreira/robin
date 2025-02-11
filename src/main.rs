@@ -131,10 +131,8 @@ async fn main() -> Result<()> {
         None => {
             if cli.list {
                 list_commands(&config_path)?;
-            } else if cli.interactive {
-                interactive_mode(&config_path)?;
             } else {
-                println!("Use --help to see available commands");
+                interactive_mode(&config_path)?;
             }
         }
     }
