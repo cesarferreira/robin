@@ -1,21 +1,84 @@
 {
-    "scripts": {
-      "build": "./gradlew build",
-      "build variant": "./gradlew assemble{{variant=[Debug,Release]}}",
-      "clean": "./gradlew clean",
-      "test": "./gradlew test",
-      "test variant": "./gradlew test{{variant=[Debug,Release]}}UnitTest",
-      "lint": "./gradlew lint",
-      "install": "./gradlew install{{variant=Debug}}",
-      "uninstall": "./gradlew uninstall{{variant=Debug}}",
-      "bundle": "./gradlew bundle{{variant=Release}}",
-      "apk": "./gradlew assemble{{variant=Release}}",
-      "dependencies": "./gradlew androidDependencies",
-      "ktlint": "./gradlew ktlintCheck",
-      "ktlint fix": "./gradlew ktlintFormat",
-      "instrumented test": "./gradlew connected{{variant=[Debug,Release]}}AndroidTest",
-      "deploy": "fastlane {{lane=[beta,production]}} --env={{env=[staging,prod]}}",
-      "release": "fastlane {{lane=[alpha,beta,production]}} --track={{track=[internal,alpha,beta,production]}}"
+  "tasks": [
+    {
+      "name": "build",
+      "command": "./gradlew build",
+      "description": "Run build"
+    },
+    {
+      "name": "build variant",
+      "command": "./gradlew assemble{{variant=[Debug,Release]}}",
+      "description": "Build Variant"
+    },
+    {
+      "name": "clean",
+      "command": "./gradlew clean",
+      "description": "Run clean"
+    },
+    {
+      "name": "test",
+      "command": "./gradlew test",
+      "description": "Run test"
+    },
+    {
+      "name": "test variant",
+      "command": "./gradlew test{{variant=[Debug,Release]}}UnitTest",
+      "description": "Test Variant"
+    },
+    {
+      "name": "lint",
+      "command": "./gradlew lint",
+      "description": "Run lint"
+    },
+    {
+      "name": "install",
+      "command": "./gradlew install{{variant=Debug}}",
+      "description": "Run install"
+    },
+    {
+      "name": "uninstall",
+      "command": "./gradlew uninstall{{variant=Debug}}",
+      "description": "Run uninstall"
+    },
+    {
+      "name": "bundle",
+      "command": "./gradlew bundle{{variant=Release}}",
+      "description": "Run bundle"
+    },
+    {
+      "name": "apk",
+      "command": "./gradlew assemble{{variant=Release}}",
+      "description": "Run apk"
+    },
+    {
+      "name": "dependencies",
+      "command": "./gradlew androidDependencies",
+      "description": "Run dependencies"
+    },
+    {
+      "name": "ktlint",
+      "command": "./gradlew ktlintCheck",
+      "description": "Run ktlint"
+    },
+    {
+      "name": "ktlint fix",
+      "command": "./gradlew ktlintFormat",
+      "description": "Ktlint Fix"
+    },
+    {
+      "name": "instrumented test",
+      "command": "./gradlew connected{{variant=[Debug,Release]}}AndroidTest",
+      "description": "Instrumented Test"
+    },
+    {
+      "name": "deploy",
+      "command": "fastlane {{lane=[beta,production]}} --env={{env=[staging,prod]}}",
+      "description": "Run deploy"
+    },
+    {
+      "name": "release",
+      "command": "fastlane {{lane=[alpha,beta,production]}} --track={{track=[internal,alpha,beta,production]}}",
+      "description": "Run release"
     }
-  }
-  
+  ]
+}

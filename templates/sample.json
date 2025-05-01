@@ -1,10 +1,29 @@
 {
-    "scripts": {
-      "clean": "...",
-      "release beta": "...",
-      "release alpha": "...",
-      "deploy staging": "echo 'ruby deploy tool --staging'",
-      "deploy production": "echo 'ruby deploy tool --prod'"
+  "tasks": [
+    {
+      "name": "clean",
+      "command": "...",
+      "description": "Run clean"
+    },
+    {
+      "name": "release beta",
+      "command": "...",
+      "description": "Release Beta"
+    },
+    {
+      "name": "release alpha",
+      "command": "...",
+      "description": "Release Alpha"
+    },
+    {
+      "name": "deploy staging",
+      "command": "echo 'ruby deploy tool --staging'",
+      "description": "Deploy Staging"
+    },
+    {
+      "name": "deploy production",
+      "command": "echo 'ruby deploy tool --prod'",
+      "description": "Deploy Production"
     }
-  }
-  
+  ]
+}

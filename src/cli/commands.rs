@@ -21,19 +21,22 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    /// Initialize a new .robin.json file
+    /// Initialize a new config file
     Init {
         /// Template to use (android, ios, flutter, rails, node, python, rust, go)
         #[arg(long)]
         template: Option<String>,
     },
     
-    /// Add a new command
+    /// Add a new task
     Add {
-        /// Command name
+        /// Task name
         name: String,
         /// Command script
         script: String,
+        /// Task description
+        #[arg(long)]
+        description: Option<String>,
     },
 
     /// Check development environment setup
@@ -41,6 +44,19 @@ pub enum Commands {
 
     /// Update development tools to their latest versions
     DoctorUpdate,
+    
+    /// Migrate from v1 (scripts) to v2 (tasks) format
+    Migrate {
+        /// Path to the legacy format config file
+        #[arg(long, default_value = ".robin.json")]
+        input: String,
+        /// Path to save the new format config file
+        #[arg(long, default_value = ".robin.json")]
+        output: String,
+        /// Force overwrite without confirmation
+        #[arg(long)]
+        force: bool,
+    },
 
     /// Run a script
     #[command(external_subcommand)]

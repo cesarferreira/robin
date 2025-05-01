@@ -39,8 +39,12 @@ pub async fn fetch_template(template_name: &str) -> Result<RobinConfig> {
 
 #[cfg(feature = "test-utils")]
 pub async fn fetch_template(_template_name: &str) -> Result<RobinConfig> {
-    use std::collections::HashMap;
-    let mut scripts = HashMap::new();
-    scripts.insert("start".to_string(), serde_json::Value::String("npm start".to_string()));
-    Ok(RobinConfig { scripts, include: vec![] })
+    let mut tasks = Vec::new();
+    tasks.push(serde_json::from_value(serde_json::json!({
+        "name": "start",
+        "command": "npm start",
+        "description": "Start the application"
+    })).unwrap());
+    
+    Ok(RobinConfig { tasks, include: vec![] })
 } 

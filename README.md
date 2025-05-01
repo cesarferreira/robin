@@ -18,15 +18,16 @@
 
 ## Features
 
-- Define and run project-specific scripts via `.robin.json`
+- Define and run project-specific tasks via `.robin.json`
 - Support for both single commands and command sequences
 - Interactive mode with fuzzy search
-- List all available commands
-- Add new commands easily
+- List all available tasks
+- Add new tasks easily
 - Cross-platform support
 - Template initialization for different project types
 - Variable substitution with default values
 - Enum validation for variables
+- Migration from script-based to task-based format
 
 ## Installation
 
@@ -46,7 +47,7 @@ cargo install --path .
 robin init
 ```
 
-This creates a `.robin.json` file in your current directory with some template scripts.
+This creates a `.robin.json` file in your current directory with some template tasks.
 
 ### Using templates
 
@@ -76,7 +77,7 @@ Each template comes with a curated set of useful commands for that specific plat
 
 If a `.robin.json` file already exists, you'll be prompted to confirm before overriding it.
 
-### List all commands
+### List all tasks
 
 ```bash
 robin --list
@@ -88,10 +89,10 @@ robin --list
 robin --interactive  # or -i
 ```
 
-### Add a new command
+### Add a new task
 
 ```bash
-robin add "deploy" "fastlane deliver --submit-to-review"
+robin add "deploy" "fastlane deliver --submit-to-review" --description "Deploy to App Store"
 ```
 
 ### Run a command
@@ -107,21 +108,37 @@ The `.robin.json` file supports both single commands and command sequences:
 
 ```json
 {
-    "scripts": {
-        "clean": "rm -rf build/",
-        "deploy": "echo 'ruby deploy tool --{{env=[staging,production]}}'",
-        "prep-and-deploy": [
-            "robin clean",
-            "robin build",
-            "robin deploy --env=production"
-        ],
-        "full-release": [
-            "flutter clean",
-            "flutter pub get",
-            "flutter build ios",
-            "cd ios && fastlane beta"
-        ]
+  "tasks": [
+    {
+      "name": "clean",
+      "command": "rm -rf build/",
+      "description": "Clean build artifacts"
+    },
+    {
+      "name": "deploy",
+      "command": "echo 'ruby deploy tool --{{env=[staging,production]}}'",
+      "description": "Deploy to an environment"
+    },
+    {
+      "name": "prep-and-deploy",
+      "command": [
+        "robin clean",
+        "robin build",
+        "robin deploy --env=production"
+      ],
+      "description": "Prepare and deploy to production"
+    },
+    {
+      "name": "full-release",
+      "command": [
+        "flutter clean",
+        "flutter pub get",
+        "flutter build ios",
+        "cd ios && fastlane beta"
+      ],
+      "description": "Build and release the iOS app"
     }
+  ]
 }
 ```
 
@@ -133,94 +150,136 @@ When using command sequences (arrays):
 
 ## External Configuration
 
-Robin supports including external configuration files, which is particularly useful for monorepos or sharing common scripts across projects:
+Robin supports including external configuration files, which is particularly useful for monorepos or sharing common tasks across projects:
 
 ```json
 {
-    "include": [
-        "../common/robin.base.json",
-        "./team-specific.json"
-    ],
-    "scripts": {
-        "local-dev": "npm run dev",
-        "test": "npm run test"
+  "include": [
+    "../common/robin.base.json",
+    "./team-specific.json"
+  ],
+  "tasks": [
+    {
+      "name": "local-dev",
+      "command": "npm run dev",
+      "description": "Run local development server"
+    },
+    {
+      "name": "test",
+      "command": "npm run test",
+      "description": "Run tests"
     }
+  ]
 }
 ```
 
 ### Monorepo Example
 
-Here's a typical monorepo structure using shared scripts:
+Here's a typical monorepo structure using shared tasks:
 
 ```
 monorepo/
 ├── common/
-│   └── robin.base.json        # Shared scripts for all projects
+│   └── robin.base.json        # Shared tasks for all projects
 ├── frontend/
-│   ├── .robin.json            # Frontend-specific scripts
+│   ├── .robin.json            # Frontend-specific tasks
 │   └── package.json
 ├── backend/
-│   ├── .robin.json            # Backend-specific scripts
+│   ├── .robin.json            # Backend-specific tasks
 │   └── package.json
 └── mobile/
-    ├── .robin.json            # Mobile-specific scripts
+    ├── .robin.json            # Mobile-specific tasks
     └── pubspec.yaml
 ```
 
 `common/robin.base.json`:
 ```json
 {
-    "scripts": {
-        "lint": "eslint .",
-        "format": "prettier --write .",
-        "docker:up": "docker-compose up -d",
-        "docker:down": "docker-compose down",
-        "ci:test": [
-            "npm ci",
-            "npm run test"
-        ]
+  "tasks": [
+    {
+      "name": "lint",
+      "command": "eslint .",
+      "description": "Run linter"
+    },
+    {
+      "name": "format",
+      "command": "prettier --write .",
+      "description": "Format code"
+    },
+    {
+      "name": "docker:up",
+      "command": "docker-compose up -d",
+      "description": "Start Docker containers"
+    },
+    {
+      "name": "docker:down",
+      "command": "docker-compose down",
+      "description": "Stop Docker containers"
+    },
+    {
+      "name": "ci:test",
+      "command": [
+        "npm ci",
+        "npm run test"
+      ],
+      "description": "Run CI tests"
     }
+  ]
 }
 ```
 
 `frontend/.robin.json`:
 ```json
 {
-    "include": ["../common/robin.base.json"],
-    "scripts": {
-        "dev": "next dev",
-        "build": "next build",
-        "start": "next start",
-        "deploy:staging": [
-            "robin docker:down",
-            "robin build",
-            "robin docker:up"
-        ]
+  "include": ["../common/robin.base.json"],
+  "tasks": [
+    {
+      "name": "dev",
+      "command": "next dev",
+      "description": "Start development server"
+    },
+    {
+      "name": "build",
+      "command": "next build",
+      "description": "Build for production"
+    },
+    {
+      "name": "start",
+      "command": "next start",
+      "description": "Start production server"
+    },
+    {
+      "name": "deploy:staging",
+      "command": [
+        "robin docker:down",
+        "robin build",
+        "robin docker:up"
+      ],
+      "description": "Deploy to staging environment"
     }
+  ]
 }
 ```
 
-`mobile/.robin.json`:
-```json
-{
-    "include": ["../common/robin.base.json"],
-    "scripts": {
-        "dev": "flutter run",
-        "build:android": "flutter build apk",
-        "build:ios": "flutter build ios",
-        "deploy:beta": [
-            "robin build:{{platform=[ios,android]}}",
-            "fastlane {{platform}} beta"
-        ]
-    }
-}
+## Migrating from scripts to tasks
+
+If you have a legacy configuration with a `scripts` object, you can migrate to the new task-based format:
+
+```bash
+robin migrate
 ```
 
-Scripts from included files are merged with local scripts, where local scripts take precedence. This allows you to:
-- Share common development workflows across projects
-- Maintain consistent CI/CD scripts
-- Override shared scripts when needed
-- Keep project-specific scripts separate from shared ones
+This will automatically convert your scripts to tasks with descriptions and create a backup of your original file. You can also specify custom paths:
+
+```bash
+robin migrate --input path/to/old-config.json --output path/to/new-config.json
+```
+
+Or force the migration without confirmation:
+
+```bash
+robin migrate --force
+```
 
 ## Variable Substitution
 

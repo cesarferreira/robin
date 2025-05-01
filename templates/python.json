@@ -1,21 +1,89 @@
 {
-  "scripts": {
-    "start": "python {{file=main.py}}",
-    "test": "pytest {{path=tests/}} --verbose",
-    "test watch": "pytest-watch {{path=tests/}}",
-    "test coverage": "pytest --cov={{path=.}} --cov-report={{format=[term,html,xml]}}",
-    "lint": "flake8 {{path=.}}",
-    "format": "black {{path=.}} --line-length={{length=88}}",
-    "type check": "mypy {{path=.}} --strict",
-    "install": "pip install -r {{file=requirements.txt}}",
-    "install dev": "pip install -r {{file=requirements-dev.txt}}",
-    "freeze": "pip freeze > {{file=requirements.txt}}",
-    "venv": "python -m venv {{name=venv}}",
-    "activate": "source {{name=venv}}/bin/activate",
-    "clean": "find . -type d -name {{pattern=__pycache__}} -exec rm -r {} +",
-    "docs": "pdoc --html --output-dir {{dir=docs}} {{path=.}}",
-    "serve docs": "python -m http.server {{port=8000}} --directory {{dir=docs}}",
-    "build": "python setup.py {{target=[sdist,bdist_wheel]}}",
-    "deploy": "twine upload {{target=[dist/*,wheels/*]}} --repository {{repo=[testpypi,pypi]}}"
-  }
-} 
+  "tasks": [
+    {
+      "name": "start",
+      "command": "python {{file=main.py}}",
+      "description": "Run start"
+    },
+    {
+      "name": "test",
+      "command": "pytest {{path=tests/}} --verbose",
+      "description": "Run test"
+    },
+    {
+      "name": "test watch",
+      "command": "pytest-watch {{path=tests/}}",
+      "description": "Test Watch"
+    },
+    {
+      "name": "test coverage",
+      "command": "pytest --cov={{path=.}} --cov-report={{format=[term,html,xml]}}",
+      "description": "Test Coverage"
+    },
+    {
+      "name": "lint",
+      "command": "flake8 {{path=.}}",
+      "description": "Run lint"
+    },
+    {
+      "name": "format",
+      "command": "black {{path=.}} --line-length={{length=88}}",
+      "description": "Run format"
+    },
+    {
+      "name": "type check",
+      "command": "mypy {{path=.}} --strict",
+      "description": "Type Check"
+    },
+    {
+      "name": "install",
+      "command": "pip install -r {{file=requirements.txt}}",
+      "description": "Run install"
+    },
+    {
+      "name": "install dev",
+      "command": "pip install -r {{file=requirements-dev.txt}}",
+      "description": "Install Dev"
+    },
+    {
+      "name": "freeze",
+      "command": "pip freeze > {{file=requirements.txt}}",
+      "description": "Run freeze"
+    },
+    {
+      "name": "venv",
+      "command": "python -m venv {{name=venv}}",
+      "description": "Run venv"
+    },
+    {
+      "name": "activate",
+      "command": "source {{name=venv}}/bin/activate",
+      "description": "Run activate"
+    },
+    {
+      "name": "clean",
+      "command": "find . -type d -name {{pattern=__pycache__}} -exec rm -r {} +",
+      "description": "Run clean"
+    },
+    {
+      "name": "docs",
+      "command": "pdoc --html --output-dir {{dir=docs}} {{path=.}}",
+      "description": "Run docs"
+    },
+    {
+      "name": "serve docs",
+      "command": "python -m http.server {{port=8000}} --directory {{dir=docs}}",
+      "description": "Serve Docs"
+    },
+    {
+      "name": "build",
+      "command": "python setup.py {{target=[sdist,bdist_wheel]}}",
+      "description": "Run build"
+    },
+    {
+      "name": "deploy",
+      "command": "twine upload {{target=[dist/*,wheels/*]}} --repository {{repo=[testpypi,pypi]}}",
+      "description": "Run deploy"
+    }
+  ]
+}

@@ -83,34 +83,20 @@ pub fn run_script(script: &serde_json::Value, notify: bool) -> Result<()> {
 
 pub fn list_commands(config_path: &PathBuf) -> Result<()> {
     let config = RobinConfig::load(config_path)
-        .with_context(|| "No .robin.json found. Run 'robin init' first")?;
+        .with_context(|| "No config file found. Run 'robin init' first")?;
 
     // Find the longest command name for padding
-    let max_len = config.scripts.keys()
-        .map(|name| name.len())
+    let max_len = config.tasks.iter()
+        .map(|task| task.name.len())
         .max()
         .unwrap_or(0);
 
-    // Convert to sorted vec for alphabetical ordering
-    let mut commands: Vec<_> = config.scripts.iter().collect();
-    commands.sort_by(|a, b| a.0.cmp(b.0));
+    // Sort tasks alphabetically by name
+    let mut tasks = config.tasks.clone();
+    tasks.sort_by(|a, b| a.name.cmp(&b.name));
 
-    for (name, script) in commands {
-        match script {
-            serde_json::Value::String(cmd) => {
-                println!("==> {:<width$} # {}", name.blue(), cmd, width = max_len);
-            },
-            serde_json::Value::Array(commands) => {
-                println!("==> {:<width$} # [", name.blue(), width = max_len);
-                for cmd in commands {
-                    if let Some(cmd_str) = cmd.as_str() {
-                        println!("       {}", cmd_str);
-                    }
-                }
-                println!("     ]");
-            },
-            _ => println!("==> {:<width$} # <invalid script type>", name.blue(), width = max_len),
-        }
+    for task in tasks {
+        println!("==> {:<width$} # {}", task.name.blue(), task.description, width = max_len);
     }
 
     Ok(())
@@ -118,18 +104,25 @@ pub fn list_commands(config_path: &PathBuf) -> Result<()> {
 
 pub fn interactive_mode(config_path: &PathBuf) -> Result<()> {
     let config = RobinConfig::load(config_path)
-        .with_context(|| "No .robin.json found. Run 'robin init' first")?;
+        .with_context(|| "No config file found. Run 'robin init' first")?;
 
-    let commands: Vec<String> = config.scripts.keys().cloned().collect();
-    if commands.is_empty() {
-        println!("{}", "No commands available".red());
+    if config.tasks.is_empty() {
+        println!("{}", "No tasks available".red());
         return Ok(());
     }
 
-    let selection = Select::new("Select a command to run:", commands).prompt()?;
-    if let Some(script) = config.scripts.get(&selection) {
-        run_script(script, false)?;
-    }
+    let options: Vec<String> = config.tasks.iter()
+        .map(|task| format!("{} - {}", task.name, task.description))
+        .collect();
+
+    let selection = Select::new("Select a task to run:", options).prompt()?;
+    let task_name = selection.split(" - ").next().unwrap_or("");
+    
+    let task = config.tasks.iter()
+        .find(|t| t.name == task_name)
+        .ok_or_else(|| anyhow!("Task not found"))?;
+    
+    run_script(&task.command, false)?;
 
     Ok(())
 } 

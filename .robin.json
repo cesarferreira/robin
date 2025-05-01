@@ -1,11 +1,30 @@
 {
   "include": ["./.base_robin.json", "./.app_robin.json"],
-  "scripts": {
-    "run:list": "cargo run -- --list",
-    "run:dev": "cargo run -- --help",
-    "run:doctor": "cargo run -- --doctor",
-    "run:interactive": "cargo run -- --interactive",
-    "run:version": "cargo run -- --version"
-
-  }
+  "tasks": [
+    {
+      "name": "run:list",
+      "command": "cargo run -- --list",
+      "description": "List all available tasks"
+    },
+    {
+      "name": "run:dev",
+      "command": "cargo run -- --help",
+      "description": "Show command help information"
+    },
+    {
+      "name": "run:doctor",
+      "command": "cargo run -- --doctor",
+      "description": "Check development environment setup"
+    },
+    {
+      "name": "run:interactive",
+      "command": "cargo run -- --interactive",
+      "description": "Run interactive task selection mode"
+    },
+    {
+      "name": "run:version",
+      "command": "cargo run -- --version",
+      "description": "Show version information"
+    }
+  ]
 }

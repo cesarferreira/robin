@@ -1,19 +1,75 @@
 {
-  "scripts": {
-    "run": "flutter run",
-    "run release": "flutter run --release",
-    "build": "flutter build {{platform=[ios,android,web,macos,linux,windows]}} {{mode=[debug,release,profile]}}",
-    "test": "flutter test {{path=test/*}}",
-    "test watch": "flutter test --watch {{path=test/*}}",
-    "clean": "flutter clean",
-    "pub get": "flutter pub get",
-    "pub upgrade": "flutter pub upgrade",
-    "analyze": "flutter analyze",
-    "format": "flutter format lib/ test/",
-    "generate": "dart run build_runner build --delete-conflicting-outputs",
-    "watch": "dart run build_runner watch --delete-conflicting-outputs",
-    "deploy": "fastlane {{platform=[ios,android]}} {{lane=[beta,production]}} --env={{env=[staging,prod]}}",
-    "release": "fastlane {{platform=[ios,android]}} {{lane=[internal,alpha,beta,production]}} --track={{track=[internal,alpha,beta,production]}}"
-  }
+  "tasks": [
+    {
+      "name": "run",
+      "command": "flutter run",
+      "description": "Run the Flutter app in debug mode"
+    },
+    {
+      "name": "run release",
+      "command": "flutter run --release",
+      "description": "Run the Flutter app in release mode"
+    },
+    {
+      "name": "build",
+      "command": "flutter build {{platform=[ios,android,web,macos,linux,windows]}} {{mode=[debug,release,profile]}}",
+      "description": "Build for specific platform and mode"
+    },
+    {
+      "name": "test",
+      "command": "flutter test {{path=test/*}}",
+      "description": "Run tests in specific path"
+    },
+    {
+      "name": "test watch",
+      "command": "flutter test --watch {{path=test/*}}",
+      "description": "Run tests in watch mode"
+    },
+    {
+      "name": "clean",
+      "command": "flutter clean",
+      "description": "Clean build artifacts"
+    },
+    {
+      "name": "pub get",
+      "command": "flutter pub get",
+      "description": "Get project dependencies"
+    },
+    {
+      "name": "pub upgrade",
+      "command": "flutter pub upgrade",
+      "description": "Upgrade project dependencies"
+    },
+    {
+      "name": "analyze",
+      "command": "flutter analyze",
+      "description": "Run static code analysis"
+    },
+    {
+      "name": "format",
+      "command": "flutter format lib/ test/",
+      "description": "Format code"
+    },
+    {
+      "name": "generate",
+      "command": "dart run build_runner build --delete-conflicting-outputs",
+      "description": "Generate code and assets"
+    },
+    {
+      "name": "watch",
+      "command": "dart run build_runner watch --delete-conflicting-outputs",
+      "description": "Watch for changes and regenerate code"
+    },
+    {
+      "name": "deploy",
+      "command": "fastlane {{platform=[ios,android]}} {{lane=[beta,production]}} --env={{env=[staging,prod]}}",
+      "description": "Deploy to a platform and environment"
+    },
+    {
+      "name": "release",
+      "command": "fastlane {{platform=[ios,android]}} {{lane=[internal,alpha,beta,production]}} --track={{track=[internal,alpha,beta,production]}}",
+      "description": "Release to a specific track"
+    }
+  ]
 }
   

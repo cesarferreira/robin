@@ -1,19 +1,74 @@
 {
-    "scripts": {
-      "build": "xcodebuild -workspace {{workspace}}.xcworkspace -scheme {{scheme}} -configuration {{config=[Debug,Release]}} build",
-      "clean": "xcodebuild clean -workspace {{workspace}}.xcworkspace -scheme {{scheme}}",
-      "test": "xcodebuild test -workspace {{workspace}}.xcworkspace -scheme {{scheme}} -destination '{{device=platform=iOS Simulator,name=iPhone 14}}'",
-      "archive": "xcodebuild archive -workspace {{workspace}}.xcworkspace -scheme {{scheme}} -configuration {{config=[Debug,Release]}} -archivePath build/{{scheme}}.xcarchive",
-      "pods": "pod install",
-      "pods update": "pod update {{pod}}",
-      "pods outdated": "pod outdated",
-      "lint": "swiftlint",
-      "lint fix": "swiftlint --fix",
-      "format": "swift-format format -i -r .",
-      "simulator": "xcrun simctl boot '{{device=iPhone 14}}'",
-      "devices": "xcrun xctrace list devices",
-      "deploy": "fastlane {{lane=[beta,production]}} --env={{env=[staging,prod]}}",
-      "release": "fastlane {{lane=[testflight,appstore]}} --track={{track=[internal,external,appstore]}}"
+  "tasks": [
+    {
+      "name": "build",
+      "command": "xcodebuild -workspace {{workspace}}.xcworkspace -scheme {{scheme}} -configuration {{config=[Debug,Release]}} build",
+      "description": "Run build"
+    },
+    {
+      "name": "clean",
+      "command": "xcodebuild clean -workspace {{workspace}}.xcworkspace -scheme {{scheme}}",
+      "description": "Run clean"
+    },
+    {
+      "name": "test",
+      "command": "xcodebuild test -workspace {{workspace}}.xcworkspace -scheme {{scheme}} -destination '{{device=platform=iOS Simulator,name=iPhone 14}}'",
+      "description": "Run test"
+    },
+    {
+      "name": "archive",
+      "command": "xcodebuild archive -workspace {{workspace}}.xcworkspace -scheme {{scheme}} -configuration {{config=[Debug,Release]}} -archivePath build/{{scheme}}.xcarchive",
+      "description": "Run archive"
+    },
+    {
+      "name": "pods",
+      "command": "pod install",
+      "description": "Run pods"
+    },
+    {
+      "name": "pods update",
+      "command": "pod update {{pod}}",
+      "description": "Pods Update"
+    },
+    {
+      "name": "pods outdated",
+      "command": "pod outdated",
+      "description": "Pods Outdated"
+    },
+    {
+      "name": "lint",
+      "command": "swiftlint",
+      "description": "Run lint"
+    },
+    {
+      "name": "lint fix",
+      "command": "swiftlint --fix",
+      "description": "Lint Fix"
+    },
+    {
+      "name": "format",
+      "command": "swift-format format -i -r .",
+      "description": "Run format"
+    },
+    {
+      "name": "simulator",
+      "command": "xcrun simctl boot '{{device=iPhone 14}}'",
+      "description": "Run simulator"
+    },
+    {
+      "name": "devices",
+      "command": "xcrun xctrace list devices",
+      "description": "Run devices"
+    },
+    {
+      "name": "deploy",
+      "command": "fastlane {{lane=[beta,production]}} --env={{env=[staging,prod]}}",
+      "description": "Run deploy"
+    },
+    {
+      "name": "release",
+      "command": "fastlane {{lane=[testflight,appstore]}} --track={{track=[internal,external,appstore]}}",
+      "description": "Run release"
     }
-  }
-  
+  ]
+}

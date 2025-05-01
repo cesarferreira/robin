@@ -1,19 +1,79 @@
 {
-  "scripts": {
-    "server": "rails server",
-    "console": "rails console",
-    "test": "rails test",
-    "routes": "rails routes",
-    "migrate": "rails db:migrate",
-    "rollback": "rails db:rollback",
-    "seed": "rails db:seed",
-    "reset db": "rails db:drop db:create db:migrate db:seed",
-    "bundle": "bundle install",
-    "assets": "rails assets:precompile",
-    "lint": "rubocop",
-    "lint fix": "rubocop -a",
-    "generate migration": "rails generate migration {{name}}",
-    "generate model": "rails generate model {{name}}",
-    "generate controller": "rails generate controller {{name}}"
-  }
-} 
+  "tasks": [
+    {
+      "name": "server",
+      "command": "rails server",
+      "description": "Run server"
+    },
+    {
+      "name": "console",
+      "command": "rails console",
+      "description": "Run console"
+    },
+    {
+      "name": "test",
+      "command": "rails test",
+      "description": "Run test"
+    },
+    {
+      "name": "routes",
+      "command": "rails routes",
+      "description": "Run routes"
+    },
+    {
+      "name": "migrate",
+      "command": "rails db:migrate",
+      "description": "Run migrate"
+    },
+    {
+      "name": "rollback",
+      "command": "rails db:rollback",
+      "description": "Run rollback"
+    },
+    {
+      "name": "seed",
+      "command": "rails db:seed",
+      "description": "Run seed"
+    },
+    {
+      "name": "reset db",
+      "command": "rails db:drop db:create db:migrate db:seed",
+      "description": "Reset Db"
+    },
+    {
+      "name": "bundle",
+      "command": "bundle install",
+      "description": "Run bundle"
+    },
+    {
+      "name": "assets",
+      "command": "rails assets:precompile",
+      "description": "Run assets"
+    },
+    {
+      "name": "lint",
+      "command": "rubocop",
+      "description": "Run lint"
+    },
+    {
+      "name": "lint fix",
+      "command": "rubocop -a",
+      "description": "Lint Fix"
+    },
+    {
+      "name": "generate migration",
+      "command": "rails generate migration {{name}}",
+      "description": "Generate Migration"
+    },
+    {
+      "name": "generate model",
+      "command": "rails generate model {{name}}",
+      "description": "Generate Model"
+    },
+    {
+      "name": "generate controller",
+      "command": "rails generate controller {{name}}",
+      "description": "Generate Controller"
+    }
+  ]
+}

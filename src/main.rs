@@ -5,6 +5,7 @@ use colored::*;
 use serde_json;
 use dialoguer::Confirm;
 use reqwest;
+use std::fs;
 
 use robin::{
     Cli, Commands,
@@ -73,16 +74,68 @@ async fn main() -> Result<()> {
             println!("{} {}", "Created".green(), config_path.display());
         }
 
-        Some(Commands::Add { name, script }) => {
+        Some(Commands::Add { name, script, description }) => {
             let mut config = if config_path.exists() {
                 RobinConfig::load(&config_path)?
             } else {
                 RobinConfig::create_template()
             };
 
-            config.scripts.insert(name.clone(), serde_json::Value::String(script.clone()));
+            let desc = description.clone().unwrap_or_else(|| "No description provided".to_string());
+            config.tasks.push(serde_json::from_value(serde_json::json!({
+                "name": name,
+                "command": script,
+                "description": desc
+            })).unwrap());
+            
             config.save(&config_path)?;
-            println!("{} {}", "Added command:".green(), name);
+            println!("{} {}", "Added task:".green(), name);
+        }
+
+        Some(Commands::Migrate { input, output, force }) => {
+            let input_path = PathBuf::from(input);
+            let output_path = PathBuf::from(output);
+            let same_file = input_path == output_path;
+            
+            if !input_path.exists() {
+                println!("{} {}", "Error:".red(), "Input file does not exist");
+                return Err(anyhow!("Input file does not exist: {}", input_path.display()));
+            }
+            
+            // Read the input file first
+            let content = fs::read_to_string(&input_path)?;
+            
+            // Check if output file exists and if we should override
+            if output_path.exists() && !force {
+                let should_override = Confirm::new()
+                    .with_prompt(format!("{} already exists. Do you want to override it?", 
+                        if same_file { "Config file" } else { "Output file" }))
+                    .default(false)
+                    .interact()?;
+                
+                if !should_override {
+                    println!("{}", "Migration cancelled.".yellow());
+                    return Ok(());
+                }
+            }
+            
+            println!("Migrating to new format...");
+            let new_config = RobinConfig::migrate_from_v1(&input_path)?;
+            
+            // If same file, create a backup
+            if same_file {
+                let backup_path = format!("{}.bak", input_path.display());
+                println!("Creating backup at {}", backup_path);
+                fs::write(&backup_path, content)?;
+            }
+            
+            new_config.save(&output_path)?;
+            println!("{} {}", "Migration complete.".green(), 
+                if same_file { 
+                    "Config file updated with new format".to_string() 
+                } else {
+                    format!("Config saved to {}", output_path.display())
+                });
         }
 
         Some(Commands::Doctor) => {
@@ -115,16 +168,18 @@ async fn main() -> Result<()> {
         }
 
         Some(Commands::Run(args)) => {
-            let config = RobinConfig::load(&config_path)
-                .with_context(|| "No .robin.json found. Run 'robin init' first")?;
+            let config = RobinConfig::load(&config_path)?;
 
-            let (script_name, var_args) = split_command_and_args(args);
+            let (task_name, var_args) = split_command_and_args(args);
 
-            if let Some(script) = config.scripts.get(&script_name) {
-                let script_with_vars = replace_variables(script, &var_args)?;
-                run_script(&script_with_vars, cli.notify)?;
+            let task = config.tasks.iter()
+                .find(|t| t.name == task_name);
+                
+            if let Some(task) = task {
+                let command_with_vars = replace_variables(&task.command, &var_args)?;
+                run_script(&command_with_vars, cli.notify)?;
             } else {
-                println!("{} {}", "Unknown command:".red(), script_name);
+                println!("{} {}", "Unknown task:".red(), task_name);
             }
         }
 

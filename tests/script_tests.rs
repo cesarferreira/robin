@@ -9,14 +9,17 @@ async fn test_list_commands() {
     let (_temp_dir, config_path) = common::setup().await;
     let mut config = RobinConfig::create_template();
     
-    config.scripts.insert(
-        "test1".to_string(),
-        Value::String("echo 'test1'".to_string())
-    );
-    config.scripts.insert(
-        "test2".to_string(),
-        Value::String("echo 'test2'".to_string())
-    );
+    config.tasks.push(serde_json::from_value(serde_json::json!({
+        "name": "test1",
+        "command": "echo 'test1'",
+        "description": "Test command 1"
+    })).unwrap());
+    
+    config.tasks.push(serde_json::from_value(serde_json::json!({
+        "name": "test2",
+        "command": "echo 'test2'",
+        "description": "Test command 2"
+    })).unwrap());
     
     config.save(&config_path).unwrap();
     

@@ -1,0 +1,37 @@
+{
+  "tasks": [
+    {
+      "name": "run:list",
+      "command": "cargo run -- --list",
+      "description": "List all tasks"
+    },
+    {
+      "name": "run:dev",
+      "command": "cargo run -- --help",
+      "description": "Show help"
+    },
+    {
+      "name": "run:doctor",
+      "command": [
+        "cargo run -- --doctor", 
+        "cargo run -- --doctorino"
+      ],
+      "description": "Run doctor"
+    },
+    {
+      "name": "deploy:staging",
+      "command": "echo 'Deploying to staging'",
+      "description": "Deploy to staging environment"
+    },
+    {
+      "name": "deploy:production",
+      "command": "echo 'Deploying to production'",
+      "description": "Deploy to production environment"
+    },
+    {
+      "name": "test",
+      "command": "cargo test",
+      "description": "Run tests"
+    }
+  ]
+}

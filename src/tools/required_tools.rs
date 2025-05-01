@@ -113,8 +113,8 @@ fn detect_required_tools(config: &RobinConfig) -> Vec<&'static RequiredTool> {
     KNOWN_TOOLS
         .iter()
         .filter(|tool| {
-            config.scripts.values().any(|script| {
-                tool.patterns.iter().any(|&pattern| check_script_contains(script, pattern))
+            config.tasks.iter().any(|task| {
+                tool.patterns.iter().any(|&pattern| check_script_contains(&task.command, pattern))
             })
         })
         .collect()
@@ -128,7 +128,7 @@ pub fn check_environment() -> Result<(bool, usize, usize, std::time::Duration)> 
 
     let config_path = std::path::PathBuf::from(crate::CONFIG_FILE);
     let config = RobinConfig::load(&config_path)
-        .with_context(|| "No .robin.json found. Run 'robin init' first")?;
+        .with_context(|| format!("No {} found. Run 'robin init' first", crate::CONFIG_FILE))?;
 
     println!("🔍 Checking development environment...\n");
 
@@ -155,8 +155,8 @@ pub fn check_environment() -> Result<(bool, usize, usize, std::time::Duration)> 
 
     // Check Environment Variables if needed tools are detected
     let needs_android = required_tools.iter().any(|t| t.name == "Flutter");
-    let needs_java = needs_android || config.scripts.values().any(|s| 
-        check_script_contains(s, "java ") || check_script_contains(s, "gradle ")
+    let needs_java = needs_android || config.tasks.iter().any(|task| 
+        check_script_contains(&task.command, "java ") || check_script_contains(&task.command, "gradle ")
     );
     
     if needs_android || needs_java {
@@ -184,7 +184,7 @@ pub fn check_environment() -> Result<(bool, usize, usize, std::time::Duration)> 
     }
 
     // Check Git Configuration if git commands are used
-    if config.scripts.values().any(|s| check_script_contains(s, "git ")) {
+    if config.tasks.iter().any(|task| check_script_contains(&task.command, "git ")) {
         println!("\n🔐 Git Configuration:");
         for key in ["user.name", "user.email"].iter() {
             match Command::new("git").args(["config", key]).output() {
@@ -208,7 +208,7 @@ pub fn check_environment() -> Result<(bool, usize, usize, std::time::Duration)> 
 pub fn update_tools() -> Result<(bool, Vec<String>)> {
     let config_path = std::path::PathBuf::from(crate::CONFIG_FILE);
     let config = RobinConfig::load(&config_path)
-        .with_context(|| "No .robin.json found. Run 'robin init' first")?;
+        .with_context(|| format!("No {} found. Run 'robin init' first", crate::CONFIG_FILE))?;
 
     let required_tools = detect_required_tools(&config);
     let mut updated_tools = Vec::new();

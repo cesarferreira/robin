@@ -1,11 +1,39 @@
 {
-  "scripts": {
-    "dev": "npx next dev --turbopack",
-    "build": "npx next build",
-    "start": "npx next start",
-    "lint": "npx next lint",
-    "format": "prettier --write .",
-    "typecheck": "tsc --noEmit",
-    "clean": "rm -rf .next"
-  }
-} 
+  "tasks": [
+    {
+      "name": "dev",
+      "command": "npx next dev --turbopack",
+      "description": "Run dev"
+    },
+    {
+      "name": "build",
+      "command": "npx next build",
+      "description": "Run build"
+    },
+    {
+      "name": "start",
+      "command": "npx next start",
+      "description": "Run start"
+    },
+    {
+      "name": "lint",
+      "command": "npx next lint",
+      "description": "Run lint"
+    },
+    {
+      "name": "format",
+      "command": "prettier --write .",
+      "description": "Run format"
+    },
+    {
+      "name": "typecheck",
+      "command": "tsc --noEmit",
+      "description": "Run typecheck"
+    },
+    {
+      "name": "clean",
+      "command": "rm -rf .next",
+      "description": "Run clean"
+    }
+  ]
+}

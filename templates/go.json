@@ -1,23 +1,99 @@
 {
-  "scripts": {
-    "build": "go build -v -o {{output=bin/app}} {{package=./cmd/...}}",
-    "run": "go run {{package=./cmd/main.go}} {{args}}",
-    "test": "go test -v {{package=./...}} --race",
-    "test verbose": "go test -v {{package=./...}} --cover",
-    "test coverage": "go test {{package=./...}} -coverprofile={{output=coverage.out}} --html",
-    "test race": "go test {{package=./...}} --race --timeout={{timeout=10m}}",
-    "lint": "golangci-lint run --config={{config=.golangci.yml}} --fix",
-    "lint fix": "golangci-lint run --fix {{severity=[warning,error]}}",
-    "format": "go fmt {{package=./...}}",
-    "vet": "go vet {{package=./...}} -v",
-    "tidy": "go mod tidy -v",
-    "download": "go mod download -x",
-    "update deps": "go get -u {{package=./...}} -v",
-    "clean": "go clean -i {{package=./...}}",
-    "generate": "go generate {{package=./...}} -x",
-    "doc": "godoc -http=:{{port=6060}}",
-    "build release": "go build -ldflags=\"-s -w\" --tags={{tags=production}} -o {{output=bin/app}} {{package=./cmd/...}}",
-    "cross compile": "GOOS={{os=[linux,darwin,windows]}} GOARCH={{arch=[amd64,arm64]}} go build {{package=./cmd/...}}",
-    "profile": "go test -cpuprofile={{output=cpu.prof}} -memprofile={{output=mem.prof}} {{package=./...}}"
-  }
-} 
+  "tasks": [
+    {
+      "name": "build",
+      "command": "go build -v -o {{output=bin/app}} {{package=./cmd/...}}",
+      "description": "Run build"
+    },
+    {
+      "name": "run",
+      "command": "go run {{package=./cmd/main.go}} {{args}}",
+      "description": "Run run"
+    },
+    {
+      "name": "test",
+      "command": "go test -v {{package=./...}} --race",
+      "description": "Run test"
+    },
+    {
+      "name": "test verbose",
+      "command": "go test -v {{package=./...}} --cover",
+      "description": "Test Verbose"
+    },
+    {
+      "name": "test coverage",
+      "command": "go test {{package=./...}} -coverprofile={{output=coverage.out}} --html",
+      "description": "Test Coverage"
+    },
+    {
+      "name": "test race",
+      "command": "go test {{package=./...}} --race --timeout={{timeout=10m}}",
+      "description": "Test Race"
+    },
+    {
+      "name": "lint",
+      "command": "golangci-lint run --config={{config=.golangci.yml}} --fix",
+      "description": "Run lint"
+    },
+    {
+      "name": "lint fix",
+      "command": "golangci-lint run --fix {{severity=[warning,error]}}",
+      "description": "Lint Fix"
+    },
+    {
+      "name": "format",
+      "command": "go fmt {{package=./...}}",
+      "description": "Run format"
+    },
+    {
+      "name": "vet",
+      "command": "go vet {{package=./...}} -v",
+      "description": "Run vet"
+    },
+    {
+      "name": "tidy",
+      "command": "go mod tidy -v",
+      "description": "Run tidy"
+    },
+    {
+      "name": "download",
+      "command": "go mod download -x",
+      "description": "Run download"
+    },
+    {
+      "name": "update deps",
+      "command": "go get -u {{package=./...}} -v",
+      "description": "Update Deps"
+    },
+    {
+      "name": "clean",
+      "command": "go clean -i {{package=./...}}",
+      "description": "Run clean"
+    },
+    {
+      "name": "generate",
+      "command": "go generate {{package=./...}} -x",
+      "description": "Run generate"
+    },
+    {
+      "name": "doc",
+      "command": "godoc -http=:{{port=6060}}",
+      "description": "Run doc"
+    },
+    {
+      "name": "build release",
+      "command": "go build -ldflags=\"-s -w\" --tags={{tags=production}} -o {{output=bin/app}} {{package=./cmd/...}}",
+      "description": "Build Release"
+    },
+    {
+      "name": "cross compile",
+      "command": "GOOS={{os=[linux,darwin,windows]}} GOARCH={{arch=[amd64,arm64]}} go build {{package=./cmd/...}}",
+      "description": "Cross Compile"
+    },
+    {
+      "name": "profile",
+      "command": "go test -cpuprofile={{output=cpu.prof}} -memprofile={{output=mem.prof}} {{package=./...}}",
+      "description": "Run profile"
+    }
+  ]
+}
