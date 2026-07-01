@@ -163,6 +163,7 @@ The `.robin.json` file supports both single commands and command sequences:
 
 When using command sequences (arrays):
 - Commands are executed in order
+- Each command is echoed (prefixed with `▶`) as it runs, so you can follow along
 - If any command fails, the sequence stops
 - Environment variables and working directory are preserved between commands
 - Notifications show total execution time for the sequence

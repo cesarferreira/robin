@@ -165,6 +165,10 @@ pub fn run_script_in(script: &serde_json::Value, notify: bool, cwd: Option<&Path
         serde_json::Value::Array(commands) => {
             for cmd in commands {
                 if let Some(cmd_str) = cmd.as_str() {
+                    // Echo each step so the user can follow a multi-command
+                    // sequence and see exactly which command is running.
+                    println!("{} {}", "▶".cyan().bold(), cmd_str);
+
                     let status = shell_command(cmd_str, cwd)
                         .status()
                         .with_context(|| format!("Failed to execute script: {}", cmd_str))?;
