@@ -27,6 +27,7 @@
 - Template initialization for different project types
 - Variable substitution with default values
 - Enum validation for variables
+- Environment variable substitution with defaults (`${VAR:-default}`)
 
 ## Installation
 
@@ -311,6 +312,34 @@ Variables work in both single commands and command sequences:
     }
 }
 ```
+
+### Environment Variables with Defaults
+In addition to the `{{...}}` syntax (which reads from `--variable=` arguments), you can
+read values from the **environment** using Docker Compose-style `${VAR:-default}` syntax:
+
+```json
+{
+    "scripts": {
+        "serve": "echo \"starting on port ${PORT:-8080}\"",
+        "deploy": "kubectl apply -n ${NAMESPACE:-default} -f deploy.yaml"
+    }
+}
+```
+
+```bash
+robin serve              # PORT unset -> "starting on port 8080"
+PORT=9000 robin serve    # PORT set   -> "starting on port 9000"
+```
+
+Two forms are supported (defaults only):
+
+| Syntax | Behavior |
+|--------|----------|
+| `${VAR:-default}` | Use `$VAR` if it is set **and non-empty**, otherwise `default`. |
+| `${VAR-default}`  | Use `$VAR` if it is **set** (even if empty), otherwise `default`. |
+
+A bare `${VAR}` (with no default) is left untouched and expanded by the shell at run
+time, exactly as before.
 
 ## Development Environment
 

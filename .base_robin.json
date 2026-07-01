@@ -19,6 +19,7 @@
     "test": "cargo test",
     "fmt": "cargo fmt --all -- --check",
     "build:mode": "cargo build --{{mode=[debug, release]}}",
-    "test:type": "cargo test --{{type=[lib, doc, all]}}"
+    "test:type": "cargo test --{{type=[lib, doc, all]}}",
+    "serve": "echo starting on port ${PORT:-8080}"
   }
 }
