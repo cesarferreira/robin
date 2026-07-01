@@ -1,6 +1,39 @@
-use robin::config::RobinConfig;
+use robin::config::{RobinConfig, find_config_from};
 use std::fs;
 use tempfile::tempdir;
+
+#[test]
+fn find_config_walks_up_to_ancestor() {
+    let dir = tempdir().unwrap();
+    let root = dir.path();
+    fs::write(root.join(".robin.json"), r#"{"scripts":{}}"#).unwrap();
+
+    let nested = root.join("a").join("b").join("c");
+    fs::create_dir_all(&nested).unwrap();
+
+    let found = find_config_from(&nested).expect("should find config in an ancestor");
+    assert_eq!(found, root.join(".robin.json"));
+}
+
+#[test]
+fn find_config_prefers_the_nearest_config() {
+    let dir = tempdir().unwrap();
+    let root = dir.path();
+    fs::write(root.join(".robin.json"), r#"{"scripts":{}}"#).unwrap();
+
+    let sub = root.join("sub");
+    fs::create_dir_all(&sub).unwrap();
+    fs::write(sub.join(".robin.json"), r#"{"scripts":{}}"#).unwrap();
+
+    let found = find_config_from(&sub).expect("should find nearest config");
+    assert_eq!(found, sub.join(".robin.json"));
+}
+
+#[test]
+fn find_config_returns_none_when_absent() {
+    let dir = tempdir().unwrap();
+    assert!(find_config_from(dir.path()).is_none());
+}
 
 #[test]
 fn load_missing_file_gives_helpful_error() {

@@ -102,6 +102,11 @@ robin deploy staging
 robin release beta
 ```
 
+Robin looks for `.robin.json` in the current directory and walks up the parent
+directories until it finds one — so you can run commands from anywhere inside
+your project, just like `git` or `cargo`. (`robin init` always writes to the
+current directory.)
+
 ## Configuration
 
 The `.robin.json` file supports both single commands and command sequences:

@@ -9,7 +9,7 @@ pub mod tools;
 pub mod utils;
 
 pub use cli::{Cli, Commands};
-pub use config::RobinConfig;
+pub use config::{RobinConfig, find_config_from, find_config_path};
 pub use scripts::{interactive_mode, list_commands, run_script};
 pub use tools::{check_environment, update_tools};
 pub use utils::{check_for_update, replace_variables, send_notification, split_command_and_args};

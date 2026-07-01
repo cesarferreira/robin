@@ -3,7 +3,33 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+
+use crate::CONFIG_FILE;
+
+/// Walks up from `start` (inclusive) looking for the first directory that
+/// contains a `.robin.json`. Returns the path to that config, or `None` when no
+/// ancestor holds one. This lets `robin` be run from any subdirectory of a
+/// project, mirroring how `git` and `cargo` locate their root files.
+pub fn find_config_from(start: &Path) -> Option<PathBuf> {
+    let mut dir = Some(start);
+    while let Some(current) = dir {
+        let candidate = current.join(CONFIG_FILE);
+        if candidate.is_file() {
+            return Some(candidate);
+        }
+        dir = current.parent();
+    }
+    None
+}
+
+/// Resolves the config path for read commands: the nearest `.robin.json` found
+/// by walking up from the current directory, falling back to `./.robin.json`
+/// so that "not found" errors still name a sensible location.
+pub fn find_config_path() -> PathBuf {
+    let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+    find_config_from(&cwd).unwrap_or_else(|| cwd.join(CONFIG_FILE))
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RobinConfig {
