@@ -6,8 +6,8 @@ use std::path::PathBuf;
 
 use robin::{
     CONFIG_FILE, Cli, Commands, RobinConfig, check_environment, check_for_update, find_config_path,
-    interactive_mode, list_commands, replace_variables, run_script, send_notification,
-    split_command_and_args, update_tools,
+    interactive_mode, list_commands, replace_variables, run_script, script_command,
+    send_notification, split_command_and_args, update_tools,
 };
 
 const GITHUB_TEMPLATE_BASE: &str =
@@ -96,6 +96,18 @@ async fn dispatch(cli: &Cli) -> Result<()> {
             println!("{} {}", "Added command:".green(), name);
         }
 
+        Some(Commands::Migrate) => {
+            let config = RobinConfig::load_raw(&config_path)
+                .with_context(|| "No .robin.json found. Run 'robin init' first")?;
+            let migrated = config.migrated();
+            migrated.save(&config_path)?;
+            println!(
+                "{} {} (added a 'desc' field to each task)",
+                "Migrated".green(),
+                config_path.display()
+            );
+        }
+
         Some(Commands::Doctor) => {
             let config = RobinConfig::load(&config_path)
                 .with_context(|| "No .robin.json found. Run 'robin init' first")?;
@@ -139,7 +151,10 @@ async fn dispatch(cli: &Cli) -> Result<()> {
 
             let (script_name, var_args) = split_command_and_args(args);
 
-            if let Some(script) = config.scripts.get(&script_name) {
+            if let Some(entry) = config.scripts.get(&script_name) {
+                let script = script_command(entry).ok_or_else(|| {
+                    anyhow!("Command '{}' has an invalid script definition", script_name)
+                })?;
                 let script_with_vars = replace_variables(script, &var_args)?;
                 run_script(&script_with_vars, cli.notify)?;
             } else {

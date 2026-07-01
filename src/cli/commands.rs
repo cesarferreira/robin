@@ -36,6 +36,10 @@ pub enum Commands {
         script: String,
     },
 
+    /// Rewrite .robin.json so every task uses the object form with a `desc`
+    /// field ready to be filled in (existing string/array tasks keep working)
+    Migrate,
+
     /// Check development environment setup
     Doctor,
 

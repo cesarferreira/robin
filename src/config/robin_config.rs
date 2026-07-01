@@ -33,13 +33,55 @@ pub fn find_config_path() -> PathBuf {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RobinConfig {
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub include: Vec<String>,
     pub scripts: HashMap<String, Value>,
 }
 
+/// Returns the executable part of a script entry.
+///
+/// A script may be written in three shapes:
+///   - a bare string:          `"cargo build"`
+///   - an array of commands:    `["cargo build", "cargo test"]`
+///   - an object with metadata: `{ "cmd": <string|array>, "desc": "..." }`
+///
+/// For the string/array forms the entry is itself the command; for the object
+/// form the command lives under `cmd`. Returns `None` for unsupported shapes.
+pub fn script_command(entry: &Value) -> Option<&Value> {
+    match entry {
+        Value::String(_) | Value::Array(_) => Some(entry),
+        Value::Object(map) => map.get("cmd"),
+        _ => None,
+    }
+}
+
+/// Returns the human-readable description of a script entry, when it uses the
+/// object form and carries a non-empty `desc`.
+pub fn script_description(entry: &Value) -> Option<&str> {
+    entry
+        .as_object()?
+        .get("desc")?
+        .as_str()
+        .filter(|s| !s.is_empty())
+}
+
 impl RobinConfig {
     pub fn load(path: &Path) -> Result<Self> {
+        let mut config = Self::load_raw(path)?;
+
+        // Load and merge included configs
+        if !config.include.is_empty() {
+            let base_dir = path.parent().unwrap_or_else(|| Path::new("."));
+            config = config.merge_includes(base_dir)?;
+        }
+
+        Ok(config)
+    }
+
+    /// Parses a single config file without following `include` — the scripts are
+    /// exactly those declared in this file. Used by commands (like `migrate`)
+    /// that rewrite the file in place and must not inline included scripts.
+    pub fn load_raw(path: &Path) -> Result<Self> {
         if !path.exists() {
             return Err(anyhow::anyhow!(
                 "No .robin.json found. Run 'robin init' first"
@@ -49,14 +91,8 @@ impl RobinConfig {
         let content = fs::read_to_string(path)
             .with_context(|| format!("Failed to read config file: {}", path.display()))?;
 
-        let mut config: Self = serde_json::from_str(&content)
+        let config: Self = serde_json::from_str(&content)
             .with_context(|| "The .robin.json file exists but contains malformed JSON. Please check the file format.")?;
-
-        // Load and merge included configs
-        if !config.include.is_empty() {
-            let base_dir = path.parent().unwrap_or_else(|| Path::new("."));
-            config = config.merge_includes(base_dir)?;
-        }
 
         Ok(config)
     }
@@ -113,5 +149,89 @@ impl RobinConfig {
             include: Vec::new(),
             scripts,
         }
+    }
+
+    /// Rewrites every script into the object form `{ "cmd": ..., "desc": "" }`,
+    /// leaving an empty `desc` ready to be filled in. Entries already in object
+    /// form are kept as-is. This is what `robin migrate` applies so users can
+    /// start attaching descriptions to existing tasks.
+    pub fn migrated(&self) -> Self {
+        let scripts = self
+            .scripts
+            .iter()
+            .map(|(name, entry)| {
+                let migrated = match entry {
+                    Value::Object(_) => entry.clone(),
+                    other => serde_json::json!({ "cmd": other, "desc": "" }),
+                };
+                (name.clone(), migrated)
+            })
+            .collect();
+
+        Self {
+            include: self.include.clone(),
+            scripts,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn script_command_reads_bare_string_and_array() {
+        assert_eq!(script_command(&json!("cargo build")), Some(&json!("cargo build")));
+        let arr = json!(["a", "b"]);
+        assert_eq!(script_command(&arr), Some(&arr));
+    }
+
+    #[test]
+    fn script_command_reads_cmd_field_from_object() {
+        let entry = json!({ "cmd": "cargo build", "desc": "Build it" });
+        assert_eq!(script_command(&entry), Some(&json!("cargo build")));
+
+        let entry_arr = json!({ "cmd": ["a", "b"], "desc": "seq" });
+        assert_eq!(script_command(&entry_arr), Some(&json!(["a", "b"])));
+    }
+
+    #[test]
+    fn script_command_is_none_for_unsupported_shapes() {
+        assert_eq!(script_command(&json!(42)), None);
+        assert_eq!(script_command(&json!({ "desc": "no cmd" })), None);
+    }
+
+    #[test]
+    fn script_description_reads_only_non_empty_desc() {
+        assert_eq!(
+            script_description(&json!({ "cmd": "x", "desc": "hello" })),
+            Some("hello")
+        );
+        assert_eq!(script_description(&json!({ "cmd": "x", "desc": "" })), None);
+        assert_eq!(script_description(&json!("cargo build")), None);
+    }
+
+    #[test]
+    fn migrated_wraps_strings_and_arrays_but_keeps_objects() {
+        let mut scripts = HashMap::new();
+        scripts.insert("s".to_string(), json!("cargo build"));
+        scripts.insert("a".to_string(), json!(["x", "y"]));
+        scripts.insert(
+            "o".to_string(),
+            json!({ "cmd": "already", "desc": "kept" }),
+        );
+        let config = RobinConfig {
+            include: vec!["base.json".to_string()],
+            scripts,
+        };
+
+        let migrated = config.migrated();
+
+        assert_eq!(migrated.scripts["s"], json!({ "cmd": "cargo build", "desc": "" }));
+        assert_eq!(migrated.scripts["a"], json!({ "cmd": ["x", "y"], "desc": "" }));
+        assert_eq!(migrated.scripts["o"], json!({ "cmd": "already", "desc": "kept" }));
+        // `include` is preserved untouched.
+        assert_eq!(migrated.include, vec!["base.json".to_string()]);
     }
 }

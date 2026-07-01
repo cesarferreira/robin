@@ -28,6 +28,7 @@
 - Variable substitution with default values
 - Enum validation for variables
 - Environment variable substitution with defaults (`${VAR:-default}`)
+- Optional per-task descriptions (shown in `--list` and interactive mode)
 
 ## Installation
 
@@ -136,6 +137,34 @@ When using command sequences (arrays):
 - If any command fails, the sequence stops
 - Environment variables and working directory are preserved between commands
 - Notifications show total execution time for the sequence
+
+### Task descriptions
+
+Any task can carry a description by switching to the object form. The command
+itself goes under `cmd` (a string *or* an array), and `desc` is shown in
+`robin --list` and the interactive picker:
+
+```json
+{
+    "scripts": {
+        "build": "cargo build",
+        "deploy": {
+            "cmd": ["cargo build --release", "scp target/release/app server:/srv"],
+            "desc": "Build a release binary and copy it to the server"
+        }
+    }
+}
+```
+
+The plain string and array forms keep working — descriptions are entirely
+optional. To add the `desc` scaffolding to every task in an existing file, run:
+
+```bash
+robin migrate
+```
+
+This rewrites `.robin.json` so each task uses the `{ "cmd": ..., "desc": "" }`
+form, ready for you to fill in the descriptions.
 
 ## External Configuration
 

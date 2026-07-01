@@ -5,7 +5,7 @@ use serde_json;
 use std::path::Path;
 use std::process::Command;
 
-use crate::config::RobinConfig;
+use crate::config::{RobinConfig, script_command, script_description};
 use crate::utils::send_notification;
 
 pub fn run_script(script: &serde_json::Value, notify: bool) -> Result<()> {
@@ -99,11 +99,14 @@ pub fn list_commands(config_path: &Path) -> Result<()> {
     commands.sort_by(|a, b| a.0.cmp(b.0));
 
     for (name, script) in commands {
-        match script {
-            serde_json::Value::String(cmd) => {
+        if let Some(desc) = script_description(script) {
+            println!("    {:<width$}   {}", "", desc.dimmed(), width = max_len);
+        }
+        match script_command(script) {
+            Some(serde_json::Value::String(cmd)) => {
                 println!("==> {:<width$} # {}", name.blue(), cmd, width = max_len);
             }
-            serde_json::Value::Array(commands) => {
+            Some(serde_json::Value::Array(commands)) => {
                 println!("==> {:<width$} # [", name.blue(), width = max_len);
                 for cmd in commands {
                     if let Some(cmd_str) = cmd.as_str() {
@@ -135,7 +138,9 @@ pub fn interactive_mode(config_path: &Path) -> Result<()> {
 
     let selection = Select::new("Select a command to run:", commands).prompt()?;
     if let Some(script) = config.scripts.get(&selection) {
-        run_script(script, false)?;
+        if let Some(cmd) = script_command(script) {
+            run_script(cmd, false)?;
+        }
     }
 
     Ok(())
