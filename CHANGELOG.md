@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-07-01
+
+### Added
+
+- Notify when a newer version is available on crates.io
+- Support Docker-style ${VAR:-default} environment defaults
+
+### Changed
+
+- Updated readme
+- Updated rust template
+- Sort by alphabetical order, defaults to interactive if no params are passed
+- Bump dependencies and drop unused crates
+- Add Makefile and cargo-release changelog workflow
+- Move to Rust edition 2024
+- Cover config includes, arg parsing, and script execution
+- Apply cargo fmt across the crate
+- Trigger workflow on main instead of master
+- Generate changelog with git-cliff instead of a bespoke script
+
+### Documentation
+
+- Backfill CHANGELOG with all historical releases
+
+### Fixed
+
+- Correct tool detection and make doctor testable
 ## [1.0.1] - 2025-01-25
 
 ### Added
