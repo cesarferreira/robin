@@ -5,9 +5,9 @@ use dialoguer::Confirm;
 use std::path::PathBuf;
 
 use robin::{
-    CONFIG_FILE, Cli, Commands, RobinConfig, check_environment, check_for_update, interactive_mode,
-    list_commands, replace_variables, run_script, send_notification, split_command_and_args,
-    update_tools,
+    CONFIG_FILE, Cli, Commands, RobinConfig, check_environment, check_for_update, find_config_path,
+    interactive_mode, list_commands, replace_variables, run_script, send_notification,
+    split_command_and_args, update_tools,
 };
 
 const GITHUB_TEMPLATE_BASE: &str =
@@ -45,10 +45,14 @@ async fn main() -> Result<()> {
 }
 
 async fn dispatch(cli: &Cli) -> Result<()> {
-    let config_path = PathBuf::from(CONFIG_FILE);
+    // Read/edit commands locate the nearest `.robin.json` by walking up from the
+    // current directory; `init` always targets the current directory so it never
+    // overwrites a parent project's config.
+    let config_path = find_config_path();
 
     match &cli.command {
         Some(Commands::Init { template }) => {
+            let config_path = PathBuf::from(CONFIG_FILE);
             if config_path.exists() {
                 let should_override = Confirm::new()
                     .with_prompt("Config file already exists. Do you want to override it?")
