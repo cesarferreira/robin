@@ -1,9 +1,12 @@
 use anyhow::{Context, Result, anyhow};
 use colored::*;
+use fuzzy_matcher::FuzzyMatcher;
+use fuzzy_matcher::skim::SkimMatcherV2;
 use inquire::Select;
 use serde_json;
 use serde_json::Value;
 use std::collections::HashMap;
+use std::fmt;
 use std::path::Path;
 use std::process::Command;
 
@@ -243,18 +246,75 @@ pub fn list_commands(config_path: &Path) -> Result<()> {
     Ok(())
 }
 
+/// One selectable row in the interactive picker.
+struct CommandChoice {
+    /// The task name, used to look the script back up after selection.
+    name: String,
+    /// Plain-text `name description` used for fuzzy matching (never colored,
+    /// so ANSI codes in `label` don't pollute the search).
+    search: String,
+    /// Pre-rendered, column-aligned label shown in the picker.
+    label: String,
+}
+
+impl fmt::Display for CommandChoice {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.label)
+    }
+}
+
+/// Builds the aligned, sorted list of picker rows from the config's scripts.
+/// Names are sorted alphabetically (HashMap order isn't stable) and padded to a
+/// common width so descriptions line up in one column.
+fn command_choices(scripts: &HashMap<String, Value>) -> Vec<CommandChoice> {
+    let mut entries: Vec<(&String, &Value)> = scripts.iter().collect();
+    entries.sort_by(|a, b| a.0.cmp(b.0));
+
+    let max_len = entries.iter().map(|(name, _)| name.len()).max().unwrap_or(0);
+
+    entries
+        .into_iter()
+        .map(|(name, script)| match script_description(script) {
+            Some(desc) => CommandChoice {
+                name: name.clone(),
+                search: format!("{} {}", name, desc),
+                label: format!("{:<width$}   {}", name, desc.dimmed(), width = max_len),
+            },
+            None => CommandChoice {
+                name: name.clone(),
+                search: name.clone(),
+                label: name.clone(),
+            },
+        })
+        .collect()
+}
+
 pub fn interactive_mode(config_path: &Path) -> Result<()> {
     let config = RobinConfig::load(config_path)
         .with_context(|| "No .robin.json found. Run 'robin init' first")?;
 
-    let commands: Vec<String> = config.scripts.keys().cloned().collect();
-    if commands.is_empty() {
+    if config.scripts.is_empty() {
         println!("{}", "No commands available".red());
         return Ok(());
     }
 
-    let selection = Select::new("Select a command to run:", commands).prompt()?;
-    if let Some(script) = config.scripts.get(&selection) {
+    let choices = command_choices(&config.scripts);
+
+    // Fuzzy-match against the plain `search` text (name + description) rather
+    // than the colored label inquire would use by default.
+    let matcher = SkimMatcherV2::default();
+    let scorer = |input: &str, choice: &CommandChoice, _: &str, _: usize| -> Option<i64> {
+        if input.is_empty() {
+            return Some(0);
+        }
+        matcher.fuzzy_match(&choice.search, input)
+    };
+
+    let selection = Select::new("Select a command to run:", choices)
+        .with_scorer(&scorer)
+        .prompt()?;
+
+    if let Some(script) = config.scripts.get(&selection.name) {
         if let Some(cmd) = script_command(script) {
             let resolved = resolve_task_command(cmd, &config.scripts)?;
             run_script(&resolved, false)?;
@@ -262,4 +322,60 @@ pub fn interactive_mode(config_path: &Path) -> Result<()> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    fn strip_ansi(s: &str) -> String {
+        let re = regex::Regex::new(r"\x1b\[[0-9;]*m").unwrap();
+        re.replace_all(s, "").to_string()
+    }
+
+    #[test]
+    fn choices_are_sorted_and_description_column_is_aligned() {
+        let mut scripts = HashMap::new();
+        scripts.insert("build".to_string(), json!({ "cmd": "cargo build", "desc": "Compile" }));
+        scripts.insert("deploy".to_string(), json!({ "cmd": "ship", "desc": "Release it" }));
+        scripts.insert("clean".to_string(), json!("rm -rf target/"));
+
+        let choices = command_choices(&scripts);
+
+        // Alphabetical order, independent of HashMap iteration order.
+        assert_eq!(
+            choices.iter().map(|c| c.name.as_str()).collect::<Vec<_>>(),
+            vec!["build", "clean", "deploy"]
+        );
+
+        // The description column starts at the same offset for every row that
+        // has a description (name padded to the longest name, "deploy" = 6).
+        let build = strip_ansi(&choices[0].label);
+        let deploy = strip_ansi(&choices[2].label);
+        assert_eq!(build.find("Compile"), deploy.find("Release it"));
+        assert_eq!(build, "build    Compile");
+        assert_eq!(deploy, "deploy   Release it");
+
+        // A task without a description renders as just its (unpadded) name.
+        assert_eq!(choices[1].label, "clean");
+    }
+
+    #[test]
+    fn search_text_is_plain_name_plus_description() {
+        let mut scripts = HashMap::new();
+        scripts.insert("build".to_string(), json!({ "cmd": "x", "desc": "Compile the app" }));
+        scripts.insert("clean".to_string(), json!("rm -rf target/"));
+
+        let choices = command_choices(&scripts);
+
+        // Description is searchable, and the search text carries no ANSI codes.
+        let build = choices.iter().find(|c| c.name == "build").unwrap();
+        assert_eq!(build.search, "build Compile the app");
+        assert!(!build.search.contains('\u{1b}'));
+
+        // No description -> search is just the name.
+        let clean = choices.iter().find(|c| c.name == "clean").unwrap();
+        assert_eq!(clean.search, "clean");
+    }
 }

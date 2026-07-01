@@ -1,9 +1,8 @@
 {
-    "scripts": {
-      "deploy:env": "echo \"Deploying to {{env=[staging, prod]}}\"",
-      "deploy:app": "fastlane {{platform=[ios, android]}} {{env=[dev, staging, prod]}} --track={{track=[alpha, beta, production]}}",
-      "multiple": ["echo \"1\"", "echo \"2\"", "echo \"3\""],
-      "download_apk2": "echo 'bundle exec fastlane android download_universal_apk is_canary:{{is_canary=[true,false]}} version_code:{{version_code}} destination:build/{{version_code}}.apk'"
-    }
+  "scripts": {
+    "deploy:env": { "cmd": "echo \"Deploying to {{env=[staging, prod]}}\"", "desc": "Demo of enum-validated {{env}} variable" },
+    "deploy:app": { "cmd": "fastlane {{platform=[ios, android]}} {{env=[dev, staging, prod]}} --track={{track=[alpha, beta, production]}}", "desc": "Deploy an app build with fastlane (platform/env/track)" },
+    "multiple": { "cmd": ["echo \"1\"", "echo \"2\"", "echo \"3\""], "desc": "Demo of a multi-command sequence" },
+    "download_apk2": { "cmd": "echo 'bundle exec fastlane android download_universal_apk is_canary:{{is_canary=[true,false]}} version_code:{{version_code}} destination:build/{{version_code}}.apk'", "desc": "Demo of fastlane APK download with variables" }
   }
-  
+}

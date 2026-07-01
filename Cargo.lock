@@ -1728,6 +1728,7 @@ dependencies = [
  "dialoguer",
  "dirs",
  "dotenvy",
+ "fuzzy-matcher",
  "inquire",
  "mockito",
  "notify-rust",

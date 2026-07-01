@@ -1,11 +1,10 @@
 {
   "include": ["./.base_robin.json", "./.app_robin.json"],
   "scripts": {
-    "run:list": "cargo run -- --list",
-    "run:dev": "cargo run -- --help",
-    "run:doctor": "cargo run -- --doctor",
-    "run:interactive": "cargo run -- --interactive",
-    "run:version": "cargo run -- --version"
-
+    "run:list": { "cmd": "cargo run -- --list", "desc": "List all robin tasks via the dev build" },
+    "run:dev": { "cmd": "cargo run -- --help", "desc": "Run the dev build and print its help" },
+    "run:doctor": { "cmd": "cargo run -- --doctor", "desc": "Run the environment doctor via the dev build" },
+    "run:interactive": { "cmd": "cargo run -- --interactive", "desc": "Open the interactive task picker via the dev build" },
+    "run:version": { "cmd": "cargo run -- --version", "desc": "Print the dev build's version" }
   }
 }
