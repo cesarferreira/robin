@@ -1,6 +1,6 @@
-use std::process::Command;
 use anyhow::Result;
 use notify_rust::Notification;
+use std::process::Command;
 
 pub fn send_notification(title: &str, message: &str, success: bool) -> Result<()> {
     if cfg!(target_os = "windows") {
@@ -16,10 +16,14 @@ pub fn send_notification(title: &str, message: &str, success: bool) -> Result<()
     } else {
         // Use notify-rust for Unix-like systems (Linux and macOS)
         let mut notification = Notification::new();
-        
+
         notification
             .summary(title)
-            .body(&format!("{} {}", if success { "✅" } else { "❌" }, message))
+            .body(&format!(
+                "{} {}",
+                if success { "✅" } else { "❌" },
+                message
+            ))
             .timeout(5000); // 5 seconds
 
         // Set appropriate icon based on the platform
@@ -32,4 +36,4 @@ pub fn send_notification(title: &str, message: &str, success: bool) -> Result<()
         notification.show()?;
     }
     Ok(())
-} 
+}

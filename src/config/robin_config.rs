@@ -1,9 +1,9 @@
+use anyhow::{Context, Result};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
-use serde::{Deserialize, Serialize};
-use anyhow::{Context, Result};
-use serde_json::Value;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RobinConfig {
@@ -15,12 +15,14 @@ pub struct RobinConfig {
 impl RobinConfig {
     pub fn load(path: &Path) -> Result<Self> {
         if !path.exists() {
-            return Err(anyhow::anyhow!("No .robin.json found. Run 'robin init' first"));
+            return Err(anyhow::anyhow!(
+                "No .robin.json found. Run 'robin init' first"
+            ));
         }
 
         let content = fs::read_to_string(path)
             .with_context(|| format!("Failed to read config file: {}", path.display()))?;
-        
+
         let mut config: Self = serde_json::from_str(&content)
             .with_context(|| "The .robin.json file exists but contains malformed JSON. Please check the file format.")?;
 
@@ -40,7 +42,7 @@ impl RobinConfig {
             let full_path = base_dir.join(include_path);
             let included_config = Self::load(&full_path)
                 .with_context(|| format!("Failed to load included config: {}", include_path))?;
-            
+
             // Merge scripts from included config; existing keys take precedence.
             for (key, value) in included_config.scripts {
                 merged_scripts.entry(key).or_insert(value);
@@ -54,27 +56,36 @@ impl RobinConfig {
     }
 
     pub fn save(&self, path: &Path) -> Result<()> {
-        let content = serde_json::to_string_pretty(self)
-            .with_context(|| "Failed to serialize config")?;
-        
+        let content =
+            serde_json::to_string_pretty(self).with_context(|| "Failed to serialize config")?;
+
         fs::write(path, content)
             .with_context(|| format!("Failed to write config to: {}", path.display()))?;
-        
+
         Ok(())
     }
 
     pub fn create_template() -> Self {
         let mut scripts = HashMap::new();
         scripts.insert("clean".to_string(), Value::String("...".to_string()));
-        scripts.insert("deploy staging".to_string(), Value::String("echo 'ruby deploy tool --staging'".to_string()));
-        scripts.insert("deploy production".to_string(), Value::String("...".to_string()));
+        scripts.insert(
+            "deploy staging".to_string(),
+            Value::String("echo 'ruby deploy tool --staging'".to_string()),
+        );
+        scripts.insert(
+            "deploy production".to_string(),
+            Value::String("...".to_string()),
+        );
         scripts.insert("release beta".to_string(), Value::String("...".to_string()));
-        scripts.insert("release alpha".to_string(), Value::String("...".to_string()));
+        scripts.insert(
+            "release alpha".to_string(),
+            Value::String("...".to_string()),
+        );
         scripts.insert("release dev".to_string(), Value::String("...".to_string()));
 
-        Self { 
+        Self {
             include: Vec::new(),
-            scripts 
+            scripts,
         }
     }
-} 
+}

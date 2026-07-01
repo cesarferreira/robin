@@ -1,3 +1,3 @@
 mod robin_config;
 
-pub use robin_config::RobinConfig; 
+pub use robin_config::RobinConfig;

@@ -8,7 +8,10 @@ fn config_with(scripts: &[(&str, Value)]) -> RobinConfig {
     for (name, script) in scripts {
         map.insert((*name).to_string(), script.clone());
     }
-    RobinConfig { include: vec![], scripts: map }
+    RobinConfig {
+        include: vec![],
+        scripts: map,
+    }
 }
 
 #[test]
@@ -31,7 +34,10 @@ fn check_environment_probes_detected_tools() {
     let config = config_with(&[("status", json!("git status"))]);
     let (_passed, found, missing, _duration) = check_environment(&config).unwrap();
 
-    assert!(found + missing >= 1, "git should trigger at least one check");
+    assert!(
+        found + missing >= 1,
+        "git should trigger at least one check"
+    );
 }
 
 #[test]

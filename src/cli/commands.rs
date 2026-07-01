@@ -27,7 +27,7 @@ pub enum Commands {
         #[arg(long)]
         template: Option<String>,
     },
-    
+
     /// Add a new command
     Add {
         /// Command name
@@ -45,4 +45,4 @@ pub enum Commands {
     /// Run a script
     #[command(external_subcommand)]
     Run(Vec<String>),
-} 
+}

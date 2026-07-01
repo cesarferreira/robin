@@ -1,38 +1,36 @@
-use std::path::PathBuf;
 use anyhow::{Context, Result, anyhow};
 use clap::Parser;
 use colored::*;
 use dialoguer::Confirm;
+use std::path::PathBuf;
 
 use robin::{
-    Cli, Commands,
-    RobinConfig,
-    check_environment, update_tools,
-    send_notification, split_command_and_args, replace_variables,
-    run_script, list_commands, interactive_mode,
-    check_for_update,
-    CONFIG_FILE
+    CONFIG_FILE, Cli, Commands, RobinConfig, check_environment, check_for_update, interactive_mode,
+    list_commands, replace_variables, run_script, send_notification, split_command_and_args,
+    update_tools,
 };
 
-const GITHUB_TEMPLATE_BASE: &str = "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/main/templates";
+const GITHUB_TEMPLATE_BASE: &str =
+    "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/main/templates";
 
 async fn fetch_template(template_name: &str) -> Result<RobinConfig> {
     let url = format!("{}/{}.json", GITHUB_TEMPLATE_BASE, template_name);
     let response = reqwest::get(&url)
         .await
         .with_context(|| format!("Failed to fetch template from: {}", url))?;
-    
+
     if !response.status().is_success() {
         return Err(anyhow!("Template '{}' not found", template_name));
     }
 
-    let content = response.text()
+    let content = response
+        .text()
         .await
         .with_context(|| "Failed to read template content")?;
-    
-    let config: RobinConfig = serde_json::from_str(&content)
-        .with_context(|| "Failed to parse template JSON")?;
-    
+
+    let config: RobinConfig =
+        serde_json::from_str(&content).with_context(|| "Failed to parse template JSON")?;
+
     Ok(config)
 }
 
@@ -56,7 +54,7 @@ async fn dispatch(cli: &Cli) -> Result<()> {
                     .with_prompt("Config file already exists. Do you want to override it?")
                     .default(false)
                     .interact()?;
-                
+
                 if !should_override {
                     println!("{}", "Operation cancelled.".yellow());
                     return Ok(());
@@ -87,7 +85,9 @@ async fn dispatch(cli: &Cli) -> Result<()> {
                 RobinConfig::create_template()
             };
 
-            config.scripts.insert(name.clone(), serde_json::Value::String(script.clone()));
+            config
+                .scripts
+                .insert(name.clone(), serde_json::Value::String(script.clone()));
             config.save(&config_path)?;
             println!("{} {}", "Added command:".green(), name);
         }
@@ -101,7 +101,12 @@ async fn dispatch(cli: &Cli) -> Result<()> {
                 let message = if success {
                     format!("All {} tools found ({:.1}s)", found, duration.as_secs_f32())
                 } else {
-                    format!("{} tools found, {} missing ({:.1}s)", found, missing, duration.as_secs_f32())
+                    format!(
+                        "{} tools found, {} missing ({:.1}s)",
+                        found,
+                        missing,
+                        duration.as_secs_f32()
+                    )
                 };
                 send_notification("Robin Doctor", &message, success)?;
             }

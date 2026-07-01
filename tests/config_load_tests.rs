@@ -58,9 +58,18 @@ fn includes_are_merged_with_base_taking_precedence() {
 
     let config = RobinConfig::load(&base).unwrap();
 
-    assert_eq!(config.scripts.get("shared").unwrap().as_str().unwrap(), "base wins");
-    assert_eq!(config.scripts.get("only_base").unwrap().as_str().unwrap(), "b");
-    assert_eq!(config.scripts.get("only_child").unwrap().as_str().unwrap(), "c");
+    assert_eq!(
+        config.scripts.get("shared").unwrap().as_str().unwrap(),
+        "base wins"
+    );
+    assert_eq!(
+        config.scripts.get("only_base").unwrap().as_str().unwrap(),
+        "b"
+    );
+    assert_eq!(
+        config.scripts.get("only_child").unwrap().as_str().unwrap(),
+        "c"
+    );
     assert_eq!(config.scripts.len(), 3);
 }
 
