@@ -1720,7 +1720,7 @@ dependencies = [
 
 [[package]]
 name = "robin_cli_tool"
-version = "1.1.0"
+version = "1.2.0"
 dependencies = [
  "anyhow",
  "clap",

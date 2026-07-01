@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-07-01
+
+### Added
+
+- Locate .robin.json by walking up parent directories (#8)
+- Add optional per-task descriptions and a migrate command (#9)
+- Reference other tasks from a sequence with @task (#16)
+- Add remove and rename commands for tasks (#10)
+- Add --dry-run to preview resolved commands (#11)
+- Add --cwd to run a task in another directory (#12)
+- Auto-load a .env file next to .robin.json (#13)
+- Echo each command as it runs in a sequence (#14)
+- Publish a JSON Schema and reference it via $schema (#15)
+- Added descriptions to the fuzzy finder
+
+### Changed
+
+- Update readme
+
+### Documentation
+
+- Add quick-look example and document --notify flag
+- Add SKILL.md + AGENTS.md, fix doctor-update naming and nextjs template help (#18)
 ## [1.1.0] - 2026-07-01
 
 ### Added
