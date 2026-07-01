@@ -5,9 +5,10 @@ use dialoguer::Confirm;
 use std::path::PathBuf;
 
 use robin::{
-    CONFIG_FILE, Cli, Commands, RobinConfig, check_environment, check_for_update, find_config_path,
-    command_lines, interactive_mode, list_commands, replace_variables, resolve_task_command,
-    run_script_in, script_command, send_notification, split_command_and_args, update_tools,
+    CONFIG_FILE, Cli, Commands, RobinConfig, check_environment, check_for_update, command_lines,
+    find_config_path, interactive_mode, list_commands, load_env_file, replace_variables,
+    resolve_task_command, run_script_in, script_command, send_notification, split_command_and_args,
+    update_tools,
 };
 
 const GITHUB_TEMPLATE_BASE: &str =
@@ -171,6 +172,10 @@ async fn dispatch(cli: &Cli) -> Result<()> {
             let config = RobinConfig::load(&config_path)
                 .with_context(|| "No .robin.json found. Run 'robin init' first")?;
 
+            // Load a `.env` sitting next to the config so tasks and variable
+            // substitution can use it.
+            load_env_file(&config_path);
+
             let (script_name, var_args) = split_command_and_args(args);
 
             // Robin's own flags are also accepted after the task name (e.g.
@@ -218,6 +223,7 @@ async fn dispatch(cli: &Cli) -> Result<()> {
             if cli.list {
                 list_commands(&config_path)?;
             } else {
+                load_env_file(&config_path);
                 interactive_mode(&config_path)?;
             }
         }
