@@ -1,9 +1,31 @@
 mod common;
 
 use robin::config::RobinConfig;
-use robin::scripts::{command_lines, list_commands, resolve_task_command, run_script};
+use robin::scripts::{
+    command_lines, list_commands, resolve_task_command, run_script, run_script_in,
+};
 use serde_json::{Value, json};
 use std::collections::HashMap;
+use tempfile::tempdir;
+
+#[test]
+fn run_script_in_uses_the_given_working_directory() {
+    // A marker file exists only inside the temp dir; the command succeeds only
+    // if it runs there.
+    let dir = tempdir().unwrap();
+    std::fs::write(dir.path().join("marker.txt"), "hi").unwrap();
+
+    let script = Value::String("test -f marker.txt".to_string());
+    assert!(run_script_in(&script, false, Some(dir.path())).is_ok());
+}
+
+#[test]
+fn run_script_in_without_dir_does_not_see_the_marker() {
+    // Same command, but run from the process CWD (the repo root), where the
+    // marker does not exist — so it must fail.
+    let script = Value::String("test -f this_marker_should_not_exist_12345.txt".to_string());
+    assert!(run_script_in(&script, false, None).is_err());
+}
 
 fn scripts_from(pairs: &[(&str, Value)]) -> HashMap<String, Value> {
     pairs

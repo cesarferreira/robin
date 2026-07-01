@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use robin::{
     CONFIG_FILE, Cli, Commands, RobinConfig, check_environment, check_for_update, find_config_path,
     command_lines, interactive_mode, list_commands, replace_variables, resolve_task_command,
-    run_script, script_command, send_notification, split_command_and_args, update_tools,
+    run_script_in, script_command, send_notification, split_command_and_args, update_tools,
 };
 
 const GITHUB_TEMPLATE_BASE: &str =
@@ -178,9 +178,13 @@ async fn dispatch(cli: &Cli) -> Result<()> {
             // everything trailing the command into these args.
             let dry_run = cli.dry_run || var_args.iter().any(|a| a == "--dry-run");
             let notify = cli.notify || var_args.iter().any(|a| a == "--notify");
+            let cwd = var_args
+                .iter()
+                .find_map(|a| a.strip_prefix("--cwd=").map(PathBuf::from))
+                .or_else(|| cli.cwd.clone());
             let var_args: Vec<String> = var_args
                 .into_iter()
-                .filter(|a| a != "--dry-run" && a != "--notify")
+                .filter(|a| a != "--dry-run" && a != "--notify" && !a.starts_with("--cwd="))
                 .collect();
 
             if let Some(entry) = config.scripts.get(&script_name) {
@@ -191,12 +195,19 @@ async fn dispatch(cli: &Cli) -> Result<()> {
                 let script_with_vars = replace_variables(&resolved, &var_args)?;
 
                 if dry_run {
-                    println!("{}", format!("Would run '{}':", script_name).dimmed());
+                    let where_ = match &cwd {
+                        Some(dir) => format!(" (in {})", dir.display()),
+                        None => String::new(),
+                    };
+                    println!(
+                        "{}",
+                        format!("Would run '{}'{}:", script_name, where_).dimmed()
+                    );
                     for line in command_lines(&script_with_vars) {
                         println!("  {}", line);
                     }
                 } else {
-                    run_script(&script_with_vars, notify)?;
+                    run_script_in(&script_with_vars, notify, cwd.as_deref())?;
                 }
             } else {
                 println!("{} {}", "Unknown command:".red(), script_name);
