@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/main/schema/robin.schema.json",
+  "title": "robin configuration",
+  "description": "Schema for a .robin.json file used by the robin CLI task runner.",
+  "type": "object",
+  "required": ["scripts"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Pointer to this JSON Schema, enabling editor autocomplete and validation."
+    },
+    "include": {
+      "type": "array",
+      "description": "Paths to other .robin.json-style files whose scripts are merged in. Local scripts take precedence over included ones.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "scripts": {
+      "type": "object",
+      "description": "Map of task name to the command(s) it runs.",
+      "additionalProperties": {
+        "$ref": "#/definitions/task"
+      }
+    }
+  },
+  "definitions": {
+    "command": {
+      "description": "A single shell command, or a sequence of commands run in order. An entry starting with '@' references another task by name.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "task": {
+      "description": "A task: either a bare command (string or array) or an object carrying the command plus metadata.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "type": "object",
+          "required": ["cmd"],
+          "additionalProperties": false,
+          "properties": {
+            "cmd": {
+              "$ref": "#/definitions/command"
+            },
+            "desc": {
+              "type": "string",
+              "description": "Human-readable description shown in `robin --list` and interactive mode."
+            }
+          }
+        }
+      ]
+    }
+  }
+}

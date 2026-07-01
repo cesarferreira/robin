@@ -321,6 +321,7 @@ mod tests {
             map.insert((*name).to_string(), script.clone());
         }
         RobinConfig {
+            schema: None,
             include: vec![],
             scripts: map,
         }

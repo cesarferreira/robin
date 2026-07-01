@@ -54,6 +54,7 @@ pub async fn fetch_template(_template_name: &str) -> Result<RobinConfig> {
         serde_json::Value::String("npm start".to_string()),
     );
     Ok(RobinConfig {
+        schema: None,
         scripts,
         include: vec![],
     })

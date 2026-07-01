@@ -215,6 +215,30 @@ compose without duplication:
 Running `robin ship` executes `clean`, then `build`, then the deploy step.
 Reference cycles are detected and reported as an error.
 
+### Editor autocomplete (JSON Schema)
+
+A JSON Schema for `.robin.json` is published at:
+
+```
+https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/main/schema/robin.schema.json
+```
+
+`robin init` and `robin migrate` add a `$schema` key pointing at it, so editors
+like VS Code offer autocomplete and validation out of the box. You can also add
+it to any existing file yourself:
+
+```json
+{
+    "$schema": "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/main/schema/robin.schema.json",
+    "scripts": {
+        "build": "cargo build"
+    }
+}
+```
+
+The `$schema` key is preserved when robin rewrites the file (via `add`,
+`remove`, `rename`, or `migrate`).
+
 ## External Configuration
 
 Robin supports including external configuration files, which is particularly useful for monorepos or sharing common scripts across projects:
