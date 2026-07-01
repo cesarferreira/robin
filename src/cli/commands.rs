@@ -31,7 +31,7 @@ pub struct Cli {
 pub enum Commands {
     /// Initialize a new .robin.json file
     Init {
-        /// Template to use (android, ios, flutter, rails, node, python, rust, go)
+        /// Template to use (android, ios, flutter, rails, node, nextjs, python, rust, go)
         #[arg(long)]
         template: Option<String>,
     },
