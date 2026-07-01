@@ -17,7 +17,9 @@ pub use scripts::{
     run_script_in,
 };
 pub use tools::{check_environment, update_tools};
-pub use utils::{check_for_update, replace_variables, send_notification, split_command_and_args};
+pub use utils::{
+    check_for_update, load_env_file, replace_variables, send_notification, split_command_and_args,
+};
 
 use anyhow::{Context, Result, anyhow};
 

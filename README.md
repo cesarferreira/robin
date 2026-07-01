@@ -28,6 +28,7 @@
 - Variable substitution with default values
 - Enum validation for variables
 - Environment variable substitution with defaults (`${VAR:-default}`)
+- Automatic `.env` file loading
 - Optional per-task descriptions (shown in `--list` and interactive mode)
 - Reference other tasks from a sequence with `@task`
 
@@ -421,6 +422,21 @@ Two forms are supported (defaults only):
 
 A bare `${VAR}` (with no default) is left untouched and expanded by the shell at run
 time, exactly as before.
+
+### `.env` files
+
+If a `.env` file sits next to your `.robin.json`, robin loads it automatically
+before running a task, so both the `${VAR:-default}` substitution above and your
+shell commands can use those values:
+
+```bash
+# .env  (next to .robin.json)
+PORT=9000
+NAMESPACE=production
+```
+
+Variables already present in the environment take precedence over the file, and
+loading can be disabled by setting `ROBIN_NO_DOTENV`.
 
 ## Development Environment
 
