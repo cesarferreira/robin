@@ -6,8 +6,8 @@ use std::path::PathBuf;
 
 use robin::{
     CONFIG_FILE, Cli, Commands, RobinConfig, check_environment, check_for_update, find_config_path,
-    interactive_mode, list_commands, replace_variables, run_script, script_command,
-    send_notification, split_command_and_args, update_tools,
+    interactive_mode, list_commands, replace_variables, resolve_task_command, run_script,
+    script_command, send_notification, split_command_and_args, update_tools,
 };
 
 const GITHUB_TEMPLATE_BASE: &str =
@@ -155,7 +155,8 @@ async fn dispatch(cli: &Cli) -> Result<()> {
                 let script = script_command(entry).ok_or_else(|| {
                     anyhow!("Command '{}' has an invalid script definition", script_name)
                 })?;
-                let script_with_vars = replace_variables(script, &var_args)?;
+                let resolved = resolve_task_command(script, &config.scripts)?;
+                let script_with_vars = replace_variables(&resolved, &var_args)?;
                 run_script(&script_with_vars, cli.notify)?;
             } else {
                 println!("{} {}", "Unknown command:".red(), script_name);
