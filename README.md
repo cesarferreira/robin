@@ -31,6 +31,7 @@
 - Automatic `.env` file loading
 - Optional per-task descriptions (shown in `--list` and interactive mode)
 - Reference other tasks from a sequence with `@task`
+- Optional desktop notification on completion with `--notify`
 
 ## Installation
 
@@ -137,6 +138,18 @@ Runs the task's commands in the given directory instead of the current one —
 handy in monorepos where a root-level task should act on a subproject. Like the
 other flags, it also accepts the `--cwd=DIR` form after the task name.
 
+### Get notified when a task finishes with `--notify`
+
+```bash
+robin deploy --notify
+```
+
+Sends a desktop notification when the task completes, reporting success or
+failure along with the total execution time — useful for long-running builds or
+deployments you don't want to babysit. Like the other flags, it works before or
+after the task name. Notifications are off by default and only fire when
+`--notify` is passed.
+
 ## Configuration
 
 The `.robin.json` file supports both single commands and command sequences:
@@ -166,7 +179,7 @@ When using command sequences (arrays):
 - Each command is echoed (prefixed with `▶`) as it runs, so you can follow along
 - If any command fails, the sequence stops
 - Environment variables and working directory are preserved between commands
-- Notifications show total execution time for the sequence
+- With `--notify`, a desktop notification reports the total execution time when the sequence finishes
 
 ### Task descriptions
 
