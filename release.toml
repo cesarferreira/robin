@@ -1,0 +1,17 @@
+sign-commit = false
+sign-tag = false
+publish = true
+push = true
+tag-name = "{{version}}"
+
+# Finalize CHANGELOG.md inside cargo-release's release commit.
+pre-release-hook = [
+  "python3",
+  "scripts/prepare_release.py",
+  "--release-version",
+  "{{version}}",
+  "--previous-version",
+  "{{prev_version}}",
+  "--release-date",
+  "{{date}}",
+]
