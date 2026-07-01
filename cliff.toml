@@ -1,0 +1,47 @@
+# git-cliff configuration — https://git-cliff.org
+#
+# Produces Keep-a-Changelog output, grouping conventional commits into
+# Added / Fixed / Documentation / Changed. Used by cargo-release as a
+# pre-release hook (see release.toml), which prepends the new version's
+# section to CHANGELOG.md.
+
+[changelog]
+header = """
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+"""
+body = """
+{% if version -%}
+## [{{ version }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else -%}
+## [Unreleased]
+{% endif -%}
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group }}
+{% for commit in commits %}
+- {{ commit.message | split(pat="\n") | first | upper_first }}
+{%- endfor %}
+{% endfor %}
+"""
+trim = true
+
+[git]
+conventional_commits = true
+filter_unconventional = false
+protect_breaking_commits = false
+# Bare semver tags (1.2.3), matching robin's tagging convention.
+tag_pattern = "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+sort_commits = "oldest"
+commit_parsers = [
+    { message = "^chore\\(release\\)", skip = true },
+    { message = "^chore: Release", skip = true },
+    { message = "^(feat|feature|add)", group = "Added" },
+    { message = "^(fix|bugfix)", group = "Fixed" },
+    { message = "^docs?", group = "Documentation" },
+    { message = ".*", group = "Changed" },
+]

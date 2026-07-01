@@ -4,14 +4,16 @@ publish = true
 push = true
 tag-name = "{{version}}"
 
-# Finalize CHANGELOG.md inside cargo-release's release commit.
+# Finalize CHANGELOG.md inside cargo-release's release commit: git-cliff
+# prepends the new version's section (generated from the commits since the
+# last tag) to CHANGELOG.md. Configuration lives in cliff.toml.
+#
+# The `$DRY_RUN` guard is important: git-cliff always writes the file, so
+# without it a `cargo release <level>` preview would modify CHANGELOG.md, and
+# because --prepend isn't idempotent a later real run would duplicate the
+# entry. On a dry run we no-op; cargo-release sets NEW_VERSION for real runs.
 pre-release-hook = [
-  "python3",
-  "scripts/prepare_release.py",
-  "--release-version",
-  "{{version}}",
-  "--previous-version",
-  "{{prev_version}}",
-  "--release-date",
-  "{{date}}",
+  "sh",
+  "-c",
+  "[ \"$DRY_RUN\" = true ] && exit 0; git-cliff --config cliff.toml --unreleased --tag \"$NEW_VERSION\" --prepend CHANGELOG.md",
 ]
