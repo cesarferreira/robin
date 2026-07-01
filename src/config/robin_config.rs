@@ -7,6 +7,12 @@ use std::path::{Path, PathBuf};
 
 use crate::CONFIG_FILE;
 
+/// Canonical location of the published JSON Schema for `.robin.json`. Generated
+/// configs point their `$schema` here so editors can offer autocomplete and
+/// validation.
+pub const SCHEMA_URL: &str =
+    "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/main/schema/robin.schema.json";
+
 /// Walks up from `start` (inclusive) looking for the first directory that
 /// contains a `.robin.json`. Returns the path to that config, or `None` when no
 /// ancestor holds one. This lets `robin` be run from any subdirectory of a
@@ -31,8 +37,12 @@ pub fn find_config_path() -> PathBuf {
     find_config_from(&cwd).unwrap_or_else(|| cwd.join(CONFIG_FILE))
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct RobinConfig {
+    /// Optional pointer to the JSON Schema, preserved across edits so editor
+    /// tooling keeps working. Serialized as the conventional `$schema` key.
+    #[serde(rename = "$schema", default, skip_serializing_if = "Option::is_none")]
+    pub schema: Option<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub include: Vec<String>,
     pub scripts: HashMap<String, Value>,
@@ -112,6 +122,7 @@ impl RobinConfig {
         }
 
         Ok(Self {
+            schema: self.schema.clone(),
             include: self.include.clone(),
             scripts: merged_scripts,
         })
@@ -146,6 +157,7 @@ impl RobinConfig {
         scripts.insert("release dev".to_string(), Value::String("...".to_string()));
 
         Self {
+            schema: Some(SCHEMA_URL.to_string()),
             include: Vec::new(),
             scripts,
         }
@@ -184,6 +196,12 @@ impl RobinConfig {
             .collect();
 
         Self {
+            // Ensure the migrated file points at the schema for editor tooling,
+            // keeping any pointer the user already set.
+            schema: self
+                .schema
+                .clone()
+                .or_else(|| Some(SCHEMA_URL.to_string())),
             include: self.include.clone(),
             scripts,
         }
@@ -232,6 +250,7 @@ mod tests {
         let mut scripts = HashMap::new();
         scripts.insert("old".to_string(), json!("cargo build"));
         let mut config = RobinConfig {
+            schema: None,
             include: vec![],
             scripts,
         };
@@ -245,6 +264,7 @@ mod tests {
     #[test]
     fn rename_script_errors_on_unknown_source() {
         let mut config = RobinConfig {
+            schema: None,
             include: vec![],
             scripts: HashMap::new(),
         };
@@ -258,6 +278,7 @@ mod tests {
         scripts.insert("a".to_string(), json!("1"));
         scripts.insert("b".to_string(), json!("2"));
         let mut config = RobinConfig {
+            schema: None,
             include: vec![],
             scripts,
         };
@@ -279,6 +300,7 @@ mod tests {
             json!({ "cmd": "already", "desc": "kept" }),
         );
         let config = RobinConfig {
+            schema: None,
             include: vec!["base.json".to_string()],
             scripts,
         };

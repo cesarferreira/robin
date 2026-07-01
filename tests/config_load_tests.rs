@@ -137,6 +137,38 @@ fn missing_include_reports_which_file_failed() {
 }
 
 #[test]
+fn schema_field_is_preserved_across_load_and_save() {
+    // A user-provided $schema must survive edits (add/remove/rename all save).
+    let dir = tempdir().unwrap();
+    let path = dir.path().join(".robin.json");
+    fs::write(
+        &path,
+        r#"{"$schema":"https://example.com/robin.json","scripts":{"a":"echo hi"}}"#,
+    )
+    .unwrap();
+
+    let mut config = RobinConfig::load(&path).unwrap();
+    assert_eq!(config.schema.as_deref(), Some("https://example.com/robin.json"));
+
+    config
+        .scripts
+        .insert("b".to_string(), serde_json::Value::String("echo bye".into()));
+    config.save(&path).unwrap();
+
+    let reloaded = RobinConfig::load(&path).unwrap();
+    assert_eq!(
+        reloaded.schema.as_deref(),
+        Some("https://example.com/robin.json")
+    );
+}
+
+#[test]
+fn created_template_points_at_the_published_schema() {
+    let config = RobinConfig::create_template();
+    assert_eq!(config.schema.as_deref(), Some(robin::config::SCHEMA_URL));
+}
+
+#[test]
 fn save_then_load_roundtrips() {
     let dir = tempdir().unwrap();
     let path = dir.path().join(".robin.json");

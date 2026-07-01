@@ -9,6 +9,7 @@ fn config_with(scripts: &[(&str, Value)]) -> RobinConfig {
         map.insert((*name).to_string(), script.clone());
     }
     RobinConfig {
+        schema: None,
         include: vec![],
         scripts: map,
     }
