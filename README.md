@@ -116,6 +116,16 @@ directories until it finds one — so you can run commands from anywhere inside
 your project, just like `git` or `cargo`. (`robin init` always writes to the
 current directory.)
 
+### Preview a command with `--dry-run`
+
+```bash
+robin deploy --dry-run
+```
+
+Prints the fully-resolved commands — with `@task` references expanded and all
+variables substituted — without executing anything. The flag works before or
+after the task name.
+
 ## Configuration
 
 The `.robin.json` file supports both single commands and command sequences:

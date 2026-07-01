@@ -17,6 +17,10 @@ pub struct Cli {
     /// Send system notification when command completes
     #[arg(long)]
     pub notify: bool,
+
+    /// Print the fully-resolved command(s) without executing anything
+    #[arg(long)]
+    pub dry_run: bool,
 }
 
 #[derive(Subcommand)]
