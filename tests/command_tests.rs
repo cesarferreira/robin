@@ -167,3 +167,99 @@ fn non_string_script_is_returned_unchanged() {
     let result = replace_variables(&script, &[]).unwrap();
     assert_eq!(result, Value::from(42));
 }
+
+// --- Docker Compose-style ${VAR:-default} environment substitution ---
+//
+// Each test uses a unique env-var name so it can't interfere with other tests
+// running in parallel. Helpers wrap the unsafe env mutations (Rust 2024).
+
+fn set_env(key: &str, value: &str) {
+    unsafe { std::env::set_var(key, value) };
+}
+
+fn unset_env(key: &str) {
+    unsafe { std::env::remove_var(key) };
+}
+
+#[test]
+fn env_default_used_when_var_unset() {
+    let key = "ROBIN_TEST_UNSET_PORT";
+    unset_env(key);
+    let script = Value::String(format!("serve on ${{{key}:-8080}}"));
+    let result = replace_variables(&script, &[]).unwrap();
+    assert_eq!(result.as_str().unwrap(), "serve on 8080");
+}
+
+#[test]
+fn env_value_used_when_var_set() {
+    let key = "ROBIN_TEST_SET_PORT";
+    set_env(key, "9000");
+    let script = Value::String(format!("serve on ${{{key}:-8080}}"));
+    let result = replace_variables(&script, &[]).unwrap();
+    assert_eq!(result.as_str().unwrap(), "serve on 9000");
+    unset_env(key);
+}
+
+#[test]
+fn colon_dash_treats_empty_as_unset() {
+    // `${VAR:-default}` falls back to the default when the var is set but empty.
+    let key = "ROBIN_TEST_EMPTY_COLON";
+    set_env(key, "");
+    let script = Value::String(format!("x=${{{key}:-fallback}}"));
+    let result = replace_variables(&script, &[]).unwrap();
+    assert_eq!(result.as_str().unwrap(), "x=fallback");
+    unset_env(key);
+}
+
+#[test]
+fn dash_keeps_empty_value() {
+    // `${VAR-default}` (no colon) uses the empty value because the var IS set.
+    let key = "ROBIN_TEST_EMPTY_DASH";
+    set_env(key, "");
+    let script = Value::String(format!("x=[${{{key}-fallback}}]"));
+    let result = replace_variables(&script, &[]).unwrap();
+    assert_eq!(result.as_str().unwrap(), "x=[]");
+    unset_env(key);
+}
+
+#[test]
+fn dash_uses_default_when_unset() {
+    let key = "ROBIN_TEST_DASH_UNSET";
+    unset_env(key);
+    let script = Value::String(format!("x=${{{key}-fallback}}"));
+    let result = replace_variables(&script, &[]).unwrap();
+    assert_eq!(result.as_str().unwrap(), "x=fallback");
+}
+
+#[test]
+fn env_and_arg_syntaxes_coexist() {
+    let key = "ROBIN_TEST_COEXIST";
+    unset_env(key);
+    let script = Value::String(format!("deploy {{{{target}}}} to ${{{key}:-staging}}"));
+    let args = vec!["--target=api".to_string()];
+    let result = replace_variables(&script, &args).unwrap();
+    assert_eq!(result.as_str().unwrap(), "deploy api to staging");
+}
+
+#[test]
+fn env_default_applied_across_array_commands() {
+    let key = "ROBIN_TEST_ARRAY";
+    unset_env(key);
+    let commands = vec![
+        format!("echo ${{{key}:-one}}"),
+        format!("echo ${{{key}:-two}}"),
+    ];
+    let script = Value::Array(commands.into_iter().map(Value::String).collect());
+    let result = replace_variables(&script, &[]).unwrap();
+    let array = result.as_array().unwrap();
+    assert_eq!(array[0].as_str().unwrap(), "echo one");
+    assert_eq!(array[1].as_str().unwrap(), "echo two");
+}
+
+#[test]
+fn bare_env_var_is_left_for_the_shell() {
+    // No default operator -> robin must not touch it; the shell expands it later.
+    let script = Value::String("echo ${HOME}".to_string());
+    let result = replace_variables(&script, &[]).unwrap();
+    assert_eq!(result.as_str().unwrap(), "echo ${HOME}");
+}

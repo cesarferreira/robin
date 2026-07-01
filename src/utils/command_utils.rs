@@ -47,11 +47,46 @@ pub fn replace_variables(script: &serde_json::Value, args: &[String]) -> Result<
     }
 }
 
-fn replace_variables_in_string(script: &str, args: &[String]) -> Result<String> {
-    let var_regex = Regex::new(r"\{\{(\w+)(?:=([^}]+|\[[^\]]+\]))?\}\}").unwrap();
+/// Replaces Docker Compose-style environment-variable defaults.
+///
+/// Supports two forms (defaults only):
+///   - `${VAR:-default}` -> use `$VAR` if set and non-empty, otherwise `default`.
+///   - `${VAR-default}`  -> use `$VAR` if set (even if empty), otherwise `default`.
+///
+/// Bare `${VAR}` (no operator) is intentionally left untouched so it is still
+/// expanded by the shell at run time.
+fn replace_env_variables_in_string(script: &str) -> String {
+    let env_regex = Regex::new(r"\$\{([A-Za-z_][A-Za-z0-9_]*)(:?-)([^}]*)\}").unwrap();
     let mut result = script.to_string();
 
-    for capture in var_regex.captures_iter(script) {
+    for capture in env_regex.captures_iter(script) {
+        let full_match = &capture[0];
+        let var_name = &capture[1];
+        let operator = &capture[2];
+        let default = &capture[3];
+
+        let env_value = std::env::var(var_name).ok();
+        let value = match operator {
+            ":-" => match env_value {
+                Some(v) if !v.is_empty() => v,
+                _ => default.to_string(),
+            },
+            // "-": use the env value whenever the variable is set, even if empty.
+            _ => env_value.unwrap_or_else(|| default.to_string()),
+        };
+
+        result = result.replace(full_match, &value);
+    }
+
+    result
+}
+
+fn replace_variables_in_string(script: &str, args: &[String]) -> Result<String> {
+    let script = replace_env_variables_in_string(script);
+    let var_regex = Regex::new(r"\{\{(\w+)(?:=([^}]+|\[[^\]]+\]))?\}\}").unwrap();
+    let mut result = script.clone();
+
+    for capture in var_regex.captures_iter(&script) {
         let full_match = &capture[0];
         let var_name = &capture[1];
         let default_or_enum = capture.get(2).map(|m| m.as_str()).unwrap_or("");
