@@ -29,6 +29,7 @@
 - Enum validation for variables
 - Environment variable substitution with defaults (`${VAR:-default}`)
 - Optional per-task descriptions (shown in `--list` and interactive mode)
+- Reference other tasks from a sequence with `@task`
 
 ## Installation
 
@@ -165,6 +166,25 @@ robin migrate
 
 This rewrites `.robin.json` so each task uses the `{ "cmd": ..., "desc": "" }`
 form, ready for you to fill in the descriptions.
+
+### Referencing other tasks
+
+Inside a command sequence, an entry that starts with `@` runs another task by
+name instead of a shell command. References are expanded recursively, so tasks
+compose without duplication:
+
+```json
+{
+    "scripts": {
+        "clean": "rm -rf build/",
+        "build": ["@clean", "cargo build --release"],
+        "ship": ["@build", "scp target/release/app server:/srv"]
+    }
+}
+```
+
+Running `robin ship` executes `clean`, then `build`, then the deploy step.
+Reference cycles are detected and reported as an error.
 
 ## External Configuration
 
