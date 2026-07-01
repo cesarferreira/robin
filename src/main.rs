@@ -83,8 +83,9 @@ async fn dispatch(cli: &Cli) -> Result<()> {
         }
 
         Some(Commands::Add { name, script }) => {
+            // Edit only the local file — never inline included scripts.
             let mut config = if config_path.exists() {
-                RobinConfig::load(&config_path)?
+                RobinConfig::load_raw(&config_path)?
             } else {
                 RobinConfig::create_template()
             };
@@ -94,6 +95,27 @@ async fn dispatch(cli: &Cli) -> Result<()> {
                 .insert(name.clone(), serde_json::Value::String(script.clone()));
             config.save(&config_path)?;
             println!("{} {}", "Added command:".green(), name);
+        }
+
+        Some(Commands::Remove { name }) => {
+            let mut config = RobinConfig::load_raw(&config_path)
+                .with_context(|| "No .robin.json found. Run 'robin init' first")?;
+
+            if config.scripts.remove(name).is_some() {
+                config.save(&config_path)?;
+                println!("{} {}", "Removed command:".green(), name);
+            } else {
+                return Err(anyhow!("Unknown command: {}", name));
+            }
+        }
+
+        Some(Commands::Rename { from, to }) => {
+            let mut config = RobinConfig::load_raw(&config_path)
+                .with_context(|| "No .robin.json found. Run 'robin init' first")?;
+
+            config.rename_script(from, to)?;
+            config.save(&config_path)?;
+            println!("{} {} {} {}", "Renamed command:".green(), from, "→".dimmed(), to);
         }
 
         Some(Commands::Migrate) => {

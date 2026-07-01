@@ -97,6 +97,13 @@ robin --interactive  # or -i
 robin add "deploy" "fastlane deliver --submit-to-review"
 ```
 
+### Remove or rename a command
+
+```bash
+robin remove "deploy"          # or: robin rm "deploy"
+robin rename "deploy" "ship"   # rename a task, keeping its definition
+```
+
 ### Run a command
 
 ```bash

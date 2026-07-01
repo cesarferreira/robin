@@ -151,6 +151,21 @@ impl RobinConfig {
         }
     }
 
+    /// Renames a task from `from` to `to`, preserving its definition. Errors if
+    /// `from` does not exist or `to` is already taken, so no task is silently
+    /// overwritten.
+    pub fn rename_script(&mut self, from: &str, to: &str) -> Result<()> {
+        if self.scripts.contains_key(to) {
+            return Err(anyhow::anyhow!("A command named '{}' already exists", to));
+        }
+        let value = self
+            .scripts
+            .remove(from)
+            .ok_or_else(|| anyhow::anyhow!("Unknown command: {}", from))?;
+        self.scripts.insert(to.to_string(), value);
+        Ok(())
+    }
+
     /// Rewrites every script into the object form `{ "cmd": ..., "desc": "" }`,
     /// leaving an empty `desc` ready to be filled in. Entries already in object
     /// form are kept as-is. This is what `robin migrate` applies so users can
@@ -210,6 +225,48 @@ mod tests {
         );
         assert_eq!(script_description(&json!({ "cmd": "x", "desc": "" })), None);
         assert_eq!(script_description(&json!("cargo build")), None);
+    }
+
+    #[test]
+    fn rename_script_moves_definition_to_new_key() {
+        let mut scripts = HashMap::new();
+        scripts.insert("old".to_string(), json!("cargo build"));
+        let mut config = RobinConfig {
+            include: vec![],
+            scripts,
+        };
+
+        config.rename_script("old", "new").unwrap();
+
+        assert!(!config.scripts.contains_key("old"));
+        assert_eq!(config.scripts["new"], json!("cargo build"));
+    }
+
+    #[test]
+    fn rename_script_errors_on_unknown_source() {
+        let mut config = RobinConfig {
+            include: vec![],
+            scripts: HashMap::new(),
+        };
+        let err = config.rename_script("missing", "new").unwrap_err();
+        assert!(err.to_string().contains("Unknown command"), "{err}");
+    }
+
+    #[test]
+    fn rename_script_refuses_to_overwrite_existing_target() {
+        let mut scripts = HashMap::new();
+        scripts.insert("a".to_string(), json!("1"));
+        scripts.insert("b".to_string(), json!("2"));
+        let mut config = RobinConfig {
+            include: vec![],
+            scripts,
+        };
+
+        let err = config.rename_script("a", "b").unwrap_err();
+        assert!(err.to_string().contains("already exists"), "{err}");
+        // Both tasks must remain untouched after a refused rename.
+        assert_eq!(config.scripts["a"], json!("1"));
+        assert_eq!(config.scripts["b"], json!("2"));
     }
 
     #[test]

@@ -36,6 +36,21 @@ pub enum Commands {
         script: String,
     },
 
+    /// Remove a command
+    #[command(alias = "rm")]
+    Remove {
+        /// Command name to remove
+        name: String,
+    },
+
+    /// Rename a command
+    Rename {
+        /// Current command name
+        from: String,
+        /// New command name
+        to: String,
+    },
+
     /// Rewrite .robin.json so every task uses the object form with a `desc`
     /// field ready to be filled in (existing string/array tasks keep working)
     Migrate,
