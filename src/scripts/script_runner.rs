@@ -32,6 +32,20 @@ pub fn resolve_task_command(cmd: &Value, scripts: &HashMap<String, Value>) -> Re
     Ok(Value::Array(out.into_iter().map(Value::String).collect()))
 }
 
+/// Flattens a resolved command into the individual shell command lines it will
+/// run: a single string yields one line, an array yields one line per element.
+/// Used by `--dry-run` to preview exactly what would execute.
+pub fn command_lines(script: &Value) -> Vec<String> {
+    match script {
+        Value::String(s) => vec![s.clone()],
+        Value::Array(items) => items
+            .iter()
+            .filter_map(|c| c.as_str().map(str::to_string))
+            .collect(),
+        _ => Vec::new(),
+    }
+}
+
 fn resolve_into(
     cmd: &Value,
     scripts: &HashMap<String, Value>,

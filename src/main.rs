@@ -6,8 +6,8 @@ use std::path::PathBuf;
 
 use robin::{
     CONFIG_FILE, Cli, Commands, RobinConfig, check_environment, check_for_update, find_config_path,
-    interactive_mode, list_commands, replace_variables, resolve_task_command, run_script,
-    script_command, send_notification, split_command_and_args, update_tools,
+    command_lines, interactive_mode, list_commands, replace_variables, resolve_task_command,
+    run_script, script_command, send_notification, split_command_and_args, update_tools,
 };
 
 const GITHUB_TEMPLATE_BASE: &str =
@@ -173,13 +173,31 @@ async fn dispatch(cli: &Cli) -> Result<()> {
 
             let (script_name, var_args) = split_command_and_args(args);
 
+            // Robin's own flags are also accepted after the task name (e.g.
+            // `robin build --dry-run`), since the external subcommand captures
+            // everything trailing the command into these args.
+            let dry_run = cli.dry_run || var_args.iter().any(|a| a == "--dry-run");
+            let notify = cli.notify || var_args.iter().any(|a| a == "--notify");
+            let var_args: Vec<String> = var_args
+                .into_iter()
+                .filter(|a| a != "--dry-run" && a != "--notify")
+                .collect();
+
             if let Some(entry) = config.scripts.get(&script_name) {
                 let script = script_command(entry).ok_or_else(|| {
                     anyhow!("Command '{}' has an invalid script definition", script_name)
                 })?;
                 let resolved = resolve_task_command(script, &config.scripts)?;
                 let script_with_vars = replace_variables(&resolved, &var_args)?;
-                run_script(&script_with_vars, cli.notify)?;
+
+                if dry_run {
+                    println!("{}", format!("Would run '{}':", script_name).dimmed());
+                    for line in command_lines(&script_with_vars) {
+                        println!("  {}", line);
+                    }
+                } else {
+                    run_script(&script_with_vars, notify)?;
+                }
             } else {
                 println!("{} {}", "Unknown command:".red(), script_name);
             }

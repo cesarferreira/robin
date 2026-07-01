@@ -1,7 +1,7 @@
 mod common;
 
 use robin::config::RobinConfig;
-use robin::scripts::{list_commands, resolve_task_command, run_script};
+use robin::scripts::{command_lines, list_commands, resolve_task_command, run_script};
 use serde_json::{Value, json};
 use std::collections::HashMap;
 
@@ -10,6 +10,16 @@ fn scripts_from(pairs: &[(&str, Value)]) -> HashMap<String, Value> {
         .iter()
         .map(|(k, v)| (k.to_string(), v.clone()))
         .collect()
+}
+
+#[test]
+fn command_lines_splits_string_and_array() {
+    assert_eq!(command_lines(&json!("cargo build")), vec!["cargo build"]);
+    assert_eq!(
+        command_lines(&json!(["a", "b"])),
+        vec!["a".to_string(), "b".to_string()]
+    );
+    assert!(command_lines(&json!(42)).is_empty());
 }
 
 #[test]
