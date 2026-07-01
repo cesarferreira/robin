@@ -41,11 +41,9 @@ impl RobinConfig {
             let included_config = Self::load(&full_path)
                 .with_context(|| format!("Failed to load included config: {}", include_path))?;
             
-            // Merge scripts from included config
+            // Merge scripts from included config; existing keys take precedence.
             for (key, value) in included_config.scripts {
-                if !merged_scripts.contains_key(&key) {
-                    merged_scripts.insert(key, value);
-                }
+                merged_scripts.entry(key).or_insert(value);
             }
         }
 

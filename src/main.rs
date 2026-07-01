@@ -2,9 +2,7 @@ use std::path::PathBuf;
 use anyhow::{Context, Result, anyhow};
 use clap::Parser;
 use colored::*;
-use serde_json;
 use dialoguer::Confirm;
-use reqwest;
 
 use robin::{
     Cli, Commands,
@@ -86,9 +84,10 @@ async fn main() -> Result<()> {
         }
 
         Some(Commands::Doctor) => {
-            let start_time = std::time::Instant::now();
-            let (success, found, missing, duration) = check_environment()?;
-            
+            let config = RobinConfig::load(&config_path)
+                .with_context(|| "No .robin.json found. Run 'robin init' first")?;
+            let (success, found, missing, duration) = check_environment(&config)?;
+
             if cli.notify {
                 let message = if success {
                     format!("All {} tools found ({:.1}s)", found, duration.as_secs_f32())
@@ -100,9 +99,11 @@ async fn main() -> Result<()> {
         }
 
         Some(Commands::DoctorUpdate) => {
+            let config = RobinConfig::load(&config_path)
+                .with_context(|| "No .robin.json found. Run 'robin init' first")?;
             let start_time = std::time::Instant::now();
-            let (success, updated_tools) = update_tools()?;
-            
+            let (success, _updated_tools) = update_tools(&config)?;
+
             if cli.notify {
                 let duration = start_time.elapsed();
                 let message = if success {

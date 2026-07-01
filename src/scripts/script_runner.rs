@@ -1,5 +1,5 @@
 use std::process::Command;
-use std::path::PathBuf;
+use std::path::Path;
 use anyhow::{Result, Context, anyhow};
 use colored::*;
 use inquire::Select;
@@ -81,7 +81,7 @@ pub fn run_script(script: &serde_json::Value, notify: bool) -> Result<()> {
     }
 }
 
-pub fn list_commands(config_path: &PathBuf) -> Result<()> {
+pub fn list_commands(config_path: &Path) -> Result<()> {
     let config = RobinConfig::load(config_path)
         .with_context(|| "No .robin.json found. Run 'robin init' first")?;
 
@@ -116,7 +116,7 @@ pub fn list_commands(config_path: &PathBuf) -> Result<()> {
     Ok(())
 }
 
-pub fn interactive_mode(config_path: &PathBuf) -> Result<()> {
+pub fn interactive_mode(config_path: &Path) -> Result<()> {
     let config = RobinConfig::load(config_path)
         .with_context(|| "No .robin.json found. Run 'robin init' first")?;
 
