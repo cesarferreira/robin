@@ -126,6 +126,16 @@ Prints the fully-resolved commands — with `@task` references expanded and all
 variables substituted — without executing anything. The flag works before or
 after the task name.
 
+### Run a task in another directory with `--cwd`
+
+```bash
+robin test --cwd ./services/api
+```
+
+Runs the task's commands in the given directory instead of the current one —
+handy in monorepos where a root-level task should act on a subproject. Like the
+other flags, it also accepts the `--cwd=DIR` form after the task name.
+
 ## Configuration
 
 The `.robin.json` file supports both single commands and command sequences:

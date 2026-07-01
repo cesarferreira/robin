@@ -103,17 +103,38 @@ fn resolve_command_str(
     }
 }
 
+/// Builds the shell command used to run a single script line, optionally in a
+/// specific working directory.
+fn shell_command(cmd: &str, cwd: Option<&Path>) -> Command {
+    let mut command = if cfg!(target_os = "windows") {
+        let mut c = Command::new("cmd");
+        c.args(["/C", cmd]);
+        c
+    } else {
+        let mut c = Command::new("sh");
+        c.arg("-c").arg(cmd);
+        c
+    };
+    if let Some(dir) = cwd {
+        command.current_dir(dir);
+    }
+    command
+}
+
 pub fn run_script(script: &serde_json::Value, notify: bool) -> Result<()> {
+    run_script_in(script, notify, None)
+}
+
+/// Runs a script, executing each command in `cwd` when provided (otherwise in
+/// the process's current directory).
+pub fn run_script_in(script: &serde_json::Value, notify: bool, cwd: Option<&Path>) -> Result<()> {
     let start_time = std::time::Instant::now();
 
     match script {
         serde_json::Value::String(cmd) => {
-            let status = if cfg!(target_os = "windows") {
-                Command::new("cmd").args(["/C", cmd]).status()
-            } else {
-                Command::new("sh").arg("-c").arg(cmd).status()
-            }
-            .with_context(|| format!("Failed to execute script: {}", cmd))?;
+            let status = shell_command(cmd, cwd)
+                .status()
+                .with_context(|| format!("Failed to execute script: {}", cmd))?;
 
             if notify {
                 let duration = start_time.elapsed();
@@ -144,12 +165,9 @@ pub fn run_script(script: &serde_json::Value, notify: bool) -> Result<()> {
         serde_json::Value::Array(commands) => {
             for cmd in commands {
                 if let Some(cmd_str) = cmd.as_str() {
-                    let status = if cfg!(target_os = "windows") {
-                        Command::new("cmd").args(["/C", cmd_str]).status()
-                    } else {
-                        Command::new("sh").arg("-c").arg(cmd_str).status()
-                    }
-                    .with_context(|| format!("Failed to execute script: {}", cmd_str))?;
+                    let status = shell_command(cmd_str, cwd)
+                        .status()
+                        .with_context(|| format!("Failed to execute script: {}", cmd_str))?;
 
                     if !status.success() {
                         println!("{}", format!("Script failed: {}", cmd_str).red());

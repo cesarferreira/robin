@@ -21,6 +21,10 @@ pub struct Cli {
     /// Print the fully-resolved command(s) without executing anything
     #[arg(long)]
     pub dry_run: bool,
+
+    /// Run the task's commands in this directory instead of the current one
+    #[arg(long, value_name = "DIR")]
+    pub cwd: Option<std::path::PathBuf>,
 }
 
 #[derive(Subcommand)]

@@ -14,6 +14,7 @@ pub use config::{
 };
 pub use scripts::{
     command_lines, interactive_mode, list_commands, resolve_task_command, run_script,
+    run_script_in,
 };
 pub use tools::{check_environment, update_tools};
 pub use utils::{check_for_update, replace_variables, send_notification, split_command_and_args};
