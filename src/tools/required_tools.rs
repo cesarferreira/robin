@@ -98,9 +98,9 @@ pub const KNOWN_TOOLS: &[RequiredTool] = &[
 ];
 
 fn check_script_contains(script: &serde_json::Value, pattern: &str) -> bool {
-    match script {
-        serde_json::Value::String(cmd) => command_uses(cmd, pattern),
-        serde_json::Value::Array(commands) => commands
+    match crate::config::script_command(script) {
+        Some(serde_json::Value::String(cmd)) => command_uses(cmd, pattern),
+        Some(serde_json::Value::Array(commands)) => commands
             .iter()
             .any(|cmd| cmd.as_str().is_some_and(|s| command_uses(s, pattern))),
         _ => false,
