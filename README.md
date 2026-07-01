@@ -16,6 +16,30 @@
 ## Reason
 > Maintaining a simple JSON file with all the available tasks allows for easy customization of deployment, release, cleaning, and other project-specific actions. This ensures that everyone on the team can use, edit, and add tasks on a project level.
 
+## Quick look
+
+Drop a `.robin.json` in your project:
+
+```json
+{
+    "scripts": {
+        "build": "cargo build --release",
+        "test": "cargo test",
+        "deploy": "fastlane {{env=[staging,production]}}"
+    }
+}
+```
+
+Then run any task by name:
+
+```bash
+robin build
+robin test
+robin deploy --env=staging
+```
+
+That's it. Read on for templates, variables, sequences, and more.
+
 ## Features
 
 - Define and run project-specific scripts via `.robin.json`
