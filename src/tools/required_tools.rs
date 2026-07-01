@@ -1,6 +1,6 @@
-use std::process::Command;
-use anyhow::{Result, Context};
 use crate::config::RobinConfig;
+use anyhow::{Context, Result};
+use std::process::Command;
 
 #[derive(Debug, PartialEq)]
 pub struct RequiredTool {
@@ -100,11 +100,9 @@ pub const KNOWN_TOOLS: &[RequiredTool] = &[
 fn check_script_contains(script: &serde_json::Value, pattern: &str) -> bool {
     match script {
         serde_json::Value::String(cmd) => command_uses(cmd, pattern),
-        serde_json::Value::Array(commands) => {
-            commands.iter().any(|cmd| {
-                cmd.as_str().is_some_and(|s| command_uses(s, pattern))
-            })
-        },
+        serde_json::Value::Array(commands) => commands
+            .iter()
+            .any(|cmd| cmd.as_str().is_some_and(|s| command_uses(s, pattern))),
         _ => false,
     }
 }
@@ -129,13 +127,17 @@ pub fn detect_required_tools(config: &RobinConfig) -> Vec<&'static RequiredTool>
         .iter()
         .filter(|tool| {
             config.scripts.values().any(|script| {
-                tool.patterns.iter().any(|&pattern| check_script_contains(script, pattern))
+                tool.patterns
+                    .iter()
+                    .any(|&pattern| check_script_contains(script, pattern))
             })
         })
         .collect()
 }
 
-pub fn check_environment(config: &RobinConfig) -> Result<(bool, usize, usize, std::time::Duration)> {
+pub fn check_environment(
+    config: &RobinConfig,
+) -> Result<(bool, usize, usize, std::time::Duration)> {
     let start_time = std::time::Instant::now();
     let mut all_checks_passed = true;
     let mut found_tools = 0;
@@ -166,10 +168,12 @@ pub fn check_environment(config: &RobinConfig) -> Result<(bool, usize, usize, st
 
     // Check Environment Variables if needed tools are detected
     let needs_android = required_tools.iter().any(|t| t.name == "Flutter");
-    let needs_java = needs_android || config.scripts.values().any(|s| 
-        check_script_contains(s, "java ") || check_script_contains(s, "gradle ")
-    );
-    
+    let needs_java = needs_android
+        || config
+            .scripts
+            .values()
+            .any(|s| check_script_contains(s, "java ") || check_script_contains(s, "gradle "));
+
     if needs_android || needs_java {
         println!("\n🔧 Environment Variables:");
         if needs_android {
@@ -195,7 +199,11 @@ pub fn check_environment(config: &RobinConfig) -> Result<(bool, usize, usize, st
     }
 
     // Check Git Configuration if git commands are used
-    if config.scripts.values().any(|s| check_script_contains(s, "git ")) {
+    if config
+        .scripts
+        .values()
+        .any(|s| check_script_contains(s, "git "))
+    {
         println!("\n🔐 Git Configuration:");
         for key in ["user.name", "user.email"].iter() {
             match Command::new("git").args(["config", key]).output() {
@@ -234,7 +242,7 @@ pub fn update_tools(config: &RobinConfig) -> Result<(bool, Vec<String>)> {
                         updated_tools.push("npm packages".to_string());
                     }
                 }
-            },
+            }
             "Ruby" | "Fastlane" => {
                 if Command::new("gem").arg("--version").output().is_ok() {
                     println!("Updating Fastlane...");
@@ -244,7 +252,7 @@ pub fn update_tools(config: &RobinConfig) -> Result<(bool, Vec<String>)> {
                         updated_tools.push("Fastlane".to_string());
                     }
                 }
-            },
+            }
             "Flutter" => {
                 if Command::new("flutter").arg("--version").output().is_ok() {
                     println!("Updating Flutter...");
@@ -254,7 +262,7 @@ pub fn update_tools(config: &RobinConfig) -> Result<(bool, Vec<String>)> {
                         updated_tools.push("Flutter".to_string());
                     }
                 }
-            },
+            }
             "Cargo" => {
                 if Command::new("rustup").arg("--version").output().is_ok() {
                     println!("Updating Rust toolchain...");
@@ -264,7 +272,7 @@ pub fn update_tools(config: &RobinConfig) -> Result<(bool, Vec<String>)> {
                         updated_tools.push("Rust".to_string());
                     }
                 }
-            },
+            }
             "CocoaPods"
                 if cfg!(target_os = "macos")
                     && Command::new("pod").arg("--version").output().is_ok() =>
@@ -312,7 +320,10 @@ mod tests {
         for (name, script) in scripts {
             map.insert((*name).to_string(), script.clone());
         }
-        RobinConfig { include: vec![], scripts: map }
+        RobinConfig {
+            include: vec![],
+            scripts: map,
+        }
     }
 
     fn tool_names(tools: &[&'static RequiredTool]) -> Vec<&'static str> {
@@ -323,7 +334,10 @@ mod tests {
 
     #[test]
     fn check_script_contains_matches_string() {
-        assert!(check_script_contains(&json!("cargo build --release"), "cargo "));
+        assert!(check_script_contains(
+            &json!("cargo build --release"),
+            "cargo "
+        ));
         assert!(!check_script_contains(&json!("cargo build"), "npm "));
     }
 
@@ -346,7 +360,10 @@ mod tests {
             ("build", json!("cargo build")),
             ("web", json!("npm run dev")),
         ]);
-        assert_eq!(tool_names(&detect_required_tools(&config)), vec!["Cargo", "Node.js"]);
+        assert_eq!(
+            tool_names(&detect_required_tools(&config)),
+            vec!["Cargo", "Node.js"]
+        );
     }
 
     #[test]
@@ -364,7 +381,10 @@ mod tests {
     #[test]
     fn detect_required_tools_matches_inside_arrays() {
         let config = config_with(&[("release", json!(["cargo build", "docker push img"]))]);
-        assert_eq!(tool_names(&detect_required_tools(&config)), vec!["Cargo", "Docker"]);
+        assert_eq!(
+            tool_names(&detect_required_tools(&config)),
+            vec!["Cargo", "Docker"]
+        );
     }
 
     #[test]
@@ -396,4 +416,4 @@ mod tests {
         assert!(!command_uses("cargo build", "go ")); // trailing "go" in cargo
         assert!(!command_uses("gocardless pay", "go ")); // no boundary
     }
-} 
+}
