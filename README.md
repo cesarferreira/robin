@@ -381,6 +381,20 @@ This will update:
 - Global npm packages
 - CocoaPods repositories
 
+## Update Notifications
+
+Robin checks [crates.io](https://crates.io/crates/robin_cli_tool) for newer
+releases and prints a short notice when your installed version is out of date:
+
+```
+➜ A new version of robin is available: 1.5.0 (you have 1.0.2).
+  Update with: cargo install robin_cli_tool
+```
+
+The check is throttled to at most once per day (the result is cached under your
+OS cache directory), so it never slows down day-to-day usage. To disable it
+entirely, set the `ROBIN_NO_UPDATE_CHECK` environment variable.
+
 ## License
 
 MIT © [Cesar Ferreira](http://cesarferreira.com)

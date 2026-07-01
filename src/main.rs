@@ -10,6 +10,7 @@ use robin::{
     check_environment, update_tools,
     send_notification, split_command_and_args, replace_variables,
     run_script, list_commands, interactive_mode,
+    check_for_update,
     CONFIG_FILE
 };
 
@@ -38,6 +39,14 @@ async fn fetch_template(template_name: &str) -> Result<RobinConfig> {
 #[tokio::main]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
+
+    // Run the requested command first, then surface any available update.
+    let outcome = dispatch(&cli).await;
+    check_for_update().await;
+    outcome
+}
+
+async fn dispatch(cli: &Cli) -> Result<()> {
     let config_path = PathBuf::from(CONFIG_FILE);
 
     match &cli.command {
