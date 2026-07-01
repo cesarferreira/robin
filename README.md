@@ -559,7 +559,7 @@ Example output:
 To update all development tools to their latest versions:
 
 ```bash
-robin doctor:update
+robin doctor-update
 ```
 
 This will update:

@@ -3,7 +3,7 @@
   "scripts": {
     "run:list": { "cmd": "cargo run -- --list", "desc": "List all robin tasks via the dev build" },
     "run:dev": { "cmd": "cargo run -- --help", "desc": "Run the dev build and print its help" },
-    "run:doctor": { "cmd": "cargo run -- --doctor", "desc": "Run the environment doctor via the dev build" },
+    "run:doctor": { "cmd": "cargo run -- doctor", "desc": "Run the environment doctor via the dev build" },
     "run:interactive": { "cmd": "cargo run -- --interactive", "desc": "Open the interactive task picker via the dev build" },
     "run:version": { "cmd": "cargo run -- --version", "desc": "Print the dev build's version" }
   }
