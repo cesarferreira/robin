@@ -99,17 +99,32 @@ pub const KNOWN_TOOLS: &[RequiredTool] = &[
 
 fn check_script_contains(script: &serde_json::Value, pattern: &str) -> bool {
     match script {
-        serde_json::Value::String(cmd) => cmd.contains(pattern),
+        serde_json::Value::String(cmd) => command_uses(cmd, pattern),
         serde_json::Value::Array(commands) => {
             commands.iter().any(|cmd| {
-                cmd.as_str().map_or(false, |s| s.contains(pattern))
+                cmd.as_str().is_some_and(|s| command_uses(s, pattern))
             })
         },
         _ => false,
     }
 }
 
-fn detect_required_tools(config: &RobinConfig) -> Vec<&'static RequiredTool> {
+/// Returns true when `pattern` (an invocation prefix such as `"go "`) appears
+/// in `cmd` at a command boundary — i.e. at the start of the string or right
+/// after whitespace or a shell separator. This prevents false positives like
+/// `"cargo build"` matching the Go pattern `"go "` because of the trailing
+/// `go` in `cargo`.
+fn command_uses(cmd: &str, pattern: &str) -> bool {
+    cmd.match_indices(pattern).any(|(idx, _)| {
+        idx == 0
+            || cmd[..idx]
+                .chars()
+                .next_back()
+                .is_some_and(|prev| prev.is_whitespace() || matches!(prev, ';' | '&' | '|' | '('))
+    })
+}
+
+pub fn detect_required_tools(config: &RobinConfig) -> Vec<&'static RequiredTool> {
     KNOWN_TOOLS
         .iter()
         .filter(|tool| {
@@ -120,20 +135,16 @@ fn detect_required_tools(config: &RobinConfig) -> Vec<&'static RequiredTool> {
         .collect()
 }
 
-pub fn check_environment() -> Result<(bool, usize, usize, std::time::Duration)> {
+pub fn check_environment(config: &RobinConfig) -> Result<(bool, usize, usize, std::time::Duration)> {
     let start_time = std::time::Instant::now();
     let mut all_checks_passed = true;
     let mut found_tools = 0;
     let mut missing_tools = 0;
 
-    let config_path = std::path::PathBuf::from(crate::CONFIG_FILE);
-    let config = RobinConfig::load(&config_path)
-        .with_context(|| "No .robin.json found. Run 'robin init' first")?;
-
     println!("🔍 Checking development environment...\n");
 
     // Check Required Tools
-    let required_tools = detect_required_tools(&config);
+    let required_tools = detect_required_tools(config);
     if !required_tools.is_empty() {
         println!("📦 Required Tools:");
         for tool in &required_tools {
@@ -205,12 +216,8 @@ pub fn check_environment() -> Result<(bool, usize, usize, std::time::Duration)> 
     Ok((all_checks_passed, found_tools, missing_tools, duration))
 }
 
-pub fn update_tools() -> Result<(bool, Vec<String>)> {
-    let config_path = std::path::PathBuf::from(crate::CONFIG_FILE);
-    let config = RobinConfig::load(&config_path)
-        .with_context(|| "No .robin.json found. Run 'robin init' first")?;
-
-    let required_tools = detect_required_tools(&config);
+pub fn update_tools(config: &RobinConfig) -> Result<(bool, Vec<String>)> {
+    let required_tools = detect_required_tools(config);
     let mut updated_tools = Vec::new();
     let mut all_success = true;
 
@@ -258,16 +265,17 @@ pub fn update_tools() -> Result<(bool, Vec<String>)> {
                     }
                 }
             },
-            "CocoaPods" => {
-                if cfg!(target_os = "macos") && Command::new("pod").arg("--version").output().is_ok() {
-                    println!("Updating CocoaPods repos...");
-                    if !run_update_command("pod", &["repo", "update"])? {
-                        all_success = false;
-                    } else {
-                        updated_tools.push("CocoaPods".to_string());
-                    }
+            "CocoaPods"
+                if cfg!(target_os = "macos")
+                    && Command::new("pod").arg("--version").output().is_ok() =>
+            {
+                println!("Updating CocoaPods repos...");
+                if !run_update_command("pod", &["repo", "update"])? {
+                    all_success = false;
+                } else {
+                    updated_tools.push("CocoaPods".to_string());
                 }
-            },
+            }
             _ => {}
         }
     }
@@ -291,4 +299,101 @@ fn run_update_command(cmd: &str, args: &[&str]) -> Result<bool> {
         println!("❌ {} update failed", cmd);
     }
     Ok(status.success())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::{Value, json};
+    use std::collections::HashMap;
+
+    fn config_with(scripts: &[(&str, Value)]) -> RobinConfig {
+        let mut map = HashMap::new();
+        for (name, script) in scripts {
+            map.insert((*name).to_string(), script.clone());
+        }
+        RobinConfig { include: vec![], scripts: map }
+    }
+
+    fn tool_names(tools: &[&'static RequiredTool]) -> Vec<&'static str> {
+        let mut names: Vec<_> = tools.iter().map(|t| t.name).collect();
+        names.sort_unstable();
+        names
+    }
+
+    #[test]
+    fn check_script_contains_matches_string() {
+        assert!(check_script_contains(&json!("cargo build --release"), "cargo "));
+        assert!(!check_script_contains(&json!("cargo build"), "npm "));
+    }
+
+    #[test]
+    fn check_script_contains_matches_any_array_element() {
+        let script = json!(["echo hi", "docker compose up"]);
+        assert!(check_script_contains(&script, "docker "));
+        assert!(!check_script_contains(&script, "gradle "));
+    }
+
+    #[test]
+    fn check_script_contains_ignores_non_string_types() {
+        assert!(!check_script_contains(&json!(42), "cargo "));
+        assert!(!check_script_contains(&json!([1, 2, 3]), "cargo "));
+    }
+
+    #[test]
+    fn detect_required_tools_finds_only_referenced_tools() {
+        let config = config_with(&[
+            ("build", json!("cargo build")),
+            ("web", json!("npm run dev")),
+        ]);
+        assert_eq!(tool_names(&detect_required_tools(&config)), vec!["Cargo", "Node.js"]);
+    }
+
+    #[test]
+    fn detect_required_tools_deduplicates_across_scripts() {
+        // Two scripts both reference cargo; the tool must appear only once.
+        let config = config_with(&[
+            ("build", json!("cargo build")),
+            ("test", json!("cargo test")),
+        ]);
+        let tools = detect_required_tools(&config);
+        assert_eq!(tools.len(), 1);
+        assert_eq!(tools[0].name, "Cargo");
+    }
+
+    #[test]
+    fn detect_required_tools_matches_inside_arrays() {
+        let config = config_with(&[("release", json!(["cargo build", "docker push img"]))]);
+        assert_eq!(tool_names(&detect_required_tools(&config)), vec!["Cargo", "Docker"]);
+    }
+
+    #[test]
+    fn detect_required_tools_returns_empty_when_nothing_matches() {
+        let config = config_with(&[("hello", json!("echo hello world"))]);
+        assert!(detect_required_tools(&config).is_empty());
+    }
+
+    #[test]
+    fn detect_required_tools_requires_trailing_space_boundary() {
+        // "gocardless" must not be mistaken for the Go toolchain ("go ").
+        let config = config_with(&[("pay", json!("gocardless charge"))]);
+        assert!(detect_required_tools(&config).is_empty());
+    }
+
+    #[test]
+    fn cargo_script_does_not_falsely_detect_go() {
+        // Regression: "cargo build" contains the substring "go " but must only
+        // detect Cargo, never the Go toolchain.
+        let config = config_with(&[("build", json!("cargo build --release"))]);
+        assert_eq!(tool_names(&detect_required_tools(&config)), vec!["Cargo"]);
+    }
+
+    #[test]
+    fn command_uses_respects_boundaries() {
+        assert!(command_uses("go build", "go "));
+        assert!(command_uses("cd svc && go test ./...", "go ")); // after "&& "
+        assert!(command_uses("npm run dev", "npm "));
+        assert!(!command_uses("cargo build", "go ")); // trailing "go" in cargo
+        assert!(!command_uses("gocardless pay", "go ")); // no boundary
+    }
 } 

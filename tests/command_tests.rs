@@ -1,5 +1,3 @@
-mod common;
-
 use robin::utils::{split_command_and_args, replace_variables};
 use serde_json::Value;
 

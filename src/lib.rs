@@ -14,7 +14,6 @@ pub use utils::{send_notification, split_command_and_args, replace_variables};
 pub use scripts::{run_script, list_commands, interactive_mode};
 
 use anyhow::{Context, Result, anyhow};
-use reqwest;
 
 #[cfg(not(feature = "test-utils"))]
 pub async fn fetch_template(template_name: &str) -> Result<RobinConfig> {
