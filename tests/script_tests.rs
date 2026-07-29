@@ -57,7 +57,8 @@ fn resolve_expands_reference_into_referenced_commands() {
         ("build", json!("cargo build")),
         ("deploy", json!(["@build", "scp app server:/srv"])),
     ]);
-    let resolved = resolve_task_command(&json!(["@build", "scp app server:/srv"]), &scripts).unwrap();
+    let resolved =
+        resolve_task_command(&json!(["@build", "scp app server:/srv"]), &scripts).unwrap();
     assert_eq!(resolved, json!(["cargo build", "scp app server:/srv"]));
 }
 

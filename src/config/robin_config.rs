@@ -10,8 +10,7 @@ use crate::CONFIG_FILE;
 /// Canonical location of the published JSON Schema for `.robin.json`. Generated
 /// configs point their `$schema` here so editors can offer autocomplete and
 /// validation.
-pub const SCHEMA_URL: &str =
-    "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/main/schema/robin.schema.json";
+pub const SCHEMA_URL: &str = "https://raw.githubusercontent.com/cesarferreira/robin/refs/heads/main/schema/robin.schema.json";
 
 /// Walks up from `start` (inclusive) looking for the first directory that
 /// contains a `.robin.json`. Returns the path to that config, or `None` when no
@@ -198,10 +197,7 @@ impl RobinConfig {
         Self {
             // Ensure the migrated file points at the schema for editor tooling,
             // keeping any pointer the user already set.
-            schema: self
-                .schema
-                .clone()
-                .or_else(|| Some(SCHEMA_URL.to_string())),
+            schema: self.schema.clone().or_else(|| Some(SCHEMA_URL.to_string())),
             include: self.include.clone(),
             scripts,
         }
@@ -215,7 +211,10 @@ mod tests {
 
     #[test]
     fn script_command_reads_bare_string_and_array() {
-        assert_eq!(script_command(&json!("cargo build")), Some(&json!("cargo build")));
+        assert_eq!(
+            script_command(&json!("cargo build")),
+            Some(&json!("cargo build"))
+        );
         let arr = json!(["a", "b"]);
         assert_eq!(script_command(&arr), Some(&arr));
     }
@@ -295,10 +294,7 @@ mod tests {
         let mut scripts = HashMap::new();
         scripts.insert("s".to_string(), json!("cargo build"));
         scripts.insert("a".to_string(), json!(["x", "y"]));
-        scripts.insert(
-            "o".to_string(),
-            json!({ "cmd": "already", "desc": "kept" }),
-        );
+        scripts.insert("o".to_string(), json!({ "cmd": "already", "desc": "kept" }));
         let config = RobinConfig {
             schema: None,
             include: vec!["base.json".to_string()],
@@ -307,9 +303,18 @@ mod tests {
 
         let migrated = config.migrated();
 
-        assert_eq!(migrated.scripts["s"], json!({ "cmd": "cargo build", "desc": "" }));
-        assert_eq!(migrated.scripts["a"], json!({ "cmd": ["x", "y"], "desc": "" }));
-        assert_eq!(migrated.scripts["o"], json!({ "cmd": "already", "desc": "kept" }));
+        assert_eq!(
+            migrated.scripts["s"],
+            json!({ "cmd": "cargo build", "desc": "" })
+        );
+        assert_eq!(
+            migrated.scripts["a"],
+            json!({ "cmd": ["x", "y"], "desc": "" })
+        );
+        assert_eq!(
+            migrated.scripts["o"],
+            json!({ "cmd": "already", "desc": "kept" })
+        );
         // `include` is preserved untouched.
         assert_eq!(migrated.include, vec!["base.json".to_string()]);
     }

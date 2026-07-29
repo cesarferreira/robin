@@ -148,11 +148,15 @@ fn schema_field_is_preserved_across_load_and_save() {
     .unwrap();
 
     let mut config = RobinConfig::load(&path).unwrap();
-    assert_eq!(config.schema.as_deref(), Some("https://example.com/robin.json"));
+    assert_eq!(
+        config.schema.as_deref(),
+        Some("https://example.com/robin.json")
+    );
 
-    config
-        .scripts
-        .insert("b".to_string(), serde_json::Value::String("echo bye".into()));
+    config.scripts.insert(
+        "b".to_string(),
+        serde_json::Value::String("echo bye".into()),
+    );
     config.save(&path).unwrap();
 
     let reloaded = RobinConfig::load(&path).unwrap();

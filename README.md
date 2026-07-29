@@ -54,6 +54,7 @@ That's it. Read on for templates, variables, sequences, and more.
 - Environment variable substitution with defaults (`${VAR:-default}`)
 - Automatic `.env` file loading
 - Optional per-task descriptions (shown in `--list` and interactive mode)
+- Read Makefile targets with `--make` (list, interactive picker, and run via `make`)
 - Reference other tasks from a sequence with `@task`
 - Optional desktop notification on completion with `--notify`
 
@@ -109,12 +110,14 @@ If a `.robin.json` file already exists, you'll be prompted to confirm before ove
 
 ```bash
 robin --list
+robin --make --list   # list Makefile targets instead of .robin.json tasks
 ```
 
 ### Interactive mode
 
 ```bash
 robin --interactive  # or -i
+robin --make         # pick a Makefile target interactively
 ```
 
 ### Add a new command
