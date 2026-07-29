@@ -12,8 +12,11 @@ description: Use when a project contains a .robin.json (or .base_robin.json / .a
 | Goal | Command |
 |------|---------|
 | List every task (with descriptions) | `robin --list` (`-l`) |
+| List Makefile targets | `robin --make --list` |
 | Pick a task interactively (fuzzy) | `robin --interactive` (`-i`) |
+| Pick a Makefile target interactively | `robin --make` or `robin --make -i` |
 | Run a task | `robin <task>` |
+| Run a Makefile target | `robin --make <target>` |
 | Run with variables | `robin deploy --env=staging --platform=ios` |
 | Preview without executing | `robin <task> --dry-run` |
 | Run in another directory | `robin <task> --cwd ./path` |
@@ -23,7 +26,20 @@ description: Use when a project contains a .robin.json (or .base_robin.json / .a
 | Add `desc` scaffolding to every task | `robin migrate` |
 | Check the dev environment | `robin doctor` · `robin doctor-update` |
 
-Robin searches the current directory and walks **up** to find `.robin.json`, so tasks run from anywhere inside the project. `--dry-run`, `--cwd`, and `--notify` work before or after the task name.
+Robin searches the current directory and walks **up** to find `.robin.json`, so tasks run from anywhere inside the project. `--dry-run`, `--cwd`, `--notify`, and `--make` work before or after the task name.
+
+## Makefile mode (`--make`)
+
+When a project has a `Makefile` (or `makefile` / `GNUmakefile`) but no `.robin.json` — or you simply prefer Make targets — use `--make` to treat Makefile targets as robin tasks:
+
+```bash
+robin --make --list          # list targets with recipe previews / comments
+robin --make                 # interactive picker over Makefile targets
+robin --make build           # run `make -C <makefile-dir> build`
+robin build --make           # same; robin flags also work after the target name
+```
+
+Robin walks up from the current directory to find the Makefile, mirroring `.robin.json` discovery. Each target runs via `make` so dependencies, variables, and `.PHONY` rules behave normally. Comments on the line above a target become the task description in `--list` and the interactive picker.
 
 ## Config format (`.robin.json`)
 

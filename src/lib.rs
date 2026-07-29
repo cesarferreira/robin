@@ -4,6 +4,7 @@ const GITHUB_TEMPLATE_BASE: &str =
 
 pub mod cli;
 pub mod config;
+pub mod makefile;
 pub mod scripts;
 pub mod tools;
 pub mod utils;
@@ -12,9 +13,10 @@ pub use cli::{Cli, Commands};
 pub use config::{
     RobinConfig, find_config_from, find_config_path, script_command, script_description,
 };
+pub use makefile::{find_makefile_from, find_makefile_path, load_makefile_scripts, parse_makefile};
 pub use scripts::{
-    command_lines, interactive_mode, list_commands, resolve_task_command, run_script,
-    run_script_in,
+    command_lines, interactive_mode, interactive_scripts, list_commands, list_scripts,
+    resolve_task_command, run_script, run_script_in,
 };
 pub use tools::{check_environment, update_tools};
 pub use utils::{

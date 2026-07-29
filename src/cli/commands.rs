@@ -25,6 +25,10 @@ pub struct Cli {
     /// Run the task's commands in this directory instead of the current one
     #[arg(long, value_name = "DIR")]
     pub cwd: Option<std::path::PathBuf>,
+
+    /// Read tasks from a Makefile in this directory (or an ancestor)
+    #[arg(long)]
+    pub make: bool,
 }
 
 #[derive(Subcommand)]

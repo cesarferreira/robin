@@ -6,9 +6,9 @@ use std::path::PathBuf;
 
 use robin::{
     CONFIG_FILE, Cli, Commands, RobinConfig, check_environment, check_for_update, command_lines,
-    find_config_path, interactive_mode, list_commands, load_env_file, replace_variables,
-    resolve_task_command, run_script_in, script_command, send_notification, split_command_and_args,
-    update_tools,
+    find_config_path, find_makefile_path, interactive_mode, interactive_scripts, list_commands,
+    list_scripts, load_env_file, load_makefile_scripts, replace_variables, resolve_task_command,
+    run_script_in, script_command, send_notification, split_command_and_args, update_tools,
 };
 
 const GITHUB_TEMPLATE_BASE: &str =
@@ -50,6 +50,7 @@ async fn dispatch(cli: &Cli) -> Result<()> {
     // current directory; `init` always targets the current directory so it never
     // overwrites a parent project's config.
     let config_path = find_config_path();
+    let makefile_path = find_makefile_path();
 
     match &cli.command {
         Some(Commands::Init { template }) => {
@@ -116,7 +117,13 @@ async fn dispatch(cli: &Cli) -> Result<()> {
 
             config.rename_script(from, to)?;
             config.save(&config_path)?;
-            println!("{} {} {} {}", "Renamed command:".green(), from, "→".dimmed(), to);
+            println!(
+                "{} {} {} {}",
+                "Renamed command:".green(),
+                from,
+                "→".dimmed(),
+                to
+            );
         }
 
         Some(Commands::Migrate) => {
@@ -169,12 +176,17 @@ async fn dispatch(cli: &Cli) -> Result<()> {
         }
 
         Some(Commands::Run(args)) => {
-            let config = RobinConfig::load(&config_path)
-                .with_context(|| "No .robin.json found. Run 'robin init' first")?;
-
-            // Load a `.env` sitting next to the config so tasks and variable
-            // substitution can use it.
-            load_env_file(&config_path);
+            let make_mode = cli.make || args.iter().any(|a| a == "--make");
+            let scripts = if make_mode {
+                load_makefile_scripts(&makefile_path)?
+            } else {
+                let config = RobinConfig::load(&config_path)
+                    .with_context(|| "No .robin.json found. Run 'robin init' first")?;
+                // Load a `.env` sitting next to the config so tasks and variable
+                // substitution can use it.
+                load_env_file(&config_path);
+                config.scripts
+            };
 
             let (script_name, var_args) = split_command_and_args(args);
 
@@ -189,14 +201,16 @@ async fn dispatch(cli: &Cli) -> Result<()> {
                 .or_else(|| cli.cwd.clone());
             let var_args: Vec<String> = var_args
                 .into_iter()
-                .filter(|a| a != "--dry-run" && a != "--notify" && !a.starts_with("--cwd="))
+                .filter(|a| {
+                    a != "--dry-run" && a != "--notify" && a != "--make" && !a.starts_with("--cwd=")
+                })
                 .collect();
 
-            if let Some(entry) = config.scripts.get(&script_name) {
+            if let Some(entry) = scripts.get(&script_name) {
                 let script = script_command(entry).ok_or_else(|| {
                     anyhow!("Command '{}' has an invalid script definition", script_name)
                 })?;
-                let resolved = resolve_task_command(script, &config.scripts)?;
+                let resolved = resolve_task_command(script, &scripts)?;
                 let script_with_vars = replace_variables(&resolved, &var_args)?;
 
                 if dry_run {
@@ -220,7 +234,14 @@ async fn dispatch(cli: &Cli) -> Result<()> {
         }
 
         None => {
-            if cli.list {
+            if cli.make {
+                let scripts = load_makefile_scripts(&makefile_path)?;
+                if cli.list {
+                    list_scripts(&scripts)?;
+                } else {
+                    interactive_scripts(&scripts)?;
+                }
+            } else if cli.list {
                 list_commands(&config_path)?;
             } else {
                 load_env_file(&config_path);

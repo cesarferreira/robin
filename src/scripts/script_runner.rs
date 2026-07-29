@@ -91,7 +91,10 @@ fn resolve_command_str(
                 .get(name)
                 .ok_or_else(|| anyhow!("Referenced task '{}' not found", name))?;
             let referenced = script_command(entry).ok_or_else(|| {
-                anyhow!("Referenced task '{}' has an invalid script definition", name)
+                anyhow!(
+                    "Referenced task '{}' has an invalid script definition",
+                    name
+                )
             })?;
 
             stack.push(name.to_string());
@@ -205,17 +208,19 @@ pub fn run_script_in(script: &serde_json::Value, notify: bool, cwd: Option<&Path
 pub fn list_commands(config_path: &Path) -> Result<()> {
     let config = RobinConfig::load(config_path)
         .with_context(|| "No .robin.json found. Run 'robin init' first")?;
+    list_scripts(&config.scripts)
+}
+
+pub fn list_scripts(scripts: &HashMap<String, Value>) -> Result<()> {
+    if scripts.is_empty() {
+        return Err(anyhow!("No commands available"));
+    }
 
     // Find the longest command name for padding
-    let max_len = config
-        .scripts
-        .keys()
-        .map(|name| name.len())
-        .max()
-        .unwrap_or(0);
+    let max_len = scripts.keys().map(|name| name.len()).max().unwrap_or(0);
 
     // Convert to sorted vec for alphabetical ordering
-    let mut commands: Vec<_> = config.scripts.iter().collect();
+    let mut commands: Vec<_> = scripts.iter().collect();
     commands.sort_by(|a, b| a.0.cmp(b.0));
 
     for (name, script) in commands {
@@ -270,7 +275,11 @@ fn command_choices(scripts: &HashMap<String, Value>) -> Vec<CommandChoice> {
     let mut entries: Vec<(&String, &Value)> = scripts.iter().collect();
     entries.sort_by(|a, b| a.0.cmp(b.0));
 
-    let max_len = entries.iter().map(|(name, _)| name.len()).max().unwrap_or(0);
+    let max_len = entries
+        .iter()
+        .map(|(name, _)| name.len())
+        .max()
+        .unwrap_or(0);
 
     entries
         .into_iter()
@@ -292,13 +301,16 @@ fn command_choices(scripts: &HashMap<String, Value>) -> Vec<CommandChoice> {
 pub fn interactive_mode(config_path: &Path) -> Result<()> {
     let config = RobinConfig::load(config_path)
         .with_context(|| "No .robin.json found. Run 'robin init' first")?;
+    interactive_scripts(&config.scripts)
+}
 
-    if config.scripts.is_empty() {
+pub fn interactive_scripts(scripts: &HashMap<String, Value>) -> Result<()> {
+    if scripts.is_empty() {
         println!("{}", "No commands available".red());
         return Ok(());
     }
 
-    let choices = command_choices(&config.scripts);
+    let choices = command_choices(scripts);
 
     // Fuzzy-match against the plain `search` text (name + description) rather
     // than the colored label inquire would use by default.
@@ -314,9 +326,9 @@ pub fn interactive_mode(config_path: &Path) -> Result<()> {
         .with_scorer(&scorer)
         .prompt()?;
 
-    if let Some(script) = config.scripts.get(&selection.name) {
+    if let Some(script) = scripts.get(&selection.name) {
         if let Some(cmd) = script_command(script) {
-            let resolved = resolve_task_command(cmd, &config.scripts)?;
+            let resolved = resolve_task_command(cmd, scripts)?;
             run_script(&resolved, false)?;
         }
     }
@@ -337,8 +349,14 @@ mod tests {
     #[test]
     fn choices_are_sorted_and_description_column_is_aligned() {
         let mut scripts = HashMap::new();
-        scripts.insert("build".to_string(), json!({ "cmd": "cargo build", "desc": "Compile" }));
-        scripts.insert("deploy".to_string(), json!({ "cmd": "ship", "desc": "Release it" }));
+        scripts.insert(
+            "build".to_string(),
+            json!({ "cmd": "cargo build", "desc": "Compile" }),
+        );
+        scripts.insert(
+            "deploy".to_string(),
+            json!({ "cmd": "ship", "desc": "Release it" }),
+        );
         scripts.insert("clean".to_string(), json!("rm -rf target/"));
 
         let choices = command_choices(&scripts);
@@ -364,7 +382,10 @@ mod tests {
     #[test]
     fn search_text_is_plain_name_plus_description() {
         let mut scripts = HashMap::new();
-        scripts.insert("build".to_string(), json!({ "cmd": "x", "desc": "Compile the app" }));
+        scripts.insert(
+            "build".to_string(),
+            json!({ "cmd": "x", "desc": "Compile the app" }),
+        );
         scripts.insert("clean".to_string(), json!("rm -rf target/"));
 
         let choices = command_choices(&scripts);
