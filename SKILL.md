@@ -33,13 +33,13 @@ Robin searches the current directory and walks **up** to find `.robin.json`, so 
 When a project has a `Makefile` (or `makefile` / `GNUmakefile`) but no `.robin.json` — or you simply prefer Make targets — use `--make` to treat Makefile targets as robin tasks:
 
 ```bash
-robin --make --list          # list targets with recipe previews / comments
+robin --make --list          # list targets; comments above targets become descriptions
 robin --make                 # interactive picker over Makefile targets
 robin --make build           # run `make -C <makefile-dir> build`
 robin build --make           # same; robin flags also work after the target name
 ```
 
-Robin walks up from the current directory to find the Makefile, mirroring `.robin.json` discovery. Each target runs via `make` so dependencies, variables, and `.PHONY` rules behave normally. Comments on the line above a target become the task description in `--list` and the interactive picker.
+Robin walks up from the current directory to find the Makefile, mirroring `.robin.json` discovery. Each target runs via `make` so dependencies, variables, and `.PHONY` rules behave normally. A `#` comment on the line above a target becomes its description in `--list` and the interactive picker; targets without a comment show just the target name.
 
 ## Config format (`.robin.json`)
 

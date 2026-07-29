@@ -32,7 +32,6 @@ pub fn find_makefile_path() -> PathBuf {
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct MakefileTarget {
     name: String,
-    recipe: Vec<String>,
     description: Option<String>,
 }
 
@@ -51,10 +50,6 @@ pub fn parse_makefile(content: &str, makefile_dir: &Path) -> Result<HashMap<Stri
         let cmd = format!("{} {}", make_cmd, target.name);
         let entry = if let Some(desc) = target.description.filter(|s| !s.is_empty()) {
             json!({ "cmd": cmd, "desc": desc })
-        } else if target.recipe.len() == 1 {
-            json!({ "cmd": cmd, "desc": target.recipe[0] })
-        } else if target.recipe.len() > 1 {
-            json!({ "cmd": cmd, "desc": target.recipe.join(" ; ") })
         } else {
             Value::String(cmd)
         };
@@ -126,29 +121,10 @@ fn parse_targets(content: &str) -> Result<Vec<MakefileTarget>> {
 
         if let Some(caps) = target_line.captures(line) {
             let names = caps.get(1).unwrap().as_str();
-            let mut recipe = Vec::new();
             i += 1;
 
-            while i < lines.len() {
-                let next = lines[i];
-                if next.starts_with('\t') {
-                    let mut cmd = next.trim_start_matches('\t').trim_end().to_string();
-                    while cmd.ends_with('\\') {
-                        cmd.pop();
-                        i += 1;
-                        if i >= lines.len() {
-                            break;
-                        }
-                        cmd.push(' ');
-                        cmd.push_str(lines[i].trim());
-                    }
-                    if !cmd.is_empty() {
-                        recipe.push(cmd);
-                    }
-                    i += 1;
-                    continue;
-                }
-                break;
+            while i < lines.len() && lines[i].starts_with('\t') {
+                i += 1;
             }
 
             for name in names.split_whitespace() {
@@ -157,7 +133,6 @@ fn parse_targets(content: &str) -> Result<Vec<MakefileTarget>> {
                 }
                 targets.push(MakefileTarget {
                     name: name.to_string(),
-                    recipe: recipe.clone(),
                     description: pending_comment.clone(),
                 });
             }
@@ -229,17 +204,15 @@ clean:
     }
 
     #[test]
-    fn parse_multiline_recipe_uses_joined_description() {
+    fn targets_without_comments_have_no_description() {
         let content = "\
 demo:
 \techo one
 \techo two
 ";
         let scripts = parse_makefile(content, Path::new(".")).unwrap();
-        assert_eq!(
-            scripts["demo"]["desc"].as_str().unwrap(),
-            "echo one ; echo two"
-        );
+        assert!(scripts["demo"].is_string());
+        assert!(scripts["demo"].as_str().unwrap().ends_with(" demo"));
     }
 
     #[test]
