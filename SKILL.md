@@ -59,7 +59,7 @@ Robin walks up from the current directory to find the Makefile, mirroring `.robi
 - **Sequences** run in order; each line is echoed with `▶`; stops on first failure.
 - **`@task` references** (inside a sequence) run another task by name; expanded recursively; cycles are errored.
 - **`include`** merges scripts from other files; local scripts win on conflict.
-- **Variables:** `{{name}}` filled from `--name=value`; `{{name=default}}` for a default; `{{name=[a,b]}}` for enum validation.
+- **Variables:** `{{name}}` filled from `--name=value`; `{{name=default}}` for a default (`{{name=}}` makes it optional and empty when omitted); `{{name=[a,b]}}` for enum validation.
 - **Env vars:** `${VAR:-default}` (unset/empty → default) and `${VAR-default}` (unset → default); bare `${VAR}` is left for the shell.
 - **`.env`** next to the config is auto-loaded (real env wins; disable with `ROBIN_NO_DOTENV`).
 - **`$schema`** gives editors autocomplete; robin preserves it when rewriting the file.

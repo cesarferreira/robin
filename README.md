@@ -410,6 +410,21 @@ robin build --mode=release                  # Will use: release
 robin deploy --env=prod --version=1.0.0     # Will use: prod and 1.0.0
 ```
 
+An empty default, `{{variable=}}`, makes a variable optional. It expands to nothing unless you pass it:
+
+```json
+{
+    "scripts": {
+        "test": "cargo test {{filter=}}"
+    }
+}
+```
+
+```bash
+robin test                  # Will run: cargo test
+robin test --filter=parser  # Will run: cargo test parser
+```
+
 ### Enum Validation
 You can restrict variable values to a specific set using `{{variable=[value1, value2, ...]}}` syntax:
 

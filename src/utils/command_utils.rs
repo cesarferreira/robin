@@ -83,12 +83,15 @@ fn replace_env_variables_in_string(script: &str) -> String {
 
 fn replace_variables_in_string(script: &str, args: &[String]) -> Result<String> {
     let script = replace_env_variables_in_string(script);
-    let var_regex = Regex::new(r"\{\{(\w+)(?:=([^}]+|\[[^\]]+\]))?\}\}").unwrap();
+    // `{{name}}` is required, `{{name=default}}` has a default (which may be empty, as in
+    // `{{name=}}`) and `{{name=[a,b]}}` restricts the value to a set.
+    let var_regex = Regex::new(r"\{\{(\w+)(?:=(\[[^\]]+\]|[^}]*))?\}\}").unwrap();
     let mut result = script.clone();
 
     for capture in var_regex.captures_iter(&script) {
         let full_match = &capture[0];
         let var_name = &capture[1];
+        let has_default = capture.get(2).is_some();
         let default_or_enum = capture.get(2).map(|m| m.as_str()).unwrap_or("");
         let var_pattern = format!("--{}=", var_name);
 
@@ -119,11 +122,7 @@ fn replace_variables_in_string(script: &str, args: &[String]) -> Result<String> 
                 .iter()
                 .find(|arg| arg.starts_with(&var_pattern))
                 .map(|arg| arg.trim_start_matches(&var_pattern))
-                .or(if default_or_enum.is_empty() {
-                    None
-                } else {
-                    Some(default_or_enum)
-                })
+                .or(has_default.then_some(default_or_enum))
                 .ok_or_else(|| anyhow!("Missing required variable: {}", var_name))?;
 
             result = result.replace(full_match, value);

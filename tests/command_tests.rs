@@ -33,6 +33,26 @@ fn test_replace_variables_with_defaults() {
 }
 
 #[test]
+fn test_replace_variables_with_empty_default() {
+    let script = Value::String("make e2e ARGS=\"{{args=}}\" V={{version=}}".to_string());
+
+    // Omitted: the empty default is used.
+    let result = replace_variables(&script, &[]).unwrap();
+    assert_eq!(result.as_str().unwrap(), "make e2e ARGS=\"\" V=");
+
+    // Passed: the value overrides the empty default.
+    let args = vec![
+        "--args=robotaxi --filter idle".to_string(),
+        "--version=1.2.3".to_string(),
+    ];
+    let result = replace_variables(&script, &args).unwrap();
+    assert_eq!(
+        result.as_str().unwrap(),
+        "make e2e ARGS=\"robotaxi --filter idle\" V=1.2.3"
+    );
+}
+
+#[test]
 fn test_replace_variables_with_enum_validation() {
     let script = Value::String("deploy {{env=[staging,prod]}}".to_string());
 
