@@ -5,10 +5,11 @@ use dialoguer::Confirm;
 use std::path::PathBuf;
 
 use robin::{
-    CONFIG_FILE, Cli, Commands, RobinConfig, check_environment, check_for_update, command_lines,
-    find_config_path, find_makefile_path, interactive_mode, interactive_scripts, list_commands,
-    list_scripts, load_env_file, load_makefile_scripts, replace_variables, resolve_task_command,
-    run_script_in, script_command, send_notification, split_command_and_args, update_tools,
+    CONFIG_FILE, Cli, Commands, RobinConfig, check_environment, command_lines, find_config_path,
+    find_makefile_path, interactive_mode, interactive_scripts, list_commands, list_scripts,
+    load_env_file, load_makefile_scripts, replace_variables, resolve_task_command,
+    run_background_check, run_script_in, script_command, self_update, send_notification,
+    show_update_notification, spawn_background_check, split_command_and_args, update_tools,
 };
 
 const GITHUB_TEMPLATE_BASE: &str =
@@ -39,9 +40,19 @@ async fn fetch_template(template_name: &str) -> Result<RobinConfig> {
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    // Run the requested command first, then surface any available update.
+    // The detached update-check worker re-invokes this binary; handle it first.
+    if matches!(cli.command, Some(Commands::UpdateCheck)) {
+        run_background_check().await;
+        return Ok(());
+    }
+
+    // Refresh the update cache in a detached process (only when stale), run the
+    // command, then show any update found by a previous check.
+    spawn_background_check();
     let outcome = dispatch(&cli).await;
-    check_for_update().await;
+    if !matches!(cli.command, Some(Commands::SelfUpdate { .. })) {
+        show_update_notification();
+    }
     outcome
 }
 
@@ -174,6 +185,12 @@ async fn dispatch(cli: &Cli) -> Result<()> {
                 send_notification("Robin Doctor Update", &message, success)?;
             }
         }
+
+        Some(Commands::SelfUpdate { force }) => {
+            self_update(*force).await?;
+        }
+
+        Some(Commands::UpdateCheck) => {}
 
         Some(Commands::Run(args)) => {
             let make_mode = cli.make || args.iter().any(|a| a == "--make");

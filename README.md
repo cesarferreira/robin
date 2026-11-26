@@ -593,13 +593,27 @@ Robin checks [crates.io](https://crates.io/crates/robin_cli_tool) for newer
 releases and prints a short notice when your installed version is out of date:
 
 ```
-➜ A new version of robin is available: 1.5.0 (you have 1.0.2).
-  Update with: cargo install robin_cli_tool
+➜ A new version of robin is available: 1.6.0 (you have 1.5.0).
+  Update with: robin self-update (runs: cargo install robin_cli_tool --locked)
 ```
 
-The check is throttled to at most once per day (the result is cached under your
-OS cache directory), so it never slows down day-to-day usage. To disable it
-entirely, set the `ROBIN_NO_UPDATE_CHECK` environment variable.
+The check never slows down a command. At most once per day, robin starts a
+detached background process that asks crates.io for the latest version and
+caches the result under your OS cache directory. The notice only reads that
+cache. To disable the check entirely, set the `ROBIN_NO_UPDATE_CHECK`
+environment variable.
+
+### Upgrading robin
+
+```bash
+robin self-update          # upgrade if a newer version exists
+robin self-update --force  # run the upgrade command even if up to date
+```
+
+`self-update` detects how robin was installed and runs the matching command:
+`cargo install robin_cli_tool --locked`, or `cargo binstall robin_cli_tool
+--force` for cargo-binstall installs. If robin lives outside your cargo `bin`
+directory, it asks you to upgrade manually.
 
 ## License
 

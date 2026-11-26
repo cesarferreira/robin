@@ -20,7 +20,8 @@ pub use scripts::{
 };
 pub use tools::{check_environment, update_tools};
 pub use utils::{
-    check_for_update, load_env_file, replace_variables, send_notification, split_command_and_args,
+    load_env_file, replace_variables, run_background_check, self_update, send_notification,
+    show_update_notification, spawn_background_check, split_command_and_args,
 };
 
 use anyhow::{Context, Result, anyhow};

@@ -73,6 +73,17 @@ pub enum Commands {
     /// Update development tools to their latest versions
     DoctorUpdate,
 
+    /// Upgrade robin to the latest release on crates.io
+    SelfUpdate {
+        /// Run the upgrade even if robin is already up to date
+        #[arg(short, long)]
+        force: bool,
+    },
+
+    /// Internal: refresh the update-check cache (run by a background process)
+    #[command(name = "__update-check", hide = true)]
+    UpdateCheck,
+
     /// Run a script
     #[command(external_subcommand)]
     Run(Vec<String>),

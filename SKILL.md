@@ -25,6 +25,7 @@ description: Use when a project contains a .robin.json (or .base_robin.json / .a
 | Add / remove / rename a task | `robin add "name" "cmd"` · `robin rm "name"` · `robin rename "old" "new"` |
 | Add `desc` scaffolding to every task | `robin migrate` |
 | Check the dev environment | `robin doctor` · `robin doctor-update` |
+| Upgrade robin itself | `robin self-update` (`--force` to reinstall) |
 
 Robin searches the current directory and walks **up** to find `.robin.json`, so tasks run from anywhere inside the project. `--dry-run`, `--cwd`, `--notify`, and `--make` work before or after the task name.
 
@@ -71,6 +72,6 @@ Prefer `robin add`/`rm`/`rename`/`migrate` — they preserve `$schema` and forma
 ## Env vars
 
 - `ROBIN_NO_DOTENV` — skip `.env` auto-loading.
-- `ROBIN_NO_UPDATE_CHECK` — skip the once-a-day crates.io update check.
+- `ROBIN_NO_UPDATE_CHECK` — skip the once-a-day background crates.io update check and its notice.
 
 For exact flags: `robin --help` and `robin <subcommand> --help`.
